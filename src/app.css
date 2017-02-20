@@ -1,0 +1,116 @@
+﻿html {
+    margin: 0; padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0; padding: 0;
+    -ms-content-zooming: none;
+    touch-action: none;
+    /*background-color: #000000;*/
+    /*color: #FFFFFF;*/
+}
+
+
+@-ms-viewport {
+  width: device-width;
+}
+
+span {
+    font-style: italic;
+}
+
+@media (max-width: 699px) {
+  .hidden-xs {
+    display: none;
+  }
+}
+
+
+.grid {
+  background-color: #000000;
+  top: 42px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.wg-preview-row {
+    border-top: 1px dotted rgba(103, 103, 103, 0.40);
+    border-bottom: 1px dotted rgba(103, 103, 103, 0.4);
+}
+.wg-preview-column {
+    border-left: 1px dotted rgba(103, 103, 103, 0.4);
+    border-right: 1px dotted rgba(103, 103, 103, 0.4);
+}
+
+.grid .remove-widget {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    z-index: 30;
+}
+
+.grid .configure-widget {
+    position: absolute;
+    right: 22px;
+    top: -5px;
+    z-index: 30;
+}
+
+.grid-dimensions {
+  position: absolute;
+  bottom: 0;
+  z-index: 15;
+  
+  background-color: rgba(0, 0, 0, 0.4);
+  color: #e0e0e0;
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 10px;
+}
+
+@media (max-width: 699px) {
+  .hidden-xs {
+    display: none;
+  }
+}
+.padder{
+    padding: 5px;
+    box-sizing: border-box;
+}
+.widget{ 
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+    position: relative; width: 100%; height: 100%;
+    display: block;
+}
+.widget.semi-transp {
+    background: rgba(250, 250, 250, 0.02);
+}
+.widget.red {
+    background: #ec663c;
+}
+.widget.turkoise {
+    background: #49bbb2;
+}
+.widget.green {
+    background: #95c049;
+}
+.widget.purple {
+    background: #9c4274;
+}
+
+
+.widget .header{
+    color: #fff;
+    background: rgba(0,0,0,.18);
+    text-align:center;
+    font-weight: normal;
+    padding: 5px 0;
+}
+
+.center 
+{
+    text-align: center;
+}

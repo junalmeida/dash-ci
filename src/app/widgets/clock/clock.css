@@ -1,0 +1,13 @@
+﻿body {
+}
+
+clock .time, clock .date {
+    padding: 0; margin: 0;
+    text-align: center;
+    font-weight: normal;
+}
+
+clock .time {
+    font-weight: bold;
+
+}

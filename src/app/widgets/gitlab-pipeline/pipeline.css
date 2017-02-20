@@ -1,0 +1,27 @@
+﻿body {
+}
+
+gitlab-pipeline h2, gitlab-pipeline h3, gitlab-pipeline h4 {
+    padding: 1px 0;
+    margin: 0;
+    text-wrap: none;
+    white-space: nowrap;
+    overflow: hidden;
+    font-weight: normal;
+}
+gitlab-pipeline h2 {
+    padding: 4px 0;
+    font-weight: bold;
+}
+
+gitlab-pipeline .blink {
+  animation: blinker 1s linear infinite;
+}
+gitlab-pipeline .error md-icon{
+    color: red;
+    text-shadow: 0px 0px 7px #FFFFFF;
+}
+
+@keyframes blinker {  
+  50% { opacity: 0; }
+}
