@@ -369,10 +369,9 @@ var DashCI;
                 function ($resource, globalOptions) { return function () {
                     if (!globalOptions || !globalOptions.tfs || !globalOptions.tfs.host)
                         return null;
-                    var withCredentials = true;
+                    var withCredentials = false;
                     var headers = {
-                        "Authorization": null,
-                        "Access-Control-Allow-Headers": "X-Total, X-Page, X-Total-Pages"
+                        "Authorization": null
                     };
                     if (globalOptions.tfs.privateToken) {
                         var encodedString = "Basic " + btoa(":" + globalOptions.tfs.privateToken);
@@ -380,6 +379,7 @@ var DashCI;
                     }
                     else {
                         delete headers.Authorization;
+                        withCredentials = true;
                     }
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.tfs.host, {}, {

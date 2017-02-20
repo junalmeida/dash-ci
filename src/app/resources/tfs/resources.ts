@@ -14,10 +14,9 @@
                 if (!globalOptions || !globalOptions.tfs || !globalOptions.tfs.host)
                     return null;
 
-                var withCredentials = true; 
+                var withCredentials = false; 
                 var headers = {
-                    "Authorization": <string>null,
-                    "Access-Control-Allow-Headers": "X-Total, X-Page, X-Total-Pages"
+                    "Authorization": <string>null
                 };
                 if (globalOptions.tfs.privateToken) {
                     var encodedString = "Basic " + btoa(":" + globalOptions.tfs.privateToken);
@@ -25,6 +24,7 @@
                 }
                 else {
                     delete headers.Authorization;
+                    withCredentials = true; 
                 }
 
                 // Return the resource, include your custom actions
