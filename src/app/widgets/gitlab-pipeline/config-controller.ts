@@ -1,26 +1,26 @@
-﻿/// <reference path="../types.ts" />
-
-namespace DashCI.Widgets {
+﻿
+namespace DashCI.Widgets.GitlabPipeline {
 
     export class GitlabPipelineConfigController implements ng.IController {
         public static $inject = ["$mdDialog", "gitlabResources", "colors", "config"];
         constructor(
             private $mdDialog: ng.material.IDialogService,
-            public gitlabResources: Widgets.Resources.Gitlab.IGitlabResource,
-            public colors: Widgets.ICodeDescription[],
-            public vm: IGitlabIssuesData
+            public gitlabResources: () => Resources.Gitlab.IGitlabResource,
+            public colors: Models.ICodeDescription[],
+            public vm: IGitlabPipelineData
         ) { 
             this.init();
         }
 
         private init() {
-            this.gitlabResources.project_list().$promise
-                .then((result: Widgets.Resources.Gitlab.IProject[]) => {
+            this.gitlabResources().project_list().$promise
+                .then((result: Resources.Gitlab.IProject[]) => {
                     this.projects = result;
-                });
+                })
+                .catch((reason) => console.error(reason));
         }
 
-        public projects: Widgets.Resources.Gitlab.IProject[];
+        public projects: Resources.Gitlab.IProject[];
 
 
 
@@ -32,6 +32,4 @@ namespace DashCI.Widgets {
             this.$mdDialog.hide(true);
         }
     }
-    DashCI.app.controller("GitlabPipelineConfigController", GitlabPipelineConfigController);
-
 }

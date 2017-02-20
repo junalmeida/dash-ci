@@ -1,13 +1,12 @@
-﻿/// <reference path="../types.ts" />
-
-namespace DashCI.Widgets {
+﻿
+namespace DashCI.Widgets.Label {
 
     export class LabelConfigController implements ng.IController {
         public static $inject = ["$mdDialog", "colors", "config"];
         constructor(
             private $mdDialog: ng.material.IDialogService,
-            public colors: Widgets.ICodeDescription[],
-            public vm: Widgets.IWidgetData
+            public colors: Models.ICodeDescription[],
+            public vm: Models.IWidgetData
         ) { 
             this.init();
         }

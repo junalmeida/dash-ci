@@ -25,6 +25,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="app\core\add-widget.html" />
+    <Content Include="app\core\global-config.html" />
     <Content Include="app\widgets\clock\clock.css" />
     <Content Include="app\widgets\clock\clock.html" />
     <Content Include="app\widgets\gitlab-issues\config.html" />
@@ -51,27 +52,33 @@
     <TypeScriptCompile Include="%40dev-types\angular-css\index.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\core\add-widget-controller.ts" />
+    <TypeScriptCompile Include="app\core\global-config-controller.ts" />
+    <TypeScriptCompile Include="app\models\widgets.ts" />
+    <TypeScriptCompile Include="app\resources\tfs\models.ts" />
+    <TypeScriptCompile Include="app\resources\tfs\resources.ts" />
+    <TypeScriptCompile Include="app\widgets\clock\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-issues\controller.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-pipeline\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline\controller.ts" />
     <TypeScriptCompile Include="app\widgets\label\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\label\controller.ts" />
     <TypeScriptCompile Include="app\widgets\label\label.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\config-controller.ts" />
-    <TypeScriptCompile Include="app\widgets\tfs-build\build-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-build\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\directive.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-count\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\tfs-query-count.ts" />
-    <TypeScriptCompile Include="app\widgets\_models\colors.ts" />
+    <TypeScriptCompile Include="app\models\colors.ts" />
     <TypeScriptCompile Include="app\core\main-controller.ts" />
     <TypeScriptCompile Include="app\widgets\clock\clock.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-issues\config-controller.ts" />
-    <TypeScriptCompile Include="app\widgets\gitlab-issues\gitlab-issues.ts" />
-    <TypeScriptCompile Include="app\widgets\gitlab-pipeline\gitlab-pipeline.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-issues\issues.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline\pipeline.ts" />
     <TypeScriptCompile Include="app\widgets\loader.ts" />
-    <TypeScriptCompile Include="app\widgets\types.ts" />
-    <TypeScriptCompile Include="app\widgets\_models\models.ts" />
-    <TypeScriptCompile Include="app\widgets\_resources\gitlab\resources.ts" />
-    <TypeScriptCompile Include="app\widgets\_resources\gitlab\models.ts" />
-    <TypeScriptCompile Include="app\widgets\_resources\tfs\resources.ts" />
-    <TypeScriptCompile Include="app\widgets\_resources\tfs\models.ts" />
+    <TypeScriptCompile Include="app\models\models.ts" />
+    <TypeScriptCompile Include="app\resources\gitlab\resources.ts" />
+    <TypeScriptCompile Include="app\resources\gitlab\models.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tsconfig.json" />

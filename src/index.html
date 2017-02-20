@@ -27,12 +27,12 @@
         <md-nav-item md-nav-click="goto('page4')" name="page4">Page Four</md-nav-item>-->
         <section class="config">
             <span flex> </span>
-            <md-button ng-click="main.toggleEditable()" title="{{main.editable ? 'Concluir' : 'Editar'}}" class="md-icon-button" ng-class="{ mdPrimary: main.editable }">
+            <md-button ng-click="main.toggleEditable()" title="{{main.editable ? 'Concluir' : 'Editar'}}" class="md-icon-button" ng-class="{ mdPrimary: main.editable }" aria-label="Edit dashboard page">
                 <md-icon ng-if="!main.editable">mode_edit</md-icon>
                 <md-icon ng-if="main.editable">check_circle</md-icon>
             </md-button>
 
-            <md-button title="Adicionar Widget" class="md-icon-button"
+            <md-button title="Add Widget" class="md-icon-button"
                        ng-show="main.editable"
                        ng-class="{ inactive: !main.additionPossible }"
                        ng-click="main.addWidgetDialog()"
@@ -41,9 +41,9 @@
                 <md-icon>library_add</md-icon>
             </md-button>
 
-            <md-button title="Configurar" class="md-icon-button"
+            <md-button title="Global Configuration" class="md-icon-button"
                        ng-show="main.editable"
-                       ng-click="main.configure()">
+                       ng-click="main.globalConfigDialog()">
                 <md-icon>settings</md-icon>
             </md-button>
         </section>
@@ -54,7 +54,7 @@
                 <md-icon>close</md-icon>
             </md-button>
             <div class="padder">
-                <widget-loader scope="widget" editable="main.editable"></widget-loader>
+                <widget-loader scope="widget" editable="main.editable" global-options="main.options"></widget-loader>
             </div>
         </wg-widget>
     </wg-grid>

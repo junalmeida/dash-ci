@@ -24,6 +24,7 @@
                 }
             });
         }
+
     }
 
     $(Config.supressIosRubberEffect);

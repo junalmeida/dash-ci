@@ -1,13 +1,15 @@
 ﻿/// <reference path="../app.ts" />
 
-namespace DashCI.Controllers {
+namespace DashCI.Core {
 
     class MainController implements ng.IController {
-        public static $inject = ["$scope", "$timeout", "$mdDialog"];
+        public static $inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions"];
         constructor(
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
-            private $mdDialog: ng.material.IDialogService
+            private $q: ng.IQService,
+            private $mdDialog: ng.material.IDialogService,
+            public options: Models.IOptions
         ) {
             this.loadData();
             window.onresize = this.updateGridSize;
@@ -28,11 +30,7 @@ namespace DashCI.Controllers {
         }
 
 
-        public currentPage: Widgets.IDashBoardPage;
-        public options: Widgets.IOptions = {
-            columns: 30,
-            rows: 20
-        };
+        public currentPage: Models.IDashBoardPage;
 
         public gridWidth = 800;
         public gridHeight = 600;
@@ -53,13 +51,37 @@ namespace DashCI.Controllers {
                     parent: angular.element(document.body),
                     //targetEvent: ev,
                     clickOutsideToClose: true,
-                    fullscreen: false
+                    fullscreen: false,
+
                 })
-                    .then((type: Widgets.WidgetType) => this.createWidget(type));
+                    .then((type: Models.WidgetType) => this.createWidget(type));
             }
         }
 
-        public removeWidget(widget: Widgets.IWidgetData): void {
+
+        public globalConfigDialog(ev: ng.IAngularEvent): void {
+            this.$mdDialog.show({
+                controller: GlobalConfigController,
+                controllerAs: "ctrl",
+                templateUrl: 'app/core/global-config.html',
+                parent: angular.element(document.body),
+                //targetEvent: ev,
+                clickOutsideToClose: true,
+                fullscreen: false,
+                resolve: {
+                    config: () => {
+                        var deferred = this.$q.defer();
+                        this.$timeout(() => deferred.resolve(this.options), 1);
+                        return deferred.promise;
+                    }
+                }
+
+            })
+                .then(() => this.saveData());
+        }
+
+
+        public removeWidget(widget: Models.IWidgetData): void {
             var idx = this.currentPage.widgets.indexOf(widget);
             if (idx > -1) {
                 this.currentPage.widgets.splice(idx, 1);
@@ -80,8 +102,8 @@ namespace DashCI.Controllers {
             }, 500);
         };
 
-        private createWidget(type: Widgets.WidgetType) {
-            this.currentPage.widgets.push(<Widgets.IWidgetData>{
+        private createWidget(type: Models.WidgetType) {
+            this.currentPage.widgets.push(<Models.IWidgetData>{
                 type: type,
                 position: { left: -1, top: -1, width: 6, height: 4}
             });
@@ -90,17 +112,27 @@ namespace DashCI.Controllers {
 
         private saveData() {
             window.localStorage['dash-ci'] = angular.toJson([this.currentPage]);
+            window.localStorage['dash-ci-options'] = angular.toJson(this.options);
         }
 
         private loadData() {
-            var defPage = <Widgets.IDashBoardPage>{
+            var defOptions:Models.IOptions = {
+                columns: 30,
+                rows: 20,
+                tfs: null,
+                gitlab: null
+            }
+            var savedOpts = <Models.IOptions>(angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
+            angular.extend(this.options, savedOpts);
+
+            var defPage = <Models.IDashBoardPage>{
                 id: "1",
                 widgets: []
             };
 
-            var lista = <Widgets.IDashBoardPage[]> (angular.fromJson(window.localStorage['dash-ci']) || [defPage]);
+            var lista = <Models.IDashBoardPage[]> (angular.fromJson(window.localStorage['dash-ci']) || [defPage]);
 
-            this.currentPage = lista[0];
+            this.currentPage = lista[0]; //preparing to support multiple pages
         }
     }
     DashCI.app.controller("MainController", MainController);

@@ -114,3 +114,18 @@ span {
 {
     text-align: center;
 }
+
+.hint a:visited,.hint a:link,.hint a:active
+.hint a{
+    color: #FFFFFF;
+    font-size: 13px;
+}
+
+/* Didnt find a way to change this using md-theme */
+.md-input-focused .md-input {
+    border-color: rgb(255,171,64) !important;
+}
+
+.md-input-focused label {
+    color: rgb(255,171,64) !important;
+}

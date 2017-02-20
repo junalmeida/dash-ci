@@ -1,6 +1,4 @@
-﻿/// <reference path="../types.ts" />
-
-namespace DashCI.Widgets {
+﻿namespace DashCI.Widgets.TfsBuild {
 
     class TfsBuildDirective implements ng.IDirective {
         
