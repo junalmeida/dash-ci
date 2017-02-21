@@ -766,11 +766,14 @@ var DashCI;
                     icon.css('font-size', fontSize);
                     icon.parent().width(Math.round(altura / 1));
                     //p.css('line-height', lineSize);
-                    var title = this.$scope.$element.find("h2");
-                    fontSize = Math.round(altura / 6) + "px";
-                    title.css('font-size', fontSize);
+                    var header = this.$scope.$element.find(".header");
+                    fontSize = Math.round(altura / 1) + "px";
+                    header.css('text-indent', fontSize);
+                    //var title = this.$scope.$element.find("h2");
+                    //fontSize = Math.round(altura / 6) + "px";
+                    //title.css('font-size', fontSize);
                     var txt = this.$scope.$element.find("h4");
-                    fontSize = Math.round(altura / 8) + "px";
+                    fontSize = Math.round(altura / 7) + "px";
                     txt.css('font-size', fontSize);
                 };
                 GitlabPipelineController.prototype.config = function () {
@@ -821,27 +824,27 @@ var DashCI;
                         if (_this.latest && _this.latest.status) {
                             switch (_this.latest.status) {
                                 case "pending":
-                                    _this.icon = "pause_circle_outline";
+                                    _this.icon = "pause_circle_filled";
                                     break;
                                 case "running":
-                                    _this.icon = "play_circle_outline";
+                                    _this.icon = "play_circle_filled";
                                     break;
                                 case "canceled":
-                                    _this.icon = "remove_circle_outline";
+                                    _this.icon = "remove_circle";
                                     break;
                                 case "success":
                                     _this.icon = "check_circle";
                                     break;
                                 case "failed":
-                                    _this.icon = "error_outline";
+                                    _this.icon = "error";
                                     break;
                                 case "default":
-                                    _this.icon = "help_outline";
+                                    _this.icon = "help";
                                     break;
                             }
                         }
                         else
-                            _this.icon = "help_outline";
+                            _this.icon = "help";
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
@@ -1138,9 +1141,12 @@ var DashCI;
                     icon.css('font-size', fontSize);
                     icon.parent().width(Math.round(altura / 1));
                     //p.css('line-height', lineSize);
-                    var title = this.$scope.$element.find("h2");
-                    fontSize = Math.round(altura / 6) + "px";
-                    title.css('font-size', fontSize);
+                    var header = this.$scope.$element.find(".header");
+                    fontSize = Math.round(altura / 1) + "px";
+                    header.css('text-indent', fontSize);
+                    //var title = this.$scope.$element.find("h2");
+                    //fontSize = Math.round(altura / 6) + "px";
+                    //title.css('font-size', fontSize);
                     var txt = this.$scope.$element.find("h4");
                     fontSize = Math.round(altura / 8) + "px";
                     txt.css('font-size', fontSize);
@@ -1193,39 +1199,39 @@ var DashCI;
                                 case "notStarted":
                                 case "postponed":
                                 case "none":
-                                    _this.icon = "pause_circle_outline";
+                                    _this.icon = "pause_circle_filled";
                                     break;
                                 case "inProgress":
-                                    _this.icon = "play_circle_outline";
+                                    _this.icon = "play_circle_filled";
                                     break;
                                 case "cancelling":
                                 case "stopped":
-                                    _this.icon = "remove_circle_outline";
+                                    _this.icon = "remove_circle";
                                     break;
                                 case "completed":
                                     switch (_this.latest.result) {
                                         case "partiallySucceeded":
                                         case "succeeded":
-                                            _this.icon = "check_circle";
+                                            _this.icon = "check";
                                             break;
                                         case "failed":
-                                            _this.icon = "error_outline";
+                                            _this.icon = "error";
                                             break;
                                         case "canceled":
-                                            _this.icon = "remove_circle_outline";
+                                            _this.icon = "remove_circle";
                                             break;
                                         case "default":
-                                            _this.icon = "help_outline";
+                                            _this.icon = "help";
                                             break;
                                     }
                                     break;
                                 case "default":
-                                    _this.icon = "help_outline";
+                                    _this.icon = "help";
                                     break;
                             }
                         }
                         else
-                            _this.icon = "help_outline";
+                            _this.icon = "help";
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);

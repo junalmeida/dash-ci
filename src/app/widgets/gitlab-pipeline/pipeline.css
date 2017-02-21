@@ -2,6 +2,7 @@
 }
 
 gitlab-pipeline h2, gitlab-pipeline h3, gitlab-pipeline h4 {
+    z-index: 2;
     padding: 1px 0;
     margin: 0;
     text-wrap: none;
@@ -10,9 +11,25 @@ gitlab-pipeline h2, gitlab-pipeline h3, gitlab-pipeline h4 {
     font-weight: normal;
 }
 gitlab-pipeline h2 {
+
     padding: 4px 0;
     font-weight: bold;
 }
+gitlab-pipeline.widget .header {
+    text-align: left;
+}
+gitlab-pipeline .content
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+}
+
+gitlab-pipeline .content h4:first-child {
+    margin-top: 35px;
+}
+
 
 gitlab-pipeline .blink {
   animation: blinker 1s linear infinite;

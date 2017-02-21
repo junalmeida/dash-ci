@@ -53,12 +53,17 @@
             icon.parent().width(Math.round(altura / 1));
             //p.css('line-height', lineSize);
 
-            var title = this.$scope.$element.find("h2");
-            fontSize = Math.round(altura / 6) + "px";
-            title.css('font-size', fontSize);
+            var header = this.$scope.$element.find(".header");
+            fontSize = Math.round(altura / 1) + "px";
+            header.css('text-indent', fontSize);
+
+
+            //var title = this.$scope.$element.find("h2");
+            //fontSize = Math.round(altura / 6) + "px";
+            //title.css('font-size', fontSize);
 
             var txt = this.$scope.$element.find("h4");
-            fontSize = Math.round(altura / 8) + "px";
+            fontSize = Math.round(altura / 7) + "px";
             txt.css('font-size', fontSize);
         }
 
@@ -116,22 +121,22 @@
                 if (this.latest && this.latest.status) {
                     switch (this.latest.status) {
                         case "pending":
-                            this.icon = "pause_circle_outline"; break;
+                            this.icon = "pause_circle_filled"; break;
                         case "running":
-                            this.icon = "play_circle_outline"; break;
+                            this.icon = "play_circle_filled"; break;
                         case "canceled":
-                            this.icon = "remove_circle_outline"; break;
+                            this.icon = "remove_circle"; break;
                         case "success":
                             this.icon = "check_circle"; break;
                         case "failed":
-                            this.icon = "error_outline"; break;
+                            this.icon = "error"; break;
                         case "default":
-                            this.icon = "help_outline"; break;
+                            this.icon = "help"; break;
                     }
 
                 }
                 else
-                    this.icon = "help_outline";
+                    this.icon = "help";
                 //var p = this.$scope.$element.find("p");
 
                 //p.addClass('changed');
