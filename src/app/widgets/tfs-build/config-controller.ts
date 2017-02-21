@@ -8,6 +8,7 @@ namespace DashCI.Widgets.TfsBuild {
             private $mdDialog: ng.material.IDialogService,
             public tfsResources: () => Resources.Tfs.ITfsResource,
             public colors: Models.ICodeDescription[],
+            public intervals: Models.IValueDescription[],
             public vm: ITfsBuildData
         ) { 
             this.init();

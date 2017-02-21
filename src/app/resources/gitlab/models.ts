@@ -34,4 +34,9 @@
         coverage: string;
     }
 
+    export interface IGroup extends IGitlabObject {
+        id: number;
+        name: string;
+    }
+
 }

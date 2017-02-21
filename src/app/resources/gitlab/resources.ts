@@ -2,8 +2,9 @@
 
     export interface IGitlabResource extends ng.resource.IResourceClass<IGitlabObject> {
         project_list(): IProject[];
-        issue_count(param: { project: number; labels: string; state: string }): IIssueCount;
+        issue_count(param: { scope: string; scopeId: number; labels: string; state: string }): IIssueCount;
         latest_pipeline(param: { project: number; ref: string; }): IPipeline[];
+        group_list(): IGroup[];
     }
 
     DashCI.app.factory('gitlabResources',
@@ -22,7 +23,7 @@
 
             var headers = {
                 "PRIVATE-TOKEN": <string>null,
-                "Access-Control-Allow-Headers": "X-Total, X-Page, X-Total-Pages"
+                //"Access-Control-Request-Headers": "X-Total, X-Page, X-Total-Pages"
             };
             if (globalOptions.gitlab.privateToken)
                 headers["PRIVATE-TOKEN"] = globalOptions.gitlab.privateToken;
@@ -39,17 +40,40 @@
                     transformResponse: transform
                 },
 
+                group_list: <ng.resource.IActionDescriptor>{
+                    method: 'GET',
+                    isArray: true,
+                    url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&per_page=100",
+                    headers: headers,
+                    transformResponse: transform
+                },
+
                 issue_count: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: false,
-                    url: globalOptions.gitlab.host + "/api/v3/projects/:project/issues?labels=:labels&state=:state&per_page=1",
+                    url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
                     headers: headers,
                     transformResponse: (data: any, getHeaders: Function, status: number) => {
                         if (status == 200) {
                             data = angular.fromJson(data);
                             var headers = getHeaders();
+
+                            var parsedCount = parseInt(headers["X-Total"]);
+                            if (isNaN(parsedCount)) {
+                                parsedCount = 0;
+                                //cannot access X-Total today, let's parse
+                                var links = (<string>headers.link).split('>');
+                                angular.forEach(links, (item) => {
+                                    var matches = item.match(/page=(\d*)/);
+                                    if (matches && matches.length > 1) {
+                                        var page = Number(matches[1]);
+                                        if (page > parsedCount)
+                                            parsedCount = page;
+                                    }
+                                });
+                            }
                             var ret = <IIssueCount>{
-                                count: parseInt(headers["X-Total"]) || null
+                                count: parsedCount
                             };
                             return ret;
                         }

@@ -38,8 +38,7 @@
                     <md-input-container flex="20">
                         <label>Interval:</label>
                         <md-select ng-model="ctrl.vm.poolInterval" placeholder="Select the pool interval">
-                            <md-option ng-value="10000">10 secs</md-option>
-                            <md-option ng-value="20000">20 secs</md-option>
+                            <md-option ng-value="opt.value" ng-repeat="opt in ctrl.intervals">{{ opt.desc }}</md-option>
                         </md-select>
                     </md-input-container>
                 </div>

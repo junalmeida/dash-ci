@@ -4,6 +4,10 @@ namespace DashCI.Models {
         code: string;
         desc: string;
     }
+    export interface IValueDescription {
+        value: number;
+        desc: string;
+    }
 
     export interface IWidgetDescription {
 

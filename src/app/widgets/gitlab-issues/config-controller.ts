@@ -2,11 +2,12 @@
 namespace DashCI.Widgets.GitlabIssues {
 
     export class GitlabIssuesConfigController implements ng.IController {
-        public static $inject = ["$mdDialog", "gitlabResources", "colors", "config"];
+        public static $inject = ["$mdDialog", "gitlabResources", "colors", "intervals", "config"];
         constructor(
             private $mdDialog: ng.material.IDialogService,
             public gitlabResources: () => Resources.Gitlab.IGitlabResource,
             public colors: Models.ICodeDescription[],
+            public intervals: Models.IValueDescription[],
             public vm: IGitlabIssuesData
         ) { 
             this.init();
@@ -25,9 +26,19 @@ namespace DashCI.Widgets.GitlabIssues {
                     console.error(reason);
                     this.projects = [];
                 });
+
+            res.group_list().$promise
+                .then((result) => {
+                    this.groups = result;
+                })
+                .catch((reason) => {
+                    console.error(reason);
+                    this.groups = [];
+                });
         }
 
         public projects: Resources.Gitlab.IProject[];
+        public groups: Resources.Gitlab.IGroup[];
 
 
 
