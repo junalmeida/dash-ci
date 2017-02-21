@@ -68,7 +68,7 @@
             //fontSize = Math.round(altura / 6) + "px";
             //title.css('font-size', fontSize);
             var txt = this.$scope.$element.find("h4");
-            fontSize = Math.round(altura / 8) + "px";
+            fontSize = Math.round(altura / 7) + "px";
             txt.css('font-size', fontSize);
         }
 

@@ -15,6 +15,7 @@ tfs-build h2 {
 }
 tfs-build.widget .header {
     text-align: left;
+    font-weight: bold;
 }
 tfs-build .content
 {
@@ -23,9 +24,12 @@ tfs-build .content
     height: 100%;
     top:0;
 }
-tfs-build .content h4:first-child {
-    margin-top: 35px;
+
+tfs-build .content div:last-child {
+    margin-top: 30px;
 }
+
+
 
 
 tfs-build .blink {
