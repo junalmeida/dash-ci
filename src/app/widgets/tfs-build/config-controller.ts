@@ -20,7 +20,11 @@ namespace DashCI.Widgets.TfsBuild {
             res.project_list().$promise
                 .then((result: Resources.Tfs.IProjectResult) => {
                     this.projects = result.value;
-                }).catch((reason) => console.error(reason));
+                })
+                .catch((reason) => {
+                    console.error(reason);
+                    this.projects = [];
+                });
             this.$scope.$watch(() => this.vm.project, () => this.getBuilds());
         }
 
@@ -30,13 +34,16 @@ namespace DashCI.Widgets.TfsBuild {
 
         public getBuilds() {
             var res = this.tfsResources();
-            if (!res)
+            if (!res || !this.vm.project)
                 return;
             res.build_definition_list({ project: this.vm.project }).$promise
                 .then((result: Resources.Tfs.IBuildDefinitionResult) => {
                     this.builds = result.value;
                 })
-                .catch((reason) => console.error(reason));
+                .catch((reason) => {
+                    console.error(reason);
+                    this.builds = [];
+                });
 
         }
 

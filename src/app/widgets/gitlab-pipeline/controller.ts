@@ -94,7 +94,7 @@
             this.handle = this.$interval(() => this.update(), this.data.poolInterval);
         }
 
-        public icon = "help_outline";
+        public icon = "help";
         public latest: Resources.Gitlab.IPipeline;
 
         private update() {

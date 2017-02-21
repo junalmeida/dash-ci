@@ -26,7 +26,8 @@
             };
             if (globalOptions.gitlab.privateToken)
                 headers["PRIVATE-TOKEN"] = globalOptions.gitlab.privateToken;
-
+            else
+                delete headers["PRIVATE-TOKEN"];
 
             // Return the resource, include your custom actions
             return <IGitlabResource>$resource(globalOptions.gitlab.host, {}, {

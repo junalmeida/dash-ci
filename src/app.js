@@ -319,6 +319,8 @@ var DashCI;
                     };
                     if (globalOptions.gitlab.privateToken)
                         headers["PRIVATE-TOKEN"] = globalOptions.gitlab.privateToken;
+                    else
+                        delete headers["PRIVATE-TOKEN"];
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.gitlab.host, {}, {
                         project_list: {
@@ -379,7 +381,6 @@ var DashCI;
                     }
                     else {
                         delete headers.Authorization;
-                        withCredentials = true;
                     }
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.tfs.host, {}, {
@@ -538,7 +539,10 @@ var DashCI;
                         .then(function (result) {
                         _this.projects = result;
                     })
-                        .catch(function (reason) { return console.error(reason); });
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
                 };
                 //public cancel() {
                 //    this.$mdDialog.cancel();
@@ -708,7 +712,10 @@ var DashCI;
                         .then(function (result) {
                         _this.projects = result;
                     })
-                        .catch(function (reason) { return console.error(reason); });
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
                 };
                 //public cancel() {
                 //    this.$mdDialog.cancel();
@@ -738,7 +745,7 @@ var DashCI;
                     this.$interval = $interval;
                     this.$mdDialog = $mdDialog;
                     this.gitlabResources = gitlabResources;
-                    this.icon = "help_outline";
+                    this.icon = "help";
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                     this.data.type = DashCI.Models.WidgetType.gitlabPipeline;
@@ -1072,19 +1079,26 @@ var DashCI;
                     res.project_list().$promise
                         .then(function (result) {
                         _this.projects = result.value;
-                    }).catch(function (reason) { return console.error(reason); });
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
                     this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getBuilds(); });
                 };
                 TfsBuildConfigController.prototype.getBuilds = function () {
                     var _this = this;
                     var res = this.tfsResources();
-                    if (!res)
+                    if (!res || !this.vm.project)
                         return;
                     res.build_definition_list({ project: this.vm.project }).$promise
                         .then(function (result) {
                         _this.builds = result.value;
                     })
-                        .catch(function (reason) { return console.error(reason); });
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.builds = [];
+                    });
                 };
                 //public cancel() {
                 //    this.$mdDialog.cancel();
@@ -1114,7 +1128,7 @@ var DashCI;
                     this.$interval = $interval;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
-                    this.icon = "help_outline";
+                    this.icon = "help";
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                     this.data.type = DashCI.Models.WidgetType.tfsBuild;
@@ -1302,19 +1316,25 @@ var DashCI;
                     res.project_list().$promise
                         .then(function (result) {
                         _this.projects = result.value;
-                    }).catch(function (reason) { return console.error(reason); });
-                    ;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
                     this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getQueries(); });
                 };
                 TfsQueryCountConfigController.prototype.getQueries = function () {
                     var _this = this;
                     var res = this.tfsResources();
-                    if (!res)
+                    if (!res || !this.vm.project)
                         return;
                     res.query_list({ project: this.vm.project }).$promise
                         .then(function (result) {
                         _this.queries = result.value;
-                    }).catch(function (reason) { return console.error(reason); });
+                    }).catch(function (reason) {
+                        console.error(reason);
+                        _this.queries = [];
+                    });
                 };
                 TfsQueryCountConfigController.prototype.ok = function () {
                     this.$mdDialog.hide(true);

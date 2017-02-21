@@ -19,7 +19,10 @@ namespace DashCI.Widgets.GitlabPipeline {
                 .then((result: Resources.Gitlab.IProject[]) => {
                     this.projects = result;
                 })
-                .catch((reason) => console.error(reason));
+                .catch((reason) => {
+                    console.error(reason);
+                    this.projects = [];
+                });
         }
 
         public projects: Resources.Gitlab.IProject[];
