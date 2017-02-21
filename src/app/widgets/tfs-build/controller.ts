@@ -102,10 +102,13 @@
         private update() {
             if (!this.data.project || !this.data.build)
                 return;
+            var res = this.tfsResources();
+            if (!res)
+                return;
 
 
             console.log("start request: " + this.data.id + "; " + this.data.title);
-            this.tfsResources().latest_build({
+            res.latest_build({
                 project: this.data.project,
                 build: this.data.build
             }).$promise.then((build: Resources.Tfs.IBuildResult) => {

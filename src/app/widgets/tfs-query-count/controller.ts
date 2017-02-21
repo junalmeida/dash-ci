@@ -81,8 +81,11 @@
         private update() {
             if (!this.data.project || !this.data.queryId)
                 return;
+            var res = this.tfsResources();
+            if (!res)
+                return;
 
-            this.tfsResources().run_query({
+            res.run_query({
                 project: this.data.project,
                 queryId: this.data.queryId
             }).$promise.then((result: Resources.Tfs.IRunQueryResult) => {

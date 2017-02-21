@@ -13,7 +13,10 @@
         }
 
         private init() {
-            this.tfsResources().project_list().$promise
+            var res = this.tfsResources();
+            if (!res)
+                return;
+            res.project_list().$promise
                 .then((result: Resources.Tfs.IProjectResult) => {
                     this.projects = result.value;
                 }).catch((reason) => console.error(reason));;
@@ -27,7 +30,10 @@
 
 
         public getQueries() {
-            this.tfsResources().query_list({ project: this.vm.project }).$promise
+            var res = this.tfsResources();
+            if (!res)
+                return;
+            res.query_list({ project: this.vm.project }).$promise
                 .then((result: Resources.Tfs.IQueryResult) => {
                     this.queries = result.value;
                 }).catch((reason) => console.error(reason));

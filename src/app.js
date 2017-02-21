@@ -531,7 +531,10 @@ var DashCI;
                 }
                 GitlabIssuesConfigController.prototype.init = function () {
                     var _this = this;
-                    this.gitlabResources().project_list().$promise
+                    var res = this.gitlabResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
                         .then(function (result) {
                         _this.projects = result;
                     })
@@ -622,7 +625,10 @@ var DashCI;
                     var _this = this;
                     if (!this.data.project)
                         return;
-                    this.gitlabResources().issue_count({
+                    var res = this.gitlabResources();
+                    if (!res)
+                        return;
+                    res.issue_count({
                         project: this.data.project,
                         labels: this.data.labels,
                         state: this.data.status
@@ -695,7 +701,10 @@ var DashCI;
                 }
                 GitlabPipelineConfigController.prototype.init = function () {
                     var _this = this;
-                    this.gitlabResources().project_list().$promise
+                    var res = this.gitlabResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
                         .then(function (result) {
                         _this.projects = result;
                     })
@@ -794,8 +803,11 @@ var DashCI;
                     var _this = this;
                     if (!this.data.project)
                         return;
+                    var res = this.gitlabResources();
+                    if (!res)
+                        return;
                     console.log("start request: " + this.data.id + "; " + this.data.title);
-                    this.gitlabResources().latest_pipeline({
+                    res.latest_pipeline({
                         project: this.data.project,
                         ref: this.data.refs
                     }).$promise.then(function (pipelines) {
@@ -1051,7 +1063,10 @@ var DashCI;
                 }
                 TfsBuildConfigController.prototype.init = function () {
                     var _this = this;
-                    this.tfsResources().project_list().$promise
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
                         .then(function (result) {
                         _this.projects = result.value;
                     }).catch(function (reason) { return console.error(reason); });
@@ -1059,7 +1074,10 @@ var DashCI;
                 };
                 TfsBuildConfigController.prototype.getBuilds = function () {
                     var _this = this;
-                    this.tfsResources().build_definition_list({ project: this.vm.project }).$promise
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.build_definition_list({ project: this.vm.project }).$promise
                         .then(function (result) {
                         _this.builds = result.value;
                     })
@@ -1157,8 +1175,11 @@ var DashCI;
                     var _this = this;
                     if (!this.data.project || !this.data.build)
                         return;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
                     console.log("start request: " + this.data.id + "; " + this.data.title);
-                    this.tfsResources().latest_build({
+                    res.latest_build({
                         project: this.data.project,
                         build: this.data.build
                     }).$promise.then(function (build) {
@@ -1269,7 +1290,10 @@ var DashCI;
                 }
                 TfsQueryCountConfigController.prototype.init = function () {
                     var _this = this;
-                    this.tfsResources().project_list().$promise
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
                         .then(function (result) {
                         _this.projects = result.value;
                     }).catch(function (reason) { return console.error(reason); });
@@ -1278,7 +1302,10 @@ var DashCI;
                 };
                 TfsQueryCountConfigController.prototype.getQueries = function () {
                     var _this = this;
-                    this.tfsResources().query_list({ project: this.vm.project }).$promise
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.query_list({ project: this.vm.project }).$promise
                         .then(function (result) {
                         _this.queries = result.value;
                     }).catch(function (reason) { return console.error(reason); });
@@ -1364,7 +1391,10 @@ var DashCI;
                     var _this = this;
                     if (!this.data.project || !this.data.queryId)
                         return;
-                    this.tfsResources().run_query({
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.run_query({
                         project: this.data.project,
                         queryId: this.data.queryId
                     }).$promise.then(function (result) {

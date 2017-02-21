@@ -95,10 +95,12 @@
         private update() {
             if (!this.data.project)
                 return;
-
+            var res = this.gitlabResources();
+            if (!res)
+                return;
 
             console.log("start request: " + this.data.id + "; " + this.data.title);
-            this.gitlabResources().latest_pipeline({
+            res.latest_pipeline({
                 project: this.data.project,
                 ref: this.data.refs
             }).$promise.then((pipelines: Resources.Gitlab.IPipeline[]) => {

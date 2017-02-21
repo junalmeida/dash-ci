@@ -13,7 +13,9 @@ namespace DashCI.Widgets.GitlabPipeline {
         }
 
         private init() {
-            this.gitlabResources().project_list().$promise
+            var res = this.gitlabResources();
+            if (!res) return;
+            res.project_list().$promise
                 .then((result: Resources.Gitlab.IProject[]) => {
                     this.projects = result;
                 })

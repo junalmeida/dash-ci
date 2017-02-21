@@ -82,9 +82,11 @@
         private update() {
             if (!this.data.project)
                 return;
+            var res = this.gitlabResources();
+            if (!res)
+                return;
 
-
-            this.gitlabResources().issue_count({
+            res.issue_count({
                 project: this.data.project,
                 labels: this.data.labels,
                 state: this.data.status
