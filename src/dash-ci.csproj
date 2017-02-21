@@ -46,6 +46,16 @@
     <Content Include="index.html" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="node_modules\angular-animate\angular-animate.min.js" />
+    <Content Include="node_modules\angular-aria\angular-aria.min.js" />
+    <Content Include="node_modules\angular-css\angular-css.min.js" />
+    <Content Include="node_modules\angular-material\angular-material.min.css" />
+    <Content Include="node_modules\angular-material\angular-material.min.js" />
+    <Content Include="node_modules\angular-resource\angular-resource.min.js" />
+    <Content Include="node_modules\angular-widget-grid\angular-widget-grid.css" />
+    <Content Include="node_modules\angular-widget-grid\angular-widget-grid.min.js" />
+    <Content Include="node_modules\angular\angular.min.js" />
+    <Content Include="node_modules\jquery\dist\jquery.min.js" />
     <Content Include="package.json" />
   </ItemGroup>
   <ItemGroup>
@@ -83,7 +93,9 @@
   <ItemGroup>
     <Content Include="tsconfig.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="github-pages.pubxml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
