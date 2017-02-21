@@ -1,0 +1,57 @@
+﻿<md-dialog aria-label="Adicionar Widget">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Configure Dash-CI</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="ctrl.ok()">
+                    <md-icon aria-label="Close">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content layout-gt-sm="row" layout-padding style="width: 700px">
+            <div layout="column" layout-fill>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="20">
+                        <label>Rows:</label>
+                        <input ng-model="ctrl.vm.rows" placeholder="0" type="number" required />
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Columns:</label>
+                        <input ng-model="ctrl.vm.columns" placeholder="0" type="number" required />
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="60">
+                        <label>Gitlab Host:</label>
+                        <input ng-model="ctrl.vm.gitlab.host" placeholder="https://gitlab.com" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="40">
+                        <label>Gitlab Personal Private Key:</label>
+                        <input ng-model="ctrl.vm.gitlab.privateToken" placeholder="Private Key" type="password" />
+                        <div class="hint"><a href="https://docs.gitlab.com/ce/api/README.html#personal-access-tokens" target="_blank">How to generate a token?</a></div>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="60">
+                        <label>Tfs Host and Collection:</label>
+                        <input ng-model="ctrl.vm.tfs.host" placeholder="https://username.visualstudio.com/DefaultCollection" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="40">
+                        <label>Tfs Personal Private Key:</label>
+                        <input ng-model="ctrl.vm.tfs.privateToken" placeholder="Private Key" type="password" />
+                        <div class="hint"><a href="https://www.visualstudio.com/en-us/docs/integrate/get-started/auth/overview" target="_blank">How to generate a token?</a></div>
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <span flex></span>
+            <!--<md-button ng-click="ctrl.cancel()">
+                Cancel
+            </md-button>-->
+        </md-dialog-actions>
+    </form>
+</md-dialog>

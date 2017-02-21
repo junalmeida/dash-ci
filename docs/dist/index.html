@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html ng-app="dashboard" ng-strict-di>
+<head>
+    <title>Dash-CI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" type="text/css" />-->
+    <link rel="stylesheet" href="node_modules/angular-widget-grid/angular-widget-grid.css" />
+    <link rel="stylesheet" href="node_modules/angular-material/angular-material.min.css" />
+    <link rel="stylesheet" href="app.css" />
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
+    <script type="text/javascript" src="node_modules/angular-animate/angular-animate.min.js"></script>
+    <script type="text/javascript" src="node_modules/angular-aria/angular-aria.min.js"></script>
+    <script type="text/javascript" src="node_modules/angular-material/angular-material.min.js"></script>
+    <script type="text/javascript" src="node_modules/angular-resource/angular-resource.min.js"></script>
+    <script type="text/javascript" src="node_modules/angular-css/angular-css.min.js"></script>
+    <script type="text/javascript" src="node_modules/angular-widget-grid/angular-widget-grid.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+</head>
+<body ng-controller="MainController as main" ng-cloak>
+    <md-nav-bar md-selected-nav-item="main.selectedDashboard" ng-init="main.selectedDashboard = 'page1'">
+        <md-nav-item md-nav-click="main.Go('page1')" name="page1">Dash-CI</md-nav-item>
+        <!--<md-nav-item md-nav-click="goto('page2')" name="page2">Page Two</md-nav-item>
+        <md-nav-item md-nav-click="goto('page3')" name="page3">Page Three</md-nav-item>
+        <md-nav-item md-nav-click="goto('page4')" name="page4">Page Four</md-nav-item>-->
+        <section class="config">
+            <span flex> </span>
+            <md-button ng-click="main.toggleEditable()" title="{{main.editable ? 'Concluir' : 'Editar'}}" class="md-icon-button" ng-class="{ mdPrimary: main.editable }" aria-label="Edit dashboard page">
+                <md-icon ng-if="!main.editable">mode_edit</md-icon>
+                <md-icon ng-if="main.editable">check_circle</md-icon>
+            </md-button>
+
+            <md-button title="Add Widget" class="md-icon-button"
+                       ng-show="main.editable"
+                       ng-class="{ inactive: !main.additionPossible }"
+                       ng-click="main.addWidgetDialog()"
+                       ng-mouseenter="main.gridOptions.highlightNextPosition = true"
+                       ng-mouseleave="main.gridOptions.highlightNextPosition = false">
+                <md-icon>library_add</md-icon>
+            </md-button>
+
+            <md-button title="Global Configuration" class="md-icon-button"
+                       ng-show="main.editable"
+                       ng-click="main.globalConfigDialog()">
+                <md-icon>settings</md-icon>
+            </md-button>
+        </section>
+    </md-nav-bar>
+    <wg-grid columns="{{main.options.columns}}" rows="{{main.options.rows}}" options="main.gridOptions" class="grid" id="grid">
+        <wg-widget wg-resizable wg-movable editable="{{main.editable}}" ng-repeat="widget in main.currentPage.widgets" position="widget.position">
+            <md-button title="Remove" class="remove-widget md-icon-button md-mini" ng-show="main.editable" ng-click="main.removeWidget(widget)">
+                <md-icon>close</md-icon>
+            </md-button>
+            <div class="padder">
+                <widget-loader scope="widget" editable="main.editable" global-options="main.options"></widget-loader>
+            </div>
+        </wg-widget>
+    </wg-grid>
+    <div ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}}</div>
+</body>
+</html>

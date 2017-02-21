@@ -1,0 +1,23 @@
+﻿<md-button title="Configure" class="configure-widget md-icon-button md-mini" ng-show="editable" ng-click="ctrl.config()">
+    <md-icon>settings</md-icon>
+</md-button>
+<div>
+    <div class="header">{{data.title}}</div>
+    <div class="content" layout="row" flex>
+        <div class="play-status" ng-class="{ blink: ctrl.latest.status == 'running', error: ctrl.icon == 'error'}">
+            <md-icon>{{ctrl.icon}}</md-icon>
+        </div>
+        <div flex>
+            <h4 ng-if="ctrl.latest.user">Requested by {{ctrl.latest.user.name}}</h4>
+            <h4 ng-if="ctrl.latest.ref">{{ctrl.latest.ref}} - {{ctrl.latest.id}}</h4>
+            <h4 ng-if="ctrl.latest.finished_at">{{ctrl.latest.status}} at {{ctrl.latest.finished_at | date:'MMM dd hh:mm'}}</h4>
+            <h4 ng-if="ctrl.latest.created_at && !ctrl.latest.finished_at">Requested at {{ctrl.latest.created_at | date:'MMM dd hh:mm'}}</h4>
+        </div>
+    </div>
+    <!--
+        <md-icon>help_outline</md-icon>
+        <md-icon>play_circle_outline</md-icon>
+        <md-icon>pause_circle_outline</md-icon>
+        <md-icon>error_outline</md-icon>
+        -->
+</div>
