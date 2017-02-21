@@ -1,0 +1,41 @@
+﻿<md-dialog aria-label="Adicionar Widget">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Configure Label Widget</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="ctrl.ok()">
+                    <md-icon aria-label="Close">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content layout-gt-sm="row" layout-padding style="width: 700px">
+            <!--<div layout="row" layout-align="center" flex ng-if="!ctrl.projects">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>-->
+            <div layout="column" layout-fill>
+
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="80">
+                        <label>Title:</label>
+                        <input ng-model="ctrl.vm.title" placeholder="Widget title" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Color:</label>
+                        <md-select ng-model="ctrl.vm.color" placeholder="Select the background">
+                            <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <span flex></span>
+            <!--<md-button ng-click="ctrl.cancel()">
+                Cancel
+            </md-button>-->
+        </md-dialog-actions>
+    </form>
+</md-dialog>

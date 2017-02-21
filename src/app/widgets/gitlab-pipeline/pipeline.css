@@ -1,0 +1,51 @@
+﻿body {
+}
+
+gitlab-pipeline h2, gitlab-pipeline h3, gitlab-pipeline h4 {
+    z-index: 2;
+    padding: 1px 0;
+    margin: 0;
+    text-wrap: none;
+    white-space: nowrap;
+    overflow: hidden;
+    font-weight: normal;
+}
+gitlab-pipeline h2 {
+
+    padding: 4px 0;
+    font-weight: bold;
+}
+gitlab-pipeline.widget .header {
+    text-align: left;
+    font-weight: bold;
+    /*text-transform: uppercase;*/
+}
+
+/*gitlab-pipeline.widget .header::first-letter {
+    font-size: 1.2em;
+}*/
+
+gitlab-pipeline .content
+{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+}
+
+gitlab-pipeline .content div:last-child {
+    margin-top: 30px;
+}
+
+
+gitlab-pipeline .blink {
+  animation: blinker 1s linear infinite;
+}
+gitlab-pipeline .error md-icon{
+    color: red;
+    text-shadow: 0px 0px 7px #FFFFFF;
+}
+
+@keyframes blinker {  
+  50% { opacity: 0; }
+}

@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{3B2A4FB1-B27A-4FC4-AF5D-26C6DFB1CD43}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app.css" />
+    <Content Include="app\core\add-widget.html" />
+    <Content Include="app\core\global-config.html" />
+    <Content Include="app\widgets\clock\clock.css" />
+    <Content Include="app\widgets\clock\clock.html" />
+    <Content Include="app\widgets\gitlab-issues\config.html" />
+    <Content Include="app\widgets\gitlab-issues\issues.css" />
+    <Content Include="app\widgets\gitlab-issues\issues.html" />
+    <Content Include="app\widgets\gitlab-pipeline\config.html" />
+    <Content Include="app\widgets\gitlab-pipeline\pipeline.css" />
+    <Content Include="app\widgets\gitlab-pipeline\pipeline.html" />
+    <Content Include="app\widgets\label\config.html" />
+    <Content Include="app\widgets\label\label.css" />
+    <Content Include="app\widgets\label\label.html" />
+    <Content Include="app\widgets\tfs-build\config.html" />
+    <Content Include="app\widgets\tfs-build\build.css" />
+    <Content Include="app\widgets\tfs-build\build.html" />
+    <Content Include="app\widgets\tfs-query-count\config.html" />
+    <Content Include="app\widgets\tfs-query-count\tfs-query-count.css" />
+    <Content Include="app\widgets\tfs-query-count\tfs-query-count.html" />
+    <Content Include="index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="node_modules\angular-animate\angular-animate.min.js" />
+    <Content Include="node_modules\angular-aria\angular-aria.min.js" />
+    <Content Include="node_modules\angular-css\angular-css.min.js" />
+    <Content Include="node_modules\angular-material\angular-material.min.css" />
+    <Content Include="node_modules\angular-material\angular-material.min.js" />
+    <Content Include="node_modules\angular-resource\angular-resource.min.js" />
+    <Content Include="node_modules\angular-widget-grid\angular-widget-grid.css" />
+    <Content Include="node_modules\angular-widget-grid\angular-widget-grid.min.js" />
+    <Content Include="node_modules\angular\angular.min.js" />
+    <Content Include="node_modules\jquery\dist\jquery.min.js" />
+    <Content Include="package.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="%40dev-types\angular-css\index.d.ts" />
+    <TypeScriptCompile Include="app\app.ts" />
+    <TypeScriptCompile Include="app\core\add-widget-controller.ts" />
+    <TypeScriptCompile Include="app\core\global-config-controller.ts" />
+    <TypeScriptCompile Include="app\models\widgets.ts" />
+    <TypeScriptCompile Include="app\resources\tfs\models.ts" />
+    <TypeScriptCompile Include="app\resources\tfs\resources.ts" />
+    <TypeScriptCompile Include="app\widgets\clock\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-issues\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\label\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\label\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\label\label.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-build\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-build\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-build\directive.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-count\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-count\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-count\tfs-query-count.ts" />
+    <TypeScriptCompile Include="app\models\colors.ts" />
+    <TypeScriptCompile Include="app\core\main-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\clock\clock.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-issues\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-issues\issues.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline\pipeline.ts" />
+    <TypeScriptCompile Include="app\widgets\loader.ts" />
+    <TypeScriptCompile Include="app\models\models.ts" />
+    <TypeScriptCompile Include="app\resources\gitlab\resources.ts" />
+    <TypeScriptCompile Include="app\resources\gitlab\models.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tsconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="github-pages.pubxml" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>dash_ci</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets')" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>61364</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:61364/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
+    <TypeScriptModuleKind>None</TypeScriptModuleKind>
+    <TypeScriptOutFile>.\app.js</TypeScriptOutFile>
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptMapRoot>.\</TypeScriptMapRoot>
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptRemoveComments>true</TypeScriptRemoveComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+</Project>
