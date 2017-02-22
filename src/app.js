@@ -76,16 +76,40 @@ var DashCI;
     var Core;
     (function (Core) {
         var GlobalConfigController = (function () {
-            function GlobalConfigController($mdDialog, vm) {
+            function GlobalConfigController($mdDialog, $scope, vm) {
+                var _this = this;
                 this.$mdDialog = $mdDialog;
                 this.vm = vm;
+                this.pageCount = this.vm.pages.length;
+                $scope.$watch(function () { return _this.pageCount; }, function () { return _this.updatePages(); });
             }
             GlobalConfigController.prototype.ok = function () {
                 this.$mdDialog.hide();
             };
+            GlobalConfigController.prototype.updatePages = function () {
+                if (this.pageCount < 1)
+                    this.pageCount = 1;
+                if (this.pageCount > 5)
+                    this.pageCount = 5;
+                if (this.pageCount < this.vm.pages.length) {
+                    for (var i = this.vm.pages.length; i > this.pageCount; i--) {
+                        this.vm.pages.pop();
+                    }
+                }
+                else if (this.pageCount > this.vm.pages.length) {
+                    for (var i = this.vm.pages.length; i < this.pageCount; i++) {
+                        var id = (this.vm.pages.length + 1).toString();
+                        this.vm.pages.push({
+                            id: id,
+                            name: "Dash-CI " + id.toString(),
+                            widgets: []
+                        });
+                    }
+                }
+            };
             return GlobalConfigController;
         }());
-        GlobalConfigController.$inject = ["$mdDialog", "config"];
+        GlobalConfigController.$inject = ["$mdDialog", "$scope", "config"];
         Core.GlobalConfigController = GlobalConfigController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
@@ -129,8 +153,18 @@ var DashCI;
                 this.$scope.$on('wg-update-position', function (event, widgetInfo) {
                     console.log('A widget has changed its position!', widgetInfo);
                 });
+                this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
                 this.updateGridSize();
             }
+            MainController.prototype.changePage = function () {
+                var _this = this;
+                if (!this.currentPage || this.selectedPageId != this.currentPage.id) {
+                    this.currentPage = null;
+                    this.$timeout(function () {
+                        _this.currentPage = _this.options.pages.filter(function (item) { return item.id == _this.selectedPageId; })[0];
+                    }, 500);
+                }
+            };
             MainController.prototype.addWidgetDialog = function (ev) {
                 var _this = this;
                 if (this.additionPossible) {
@@ -195,11 +229,15 @@ var DashCI;
                     gitlab: null,
                     pages: [{
                             id: "1",
+                            name: "Dash-CI",
                             widgets: []
                         }]
                 };
                 var savedOpts = (angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
                 angular.extend(this.options, defOptions, savedOpts);
+                angular.forEach(savedOpts.pages, function (item) {
+                    item.name = item.name || "Dash-CI";
+                });
                 this.currentPage = this.options.pages[0]; //preparing to support multiple pages
             };
             return MainController;
@@ -566,6 +604,7 @@ var DashCI;
                 ClockController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 ClockController.prototype.fontSize = function (height) {
                     var fontSizeTime = Math.round(height / 3.8) + "px";
@@ -683,6 +722,7 @@ var DashCI;
                 GitlabIssuesController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
@@ -866,6 +906,7 @@ var DashCI;
                 GitlabPipelineController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabPipelineController.prototype.init = function () {
                     this.data.title = this.data.title || "Pipeline";
@@ -1260,6 +1301,7 @@ var DashCI;
                 TfsBuildController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsBuildController.prototype.init = function () {
                     this.data.title = this.data.title || "Build";
@@ -1502,6 +1544,7 @@ var DashCI;
                 TfsQueryCountController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsQueryCountController.prototype.init = function () {
                     this.data.title = this.data.title || "Query";

@@ -25,12 +25,26 @@ namespace DashCI.Core {
             this.$scope.$on('wg-update-position', (event: ng.IAngularEvent, widgetInfo: any) => {
                 console.log('A widget has changed its position!', widgetInfo);
             });
+
+            this.$scope.$watch(() => this.selectedPageId, () => this.changePage());
             this.updateGridSize();
 
         }
 
 
+
+
+        public selectedPageId: string;
         public currentPage: Models.IDashBoardPage;
+
+        private changePage() {
+            if (!this.currentPage || this.selectedPageId != this.currentPage.id) {
+                this.currentPage = null;
+                this.$timeout(() => {
+                    this.currentPage = this.options.pages.filter((item) => item.id == this.selectedPageId)[0];
+                }, 500);
+            }
+        }
 
         public gridWidth = 800;
         public gridHeight = 600;
@@ -122,12 +136,15 @@ namespace DashCI.Core {
                 gitlab: null,
                 pages: [{
                     id: "1",
+                    name: "Dash-CI",
                     widgets: []
                 }]
             }
             var savedOpts = <Models.IOptions>(angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
             angular.extend(this.options, defOptions, savedOpts);
-
+            angular.forEach(savedOpts.pages, (item) => {
+                item.name = item.name || "Dash-CI";
+            });
             this.currentPage = this.options.pages[0]; //preparing to support multiple pages
         }
     }

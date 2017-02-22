@@ -27,6 +27,7 @@ namespace DashCI.Models {
 
     export interface IDashBoardPage {
         id: string;
+        name: string;
         widgets: IWidgetData[];
     }
 

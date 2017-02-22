@@ -36,6 +36,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
+            console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
         private init() {
