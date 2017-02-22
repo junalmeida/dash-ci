@@ -185,7 +185,6 @@ var DashCI;
                 this.saveData();
             };
             MainController.prototype.saveData = function () {
-                window.localStorage['dash-ci'] = angular.toJson([this.currentPage]);
                 window.localStorage['dash-ci-options'] = angular.toJson(this.options);
             };
             MainController.prototype.loadData = function () {
@@ -193,16 +192,15 @@ var DashCI;
                     columns: 30,
                     rows: 20,
                     tfs: null,
-                    gitlab: null
+                    gitlab: null,
+                    pages: [{
+                            id: "1",
+                            widgets: []
+                        }]
                 };
                 var savedOpts = (angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
-                angular.extend(this.options, savedOpts);
-                var defPage = {
-                    id: "1",
-                    widgets: []
-                };
-                var lista = (angular.fromJson(window.localStorage['dash-ci']) || [defPage]);
-                this.currentPage = lista[0]; //preparing to support multiple pages
+                angular.extend(this.options, defOptions, savedOpts);
+                this.currentPage = this.options.pages[0]; //preparing to support multiple pages
             };
             return MainController;
         }());
@@ -716,10 +714,11 @@ var DashCI;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
                     this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
                 };
                 GitlabIssuesController.prototype.update = function () {
                     var _this = this;
-                    if (!this.data.project)
+                    if (!this.data.project && !this.data.group)
                         return;
                     var res = this.gitlabResources();
                     if (!res)
@@ -742,6 +741,7 @@ var DashCI;
                         _this.issueCount = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return GitlabIssuesController;
             }());
@@ -858,7 +858,6 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.updateInterval();
                     this.update();
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 GitlabPipelineController.prototype.sizeFont = function (altura) {
                     var icon = this.$scope.$element.find(".play-status md-icon");
@@ -906,6 +905,7 @@ var DashCI;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
                     this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
                 };
                 GitlabPipelineController.prototype.update = function () {
                     var _this = this;
@@ -957,6 +957,7 @@ var DashCI;
                         _this.latest = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return GitlabPipelineController;
             }());
@@ -1356,6 +1357,7 @@ var DashCI;
                         _this.latest = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return TfsBuildController;
             }());
@@ -1544,6 +1546,7 @@ var DashCI;
                         _this.queryCount = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return TfsQueryCountController;
             }());
