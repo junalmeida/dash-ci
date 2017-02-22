@@ -25,4 +25,28 @@ namespace DashCI.Models {
         },
     ]);
 
+
+    DashCI.app.constant("intervals", <IValueDescription[]>[
+        {
+            value: 10000,
+            desc: "10 secs"
+        },
+        {
+            value: 20000,
+            desc: "20 secs"
+        },
+        {
+            value: 30000,
+            desc: "30 secs"
+        },
+        {
+            value: 60000,
+            desc: "1 min"
+        },
+        {
+            value: 120000,
+            desc: "2 min"
+        },
+    ]);
+
 }

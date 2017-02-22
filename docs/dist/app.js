@@ -230,6 +230,28 @@ var DashCI;
                 desc: "Purple"
             },
         ]);
+        DashCI.app.constant("intervals", [
+            {
+                value: 10000,
+                desc: "10 secs"
+            },
+            {
+                value: 20000,
+                desc: "20 secs"
+            },
+            {
+                value: 30000,
+                desc: "30 secs"
+            },
+            {
+                value: 60000,
+                desc: "1 min"
+            },
+            {
+                value: 120000,
+                desc: "2 min"
+            },
+        ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
 "use strict";
@@ -315,7 +337,6 @@ var DashCI;
                         return null;
                     var headers = {
                         "PRIVATE-TOKEN": null,
-                        "Access-Control-Allow-Headers": "X-Total, X-Page, X-Total-Pages"
                     };
                     if (globalOptions.gitlab.privateToken)
                         headers["PRIVATE-TOKEN"] = globalOptions.gitlab.privateToken;
@@ -330,17 +351,38 @@ var DashCI;
                             headers: headers,
                             transformResponse: transform
                         },
+                        group_list: {
+                            method: 'GET',
+                            isArray: true,
+                            url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&per_page=100",
+                            headers: headers,
+                            transformResponse: transform
+                        },
                         issue_count: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.gitlab.host + "/api/v3/projects/:project/issues?labels=:labels&state=:state&per_page=1",
+                            url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
                             headers: headers,
                             transformResponse: function (data, getHeaders, status) {
                                 if (status == 200) {
                                     data = angular.fromJson(data);
                                     var headers = getHeaders();
+                                    var parsedCount = parseInt(headers["X-Total"]);
+                                    if (isNaN(parsedCount)) {
+                                        parsedCount = 0;
+                                        //cannot access X-Total today, let's parse
+                                        var links = headers.link.split('>');
+                                        angular.forEach(links, function (item) {
+                                            var matches = item.match(/page=(\d*)/);
+                                            if (matches && matches.length > 1) {
+                                                var page = Number(matches[1]);
+                                                if (page > parsedCount)
+                                                    parsedCount = page;
+                                            }
+                                        });
+                                    }
                                     var ret = {
-                                        count: parseInt(headers["X-Total"]) || null
+                                        count: parsedCount
                                     };
                                     return ret;
                                 }
@@ -523,10 +565,11 @@ var DashCI;
         var GitlabIssues;
         (function (GitlabIssues) {
             var GitlabIssuesConfigController = (function () {
-                function GitlabIssuesConfigController($mdDialog, gitlabResources, colors, vm) {
+                function GitlabIssuesConfigController($mdDialog, gitlabResources, colors, intervals, vm) {
                     this.$mdDialog = $mdDialog;
                     this.gitlabResources = gitlabResources;
                     this.colors = colors;
+                    this.intervals = intervals;
                     this.vm = vm;
                     this.init();
                 }
@@ -543,6 +586,14 @@ var DashCI;
                         console.error(reason);
                         _this.projects = [];
                     });
+                    res.group_list().$promise
+                        .then(function (result) {
+                        _this.groups = result;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.groups = [];
+                    });
                 };
                 //public cancel() {
                 //    this.$mdDialog.cancel();
@@ -552,7 +603,7 @@ var DashCI;
                 };
                 return GitlabIssuesConfigController;
             }());
-            GitlabIssuesConfigController.$inject = ["$mdDialog", "gitlabResources", "colors", "config"];
+            GitlabIssuesConfigController.$inject = ["$mdDialog", "gitlabResources", "colors", "intervals", "config"];
             GitlabIssues.GitlabIssuesConfigController = GitlabIssuesConfigController;
         })(GitlabIssues = Widgets.GitlabIssues || (Widgets.GitlabIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
@@ -633,7 +684,8 @@ var DashCI;
                     if (!res)
                         return;
                     res.issue_count({
-                        project: this.data.project,
+                        scope: this.data.query_type,
+                        scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
                         labels: this.data.labels,
                         state: this.data.status
                     }).$promise.then(function (newCount) {
@@ -696,10 +748,11 @@ var DashCI;
         var GitlabPipeline;
         (function (GitlabPipeline) {
             var GitlabPipelineConfigController = (function () {
-                function GitlabPipelineConfigController($mdDialog, gitlabResources, colors, vm) {
+                function GitlabPipelineConfigController($mdDialog, gitlabResources, colors, intervals, vm) {
                     this.$mdDialog = $mdDialog;
                     this.gitlabResources = gitlabResources;
                     this.colors = colors;
+                    this.intervals = intervals;
                     this.vm = vm;
                     this.init();
                 }
@@ -725,7 +778,7 @@ var DashCI;
                 };
                 return GitlabPipelineConfigController;
             }());
-            GitlabPipelineConfigController.$inject = ["$mdDialog", "gitlabResources", "colors", "config"];
+            GitlabPipelineConfigController.$inject = ["$mdDialog", "gitlabResources", "colors", "intervals", "config"];
             GitlabPipeline.GitlabPipelineConfigController = GitlabPipelineConfigController;
         })(GitlabPipeline = Widgets.GitlabPipeline || (Widgets.GitlabPipeline = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
@@ -1063,11 +1116,12 @@ var DashCI;
         var TfsBuild;
         (function (TfsBuild) {
             var TfsBuildConfigController = (function () {
-                function TfsBuildConfigController($scope, $mdDialog, tfsResources, colors, vm) {
+                function TfsBuildConfigController($scope, $mdDialog, tfsResources, colors, intervals, vm) {
                     this.$scope = $scope;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
                     this.colors = colors;
+                    this.intervals = intervals;
                     this.vm = vm;
                     this.init();
                 }
@@ -1300,11 +1354,12 @@ var DashCI;
         var TfsQueryCount;
         (function (TfsQueryCount) {
             var TfsQueryCountConfigController = (function () {
-                function TfsQueryCountConfigController($scope, $mdDialog, tfsResources, colors, vm) {
+                function TfsQueryCountConfigController($scope, $mdDialog, tfsResources, colors, intervals, vm) {
                     this.$scope = $scope;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
                     this.colors = colors;
+                    this.intervals = intervals;
                     this.vm = vm;
                     this.init();
                 }
@@ -1341,7 +1396,7 @@ var DashCI;
                 };
                 return TfsQueryCountConfigController;
             }());
-            TfsQueryCountConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "config"];
+            TfsQueryCountConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
             TfsQueryCount.TfsQueryCountConfigController = TfsQueryCountConfigController;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));

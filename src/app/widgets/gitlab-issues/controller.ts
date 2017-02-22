@@ -87,7 +87,8 @@
                 return;
 
             res.issue_count({
-                project: this.data.project,
+                scope: this.data.query_type,
+                scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
                 labels: this.data.labels,
                 state: this.data.status
             }).$promise.then((newCount: Resources.Gitlab.IIssueCount) => {
@@ -101,10 +102,10 @@
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
             })
-                .catch((reason) => {
-                    this.issueCount = null;
-                    console.error(reason);
-                });
+            .catch((reason) => {
+                this.issueCount = null;
+                console.error(reason);
+            });
 
         }
 

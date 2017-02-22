@@ -2,11 +2,12 @@
 namespace DashCI.Widgets.GitlabPipeline {
 
     export class GitlabPipelineConfigController implements ng.IController {
-        public static $inject = ["$mdDialog", "gitlabResources", "colors", "config"];
+        public static $inject = ["$mdDialog", "gitlabResources", "colors", "intervals", "config"];
         constructor(
             private $mdDialog: ng.material.IDialogService,
             public gitlabResources: () => Resources.Gitlab.IGitlabResource,
             public colors: Models.ICodeDescription[],
+            public intervals: Models.IValueDescription[],
             public vm: IGitlabPipelineData
         ) { 
             this.init();

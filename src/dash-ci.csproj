@@ -79,7 +79,7 @@
     <TypeScriptCompile Include="app\widgets\tfs-query-count\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\tfs-query-count.ts" />
-    <TypeScriptCompile Include="app\models\colors.ts" />
+    <TypeScriptCompile Include="app\models\constants.ts" />
     <TypeScriptCompile Include="app\core\main-controller.ts" />
     <TypeScriptCompile Include="app\widgets\clock\clock.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-issues\config-controller.ts" />

@@ -1,12 +1,13 @@
 ﻿namespace DashCI.Widgets.TfsQueryCount {
 
     export class TfsQueryCountConfigController implements ng.IController {
-        public static $inject = ["$scope", "$mdDialog", "tfsResources", "colors", "config"];
+        public static $inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
         constructor(
             private $scope: ng.IScope,
             private $mdDialog: ng.material.IDialogService,
             public tfsResources: () => Resources.Tfs.ITfsResource,
             public colors: Models.ICodeDescription[],
+            public intervals: Models.IValueDescription[],
             public vm: ITfsQueryCountData
         ) { 
             this.init();
