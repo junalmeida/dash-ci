@@ -65,6 +65,12 @@
             var txt = this.$scope.$element.find("h4");
             fontSize = Math.round(altura / 7) + "px";
             txt.css('font-size', fontSize);
+
+            var img = this.$scope.$element.find(".avatar");
+            var size = Math.round(altura - 32);
+            img.width(size);
+            img.height(size);
+
         }
 
         public config() {
@@ -112,7 +118,7 @@
                 console.log("end request: " + this.data.id + "; " + this.data.title);
                 var new_pipeline: Resources.Gitlab.IPipeline = null;
                 var refList = this.data.refs.split(",");
-                pipelines = pipelines.filter((i: any) => refList.indexOf(i.ref) > -1);
+                pipelines = pipelines.filter((i: any) => refList.filter((r) => wildcardMatch(r, i.ref)).length > 0 );
 
                 if (pipelines.length >= 1)
                     new_pipeline = pipelines[0];

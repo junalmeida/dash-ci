@@ -35,17 +35,19 @@
                 project_list: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v3/projects?order_by=name&per_page=100",
+                    url: globalOptions.gitlab.host + "/api/v3/projects?order_by=last_activity_at&sort=desc&per_page=100",
                     headers: headers,
-                    transformResponse: transform
+                    transformResponse: transform,
+                    cache: true
                 },
 
                 group_list: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&per_page=100",
+                    url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&sort=asc&per_page=100",
                     headers: headers,
-                    transformResponse: transform
+                    transformResponse: transform,
+                    cache: true
                 },
 
                 issue_count: <ng.resource.IActionDescriptor>{
@@ -53,6 +55,7 @@
                     isArray: false,
                     url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
                     headers: headers,
+                    cache: false,
                     transformResponse: (data: any, getHeaders: Function, status: number) => {
                         if (status == 200) {
                             data = angular.fromJson(data);
@@ -87,6 +90,7 @@
                     method: 'GET',
                     isArray: true,
                     url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
+                    cache: false,
                     headers: headers
                 }
 
