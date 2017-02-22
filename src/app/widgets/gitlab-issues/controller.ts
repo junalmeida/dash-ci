@@ -18,19 +18,6 @@
             this.data.footer = false;
             this.data.header = true;
 
-            this.data.title = this.data.title || "Issues";
-            this.data.color = this.data.color || "red";
-
-            //default values
-            this.data.labels = this.data.labels || "bug";
-            this.data.status = this.data.status || "opened";
-            this.data.poolInterval = this.data.poolInterval || 10000;
-
-            this.init();
-        }
-
-        private handle: ng.IPromise<any>;
-        private init() {
             this.$scope.$watch(
                 () => this.$scope.$element.height(),
                 (height: number) => this.sizeFont(height)
@@ -39,15 +26,35 @@
                 () => this.data.poolInterval,
                 (value: number) => this.updateInterval()
             );
+            this.$scope.$on("$destroy", () => this.finalize());
+
+            this.init();
+        }
+
+        private handle: ng.IPromise<any>;
+        private finalize() {
+            if (this.handle)
+                this.$interval.cancel(this.handle);
+        }
+
+
+        private init() {
+            this.data.title = this.data.title || "Issues";
+            this.data.color = this.data.color || "red";
+
+            //default values
+            this.data.labels = this.data.labels || "bug";
+            this.data.status = this.data.status || "opened";
+            this.data.poolInterval = this.data.poolInterval || 10000;
 
             this.updateInterval();
             this.update();
         }
 
-        private sizeFont(altura: number) {
+        private sizeFont(height: number) {
             var p = this.$scope.$element.find("p");
-            var fontSize = Math.round(altura / 1.3) + "px";
-            var lineSize = Math.round((altura) - 60) + "px";
+            var fontSize = Math.round(height / 1.3) + "px";
+            var lineSize = Math.round((height) - 60) + "px";
             p.css('font-size', fontSize);
             p.css('line-height', lineSize);
         }
