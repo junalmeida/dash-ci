@@ -495,6 +495,7 @@ var DashCI;
                     }
                     else {
                         delete headers.Authorization;
+                        withCredentials = true;
                     }
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.tfs.host, {}, {
