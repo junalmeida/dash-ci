@@ -9,6 +9,7 @@ gitlab-pipeline h2, gitlab-pipeline h3, gitlab-pipeline h4 {
     white-space: nowrap;
     overflow: hidden;
     font-weight: normal;
+    text-shadow: 1px 1px 1px #000000;
 }
 gitlab-pipeline h2 {
 
@@ -36,7 +37,26 @@ gitlab-pipeline .content
 gitlab-pipeline .content div:last-child {
     margin-top: 30px;
 }
-
+gitlab-pipeline .content div h4 {
+    z-index: 1;
+}
+gitlab-pipeline .content .avatar
+{
+    z-index: 0;
+    position: absolute;
+    opacity: 0.5;
+    width: 30px;
+    height: 30px;
+    bottom: 0px;
+    right: 0;
+}
+gitlab-pipeline .content .avatar i
+{
+    display: block;
+    width: 100%; height: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
 
 gitlab-pipeline .blink {
   animation: blinker 1s linear infinite;

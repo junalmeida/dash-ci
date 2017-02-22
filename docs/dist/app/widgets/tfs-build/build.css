@@ -8,6 +8,8 @@ tfs-build h2, tfs-build h3, tfs-build h4 {
     white-space: nowrap;
     overflow: hidden;
     font-weight: normal;
+
+    text-shadow: 1px 1px 1px #000000;
 }
 tfs-build h2 {
     padding: 4px 0;
@@ -29,6 +31,27 @@ tfs-build .content div:last-child {
     margin-top: 30px;
 }
 
+tfs-build .content div h4 {
+    z-index: 1;
+}
+
+tfs-build .content .avatar
+{
+    z-index: 0;
+    position: absolute;
+    opacity: 0.5;
+    width: 30px;
+    height: 30px;
+    bottom: 0;
+    right: 0;
+}
+tfs-build .content .avatar i
+{
+    display: block;
+    width: 100%; height: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
 
 
 
