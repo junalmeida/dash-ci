@@ -530,10 +530,10 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.atualizarFonte(height); });
                 };
                 ClockController.prototype.atualizarFonte = function (altura) {
-                    var fontSizeTime = Math.round(altura / 4.5) + "px";
+                    var fontSizeTime = Math.round(altura / 3.8) + "px";
                     var lineTime = Math.round((altura / 2) - 20) + "px";
-                    var fontSizeDate = Math.round(altura / 5.5) + "px";
-                    var lineDate = Math.round((altura / 2) - 20) + "px";
+                    var fontSizeDate = Math.round(altura / 5.9) + "px";
+                    var lineDate = Math.round((altura / 2) - 30) + "px";
                     var date = this.$scope.$element.find(".date");
                     var time = this.$scope.$element.find(".time");
                     date.css('font-size', fontSizeDate);
