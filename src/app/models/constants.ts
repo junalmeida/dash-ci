@@ -23,6 +23,30 @@ namespace DashCI.Models {
             code: "purple",
             desc: "Purple"
         },
+        {
+            code: "pink",
+            desc: "Pink"
+        },
+        {
+            code: "blue",
+            desc: "Blue"
+        },
+        {
+            code: "amber",
+            desc: "Amber"
+        },
+        {
+            code: "orange",
+            desc: "Orange"
+        },
+        {
+            code: "brown",
+            desc: "Brown"
+        },
+        {
+            code: "grey",
+            desc: "Grey"
+        },
     ]);
 
 

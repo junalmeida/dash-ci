@@ -89,7 +89,7 @@ span {
     background: rgba(250, 250, 250, 0.02);
 }
 .widget.red {
-    background: #ec663c;
+    background: #F44336;
 }
 .widget.turkoise {
     background: #49bbb2;
@@ -100,8 +100,24 @@ span {
 .widget.purple {
     background: #9c4274;
 }
-
-
+.widget.pink {
+    background: #E91E63;
+}
+.widget.blue {
+    background: #2196F3;
+}
+.widget.amber {
+    background: #FFC107;
+}
+.widget.orange {
+    background: #FF5722;
+}
+.widget.brown {
+    background: #795548;
+}
+.widget.grey {
+    background: #9E9E9E;
+}
 .widget .header{
     color: #fff;
     background: rgba(0,0,0,.18);
