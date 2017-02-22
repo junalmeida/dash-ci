@@ -1,0 +1,36 @@
+﻿
+gitlab-pipeline-graph .histogram 
+{
+    box-sizing: border-box;
+    width: 100%;
+    height: 50px;
+    margin: 0 20px;
+    position: relative;
+    top: 15px;
+}
+
+
+gitlab-pipeline-graph .histogram .bar
+{
+    box-sizing: border-box;
+    width: 10px;
+    height: 100%;
+    position: absolute;
+    bottom: 0;
+
+    padding-right: 3px;
+    background-clip: content-box; 
+
+    background-color: #808080;
+}
+
+
+gitlab-pipeline-graph .histogram .bar.success
+{
+    background-color: forestgreen;
+}
+
+gitlab-pipeline-graph .histogram .bar.failed
+{
+   background-color: maroon;
+}

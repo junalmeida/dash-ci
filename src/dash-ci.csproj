@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.css" />
+    <Content Include="app.js" />
     <Content Include="app\core\add-widget.html" />
     <Content Include="app\core\global-config.html" />
     <Content Include="app\widgets\clock\clock.css" />
@@ -31,6 +32,12 @@
     <Content Include="app\widgets\gitlab-issues\config.html" />
     <Content Include="app\widgets\gitlab-issues\issues.css" />
     <Content Include="app\widgets\gitlab-issues\issues.html" />
+    <Content Include="app\widgets\tfs-build-graph\config.html" />
+    <Content Include="app\widgets\tfs-build-graph\build-graph.css" />
+    <Content Include="app\widgets\tfs-build-graph\build-graph.html" />
+    <Content Include="app\widgets\gitlab-pipeline-graph\config.html" />
+    <Content Include="app\widgets\gitlab-pipeline-graph\pipeline-graph.css" />
+    <Content Include="app\widgets\gitlab-pipeline-graph\pipeline-graph.html" />
     <Content Include="app\widgets\gitlab-pipeline\config.html" />
     <Content Include="app\widgets\gitlab-pipeline\pipeline.css" />
     <Content Include="app\widgets\gitlab-pipeline\pipeline.html" />
@@ -56,10 +63,12 @@
     <Content Include="node_modules\angular-widget-grid\angular-widget-grid.min.js" />
     <Content Include="node_modules\angular\angular.min.js" />
     <Content Include="node_modules\jquery\dist\jquery.min.js" />
+    <Content Include="node_modules\moment\min\moment.min.js" />
     <Content Include="package.json" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="%40dev-types\angular-css\index.d.ts" />
+    <TypeScriptCompile Include="%40dev-types\moment\index.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\core\add-widget-controller.ts" />
     <TypeScriptCompile Include="app\core\global-config-controller.ts" />
@@ -68,6 +77,12 @@
     <TypeScriptCompile Include="app\resources\tfs\resources.ts" />
     <TypeScriptCompile Include="app\widgets\clock\controller.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-issues\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-build-graph\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-build-graph\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-build-graph\build-graph.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline-graph\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline-graph\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline-graph\pipeline-graph.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-pipeline\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-pipeline\controller.ts" />
     <TypeScriptCompile Include="app\widgets\label\config-controller.ts" />

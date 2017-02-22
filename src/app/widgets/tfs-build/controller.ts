@@ -2,7 +2,7 @@
     export interface ITfsBuildData extends Models.IWidgetData {
         project?: string;
         poolInterval?: number;
-        build?: string;
+        build?: number;
     }
 
 

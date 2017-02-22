@@ -43,12 +43,18 @@
         sourceBranch: string;
         status: string;
         reason: string;
+        startTime: string;
         finishTime: string;
+        duration: number;
         result: string;
         requestedFor: {
             displayName: string;
             imageUrl: string;
+        },
+        css: { //ugly
+            width: string; height: string; left: string;
         }
+
     }
     export interface IBuildDefinition {
         id: string;

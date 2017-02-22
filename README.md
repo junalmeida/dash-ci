@@ -35,10 +35,12 @@ If this is your first usage, you need to set gitlab and/or tfs host and private 
 2. **Clock:**  A simple clock with current date and time.
 
 3. **TFS - Build:** Shows status of latest build definition run from a tfs project.
-4. **TFS - Query Count:** Runs a saved query from tfs and show the items count. Useful to show open bugs, issues, etc.
+4. **TFS - Build Graph:** Shows status with a graph of N build runs in a row from a tfs project.
+5. **TFS - Query Count:** Runs a saved query from tfs and show the items count. Useful to show open bugs, issues, etc.
 
-5. **Gitlab - Pipeline:** Shows status of latest pipeline run from a gitlab project.
-6. **Gitlab - Issue Query:** Counts issues at gitlab by group or project, filtering by label and state.
+6. **Gitlab - Pipeline:** Shows status of latest pipeline run from a gitlab project.
+7. **Gitlab - Pipeline Graph:** Shows status with a graph of N pipeline runs in a row from a gitlab project.
+8. **Gitlab - Issue Query:** Counts issues at gitlab by group or project, filtering by label and state.
 
 
 ### Feedback

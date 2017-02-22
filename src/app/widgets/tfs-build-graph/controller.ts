@@ -1,8 +1,9 @@
-﻿namespace DashCI.Widgets.GitlabIssues {
-    export class GitlabIssuesController implements ng.IController {
-        public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "gitlabResources"];
+﻿namespace DashCI.Widgets.TfsBuildGraph
+{
+    export class TfsBuildGraphController implements ng.IController {
+        public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
 
-        private data: IGitlabIssuesData;
+        private data: ITfsBuildGraphData;
 
         constructor(
             private $scope: Models.IWidgetScope,
@@ -10,11 +11,11 @@
             private $timeout: ng.ITimeoutService,
             private $interval: ng.IIntervalService,
             private $mdDialog: ng.material.IDialogService,
-            private gitlabResources: () => Resources.Gitlab.IGitlabResource
+            private tfsResources: () => Resources.Tfs.ITfsResource
         ) {
             this.data = this.$scope.data;
             this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-            this.data.type = Models.WidgetType.gitlabIssues;
+            this.data.type = Models.WidgetType.tfsBuildGraph;
             this.data.footer = false;
             this.data.header = true;
 
@@ -38,33 +39,28 @@
             console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
-
         private init() {
-            this.data.title = this.data.title || "Issues";
-            this.data.color = this.data.color || "red";
+            this.data.title = this.data.title || "Build Graph";
+            this.data.color = this.data.color || "blue";
 
             //default values
-            this.data.labels = this.data.labels || "bug";
-            this.data.status = this.data.status || "opened";
             this.data.poolInterval = this.data.poolInterval || 10000;
+
 
             this.updateInterval();
             this.update();
         }
 
         private sizeFont(height: number) {
-            var p = this.$scope.$element.find("p");
-            var fontSize = Math.round(height / 1.3) + "px";
-            var lineSize = Math.round((height) - 60) + "px";
-            p.css('font-size', fontSize);
-            p.css('line-height', lineSize);
+            var histogram = this.$scope.$element.find(".histogram");
+            histogram.height(height - 60);
         }
 
         public config() {
             this.$mdDialog.show({
-                controller: GitlabIssuesConfigController,
+                controller: TfsBuildGraphConfigController,
                 controllerAs: "ctrl",
-                templateUrl: 'app/widgets/gitlab-issues/config.html',
+                templateUrl: 'app/widgets/Tfs-Build-graph/config.html',
                 parent: angular.element(document.body),
                 //targetEvent: ev,
                 clickOutsideToClose: true,
@@ -81,43 +77,57 @@
 
         }
 
-        public issueCount: number;
         private updateInterval() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
             this.handle = this.$interval(() => this.update(), this.data.poolInterval);
             this.update();
         }
+
+        public builds: Resources.Tfs.IBuild[];
+
+
         private update() {
-            if (!this.data.project && !this.data.group)
+            if (!this.data.project || !this.data.build)
                 return;
-            var res = this.gitlabResources();
+            var res = this.tfsResources();
             if (!res)
                 return;
 
-            res.issue_count({
-                scope: this.data.query_type,
-                scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
-                labels: this.data.labels,
-                state: this.data.status
-            }).$promise.then((newCount: Resources.Gitlab.ICount) => {
-                //var newCount = Math.round(Math.random() * 100);
+            console.log("start request: " + this.data.id + "; " + this.data.title);
+            res.recent_builds({
+                project: this.data.project,
+                build: this.data.build,
+                count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
+            }).$promise.then((result) => {
+                console.log("end request: " + this.data.id + "; " + this.data.title);
+                var builds = result.value.reverse();
+                var maxDuration = 1; 
+                angular.forEach(builds, (item) => {
+                    if (item.finishTime) {
+                        var duration = moment(item.finishTime).subtract(moment(item.finishTime));
+                        item.duration = duration.seconds();
+                        if (maxDuration < item.duration)
+                            maxDuration = item.duration;
+                    }
+                });
 
-                if (newCount.count != this.issueCount) {
-                    this.issueCount = newCount.count;
-                    var p = this.$scope.$element.find("p");
+                var width = (100 / builds.length);
+                angular.forEach(builds, (item, i) => {
+                    item.css = {
+                        height: Math.round((100* item.duration) / maxDuration).toString() + "%",
+                        width: width.toFixed(2) + "%",
+                        left: (width * i).toFixed(2) + "%"
+                    };
+                });
 
-                    p.addClass('changed');
-                    this.$timeout(() => p.removeClass('changed'), 1000);
-                }
-            })
-            .catch((reason) => {
-                this.issueCount = null;
+                this.builds = builds;
+            }).catch((reason) => {
+                this.builds = [];
                 console.error(reason);
             });
             this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }
-
 }

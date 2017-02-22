@@ -1,0 +1,72 @@
+﻿<md-dialog aria-label="Adicionar Widget">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Configure Gitlab Pipeline Graph Widget</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="ctrl.ok()">
+                    <md-icon aria-label="Close">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content layout-gt-sm="row" layout-padding style="width: 700px">
+            <div layout="row" layout-align="center" flex ng-if="!ctrl.projects">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+            <div ng-if="ctrl.projects" layout="column" layout-fill>
+
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="80">
+                        <label>Title:</label>
+                        <input ng-model="ctrl.vm.title" placeholder="Widget title" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Color:</label>
+                        <md-select ng-model="ctrl.vm.color" placeholder="Select the background">
+                            <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="60">
+                        <label>Project:</label>
+                        <md-select ng-model="ctrl.vm.project" placeholder="Select a project">
+                            <!--<md-select-header class="select-header">
+                                <input ng-model="searchTerm"
+                                       type="search"
+                                       placeholder="Search for a project.."
+                                       class="header-searchbox md-text">
+                            </md-select-header>
+                            <md-option-group></md-option-group>-->
+                            <md-option ng-value="opt.id" ng-repeat="opt in ctrl.projects">{{ opt.name_with_namespace }}</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Number of items:</label>
+                        <input ng-model="ctrl.vm.count" type="number" min="5" max="25" />
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Interval:</label>
+                        <md-select ng-model="ctrl.vm.poolInterval" placeholder="Select the pool interval">
+                            <md-option ng-value="opt.value" ng-repeat="opt in ctrl.intervals">{{ opt.desc }}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="80">
+                        <label>Ref:</label>
+                        <input ng-model="ctrl.vm.ref" placeholder="Type a branch name" type="text" />
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <span flex></span>
+            <!--<md-button ng-click="ctrl.cancel()">
+                Cancel
+            </md-button>-->
+        </md-dialog-actions>
+    </form>
+</md-dialog>
