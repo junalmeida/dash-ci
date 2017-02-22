@@ -100,7 +100,7 @@
                 scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
                 labels: this.data.labels,
                 state: this.data.status
-            }).$promise.then((newCount: Resources.Gitlab.IIssueCount) => {
+            }).$promise.then((newCount: Resources.Gitlab.ICount) => {
                 //var newCount = Math.round(Math.random() * 100);
 
                 if (newCount.count != this.issueCount) {

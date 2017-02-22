@@ -4,7 +4,8 @@
         project_list(): IProjectResult
         query_list(param: { project: string }): IQueryResult
         run_query(param: { project: string; queryId: string }): IRunQueryResult;
-        latest_build(param: { project: string; build: string }): IBuildResult;
+        latest_build(param: { project: string; build: number }): IBuildResult;
+        recent_builds(param: { project: string; build: number, count: number }): IBuildResult;
         build_definition_list(param: { project: string; }): IBuildDefinitionResult;
     }
 
@@ -62,6 +63,15 @@
                         headers: headers,
                         cache: false,
                         withCredentials: withCredentials 
+                    },
+
+                    recent_builds: <ng.resource.IActionDescriptor>{
+                        method: 'GET',
+                        isArray: false,
+                        url: globalOptions.tfs.host + "/:project/_apis/build/builds?definitions=:build&$top=:count&api-version=2.2",
+                        headers: headers,
+                        cache: false,
+                        withCredentials: withCredentials
                     },
 
                     build_definition_list: <ng.resource.IActionDescriptor>{

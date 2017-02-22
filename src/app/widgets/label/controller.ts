@@ -28,7 +28,7 @@
         private init() {
 
             this.data.title = this.data.title || "Label";
-            this.data.color = this.data.color || "green";
+            this.data.color = this.data.color || "semi-transp";
         }
 
         public config() {

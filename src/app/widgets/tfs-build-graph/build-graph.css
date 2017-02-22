@@ -1,5 +1,5 @@
 ﻿
-gitlab-pipeline-graph .histogram 
+tfs-build-graph .histogram 
 {
     box-sizing: border-box;
     width: 100%;
@@ -10,7 +10,7 @@ gitlab-pipeline-graph .histogram
 }
 
 
-gitlab-pipeline-graph .histogram .bar
+tfs-build-graph .histogram .bar
 {
     box-sizing: border-box;
     width: 10px;
@@ -25,12 +25,12 @@ gitlab-pipeline-graph .histogram .bar
 }
 
 
-gitlab-pipeline-graph .histogram .bar.success
+tfs-build-graph .histogram .bar.success
 {
     background-color: forestgreen;
 }
 
-gitlab-pipeline-graph .histogram .bar.failed
+tfs-build-graph .histogram .bar.failed
 {
    background-color: maroon;
 }

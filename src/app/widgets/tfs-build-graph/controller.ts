@@ -1,9 +1,9 @@
-﻿namespace DashCI.Widgets.GitlabPipelineGraph
+﻿namespace DashCI.Widgets.TfsBuildGraph
 {
-    export class GitlabPipelineGraphController implements ng.IController {
-        public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "gitlabResources"];
+    export class TfsBuildGraphController implements ng.IController {
+        public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
 
-        private data: IGitlabPipelineGraphData;
+        private data: ITfsBuildGraphData;
 
         constructor(
             private $scope: Models.IWidgetScope,
@@ -11,11 +11,11 @@
             private $timeout: ng.ITimeoutService,
             private $interval: ng.IIntervalService,
             private $mdDialog: ng.material.IDialogService,
-            private gitlabResources: () => Resources.Gitlab.IGitlabResource
+            private tfsResources: () => Resources.Tfs.ITfsResource
         ) {
             this.data = this.$scope.data;
             this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-            this.data.type = Models.WidgetType.gitlabPipelineGraph;
+            this.data.type = Models.WidgetType.tfsBuildGraph;
             this.data.footer = false;
             this.data.header = true;
 
@@ -40,11 +40,10 @@
         }
 
         private init() {
-            this.data.title = this.data.title || "Pipeline Graph";
+            this.data.title = this.data.title || "Build Graph";
             this.data.color = this.data.color || "blue";
 
             //default values
-            this.data.ref = this.data.ref || "master";
             this.data.poolInterval = this.data.poolInterval || 10000;
 
 
@@ -59,9 +58,9 @@
 
         public config() {
             this.$mdDialog.show({
-                controller: GitlabPipelineGraphConfigController,
+                controller: TfsBuildGraphConfigController,
                 controllerAs: "ctrl",
-                templateUrl: 'app/widgets/gitlab-pipeline-graph/config.html',
+                templateUrl: 'app/widgets/Tfs-Build-graph/config.html',
                 parent: angular.element(document.body),
                 //targetEvent: ev,
                 clickOutsideToClose: true,
@@ -85,32 +84,36 @@
             this.update();
         }
 
-        public pipelines: Resources.Gitlab.IPipeline[];
+        public builds: Resources.Tfs.IBuild[];
 
 
         private update() {
-            if (!this.data.project)
+            if (!this.data.project || !this.data.build)
                 return;
-            var res = this.gitlabResources();
+            var res = this.tfsResources();
             if (!res)
                 return;
 
             console.log("start request: " + this.data.id + "; " + this.data.title);
-            res.recent_pipelines({
+            res.recent_builds({
                 project: this.data.project,
-                ref: this.data.ref,
+                build: this.data.build,
                 count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
-            }).$promise.then((pipelines: Resources.Gitlab.IPipeline[]) => {
+            }).$promise.then((result) => {
                 console.log("end request: " + this.data.id + "; " + this.data.title);
-                pipelines = pipelines.filter((item) => wildcardMatch(this.data.ref, item.ref)).slice(0, this.data.count).reverse();
+                var builds = result.value.reverse();
                 var maxDuration = 1; 
-                angular.forEach(pipelines, (item) => {
-                    if (maxDuration < item.duration)
-                        maxDuration = item.duration;
+                angular.forEach(builds, (item) => {
+                    if (item.finishTime) {
+                        var duration = moment(item.finishTime).subtract(moment(item.finishTime));
+                        item.duration = duration.seconds();
+                        if (maxDuration < item.duration)
+                            maxDuration = item.duration;
+                    }
                 });
 
-                var width = (100 / pipelines.length);
-                angular.forEach(pipelines, (item, i) => {
+                var width = (100 / builds.length);
+                angular.forEach(builds, (item, i) => {
                     item.css = {
                         height: Math.round((100* item.duration) / maxDuration).toString() + "%",
                         width: width.toFixed(2) + "%",
@@ -118,9 +121,9 @@
                     };
                 });
 
-                this.pipelines = pipelines;
+                this.builds = builds;
             }).catch((reason) => {
-                this.pipelines = null;
+                this.builds = [];
                 console.error(reason);
             });
             this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
