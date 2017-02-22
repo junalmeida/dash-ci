@@ -49,6 +49,11 @@
             var lineSize = Math.round((altura) - 60) + "px";
             p.css('font-size', fontSize);
             p.css('line-height', lineSize);
+
+            var img = this.$scope.$element.find(".avatar");
+            var size = Math.round(altura - 32);
+            img.width(size);
+            img.height(size);
         }
 
         public config() {

@@ -39,4 +39,13 @@
             $rootScope.$apply();
         });
     }]);
+
+
+    export function wildcardMatch(pattern: string, source: string) {
+        pattern = pattern.replace(/[\-\[\]\/\{\}\(\)\+\.\\\^\$\|]/g, "\\$&");
+        pattern = pattern.replace(/\*/g, ".*");
+        pattern = pattern.replace(/\?/g, ".");
+        var regEx = new RegExp(pattern, "i");
+        return regEx.test(source);
+    }
 }

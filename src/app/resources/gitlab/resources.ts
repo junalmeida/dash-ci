@@ -35,7 +35,7 @@
                 project_list: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v3/projects?order_by=name&per_page=100",
+                    url: globalOptions.gitlab.host + "/api/v3/projects?order_by=last_activity_at&sort=desc&per_page=100",
                     headers: headers,
                     transformResponse: transform
                 },
@@ -43,7 +43,7 @@
                 group_list: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&per_page=100",
+                    url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&sort=asc&per_page=100",
                     headers: headers,
                     transformResponse: transform
                 },

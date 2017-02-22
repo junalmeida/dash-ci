@@ -37,6 +37,14 @@ var DashCI;
                 $rootScope.$apply();
             });
         }]);
+    function wildcardMatch(pattern, source) {
+        pattern = pattern.replace(/[\-\[\]\/\{\}\(\)\+\.\\\^\$\|]/g, "\\$&");
+        pattern = pattern.replace(/\*/g, ".*");
+        pattern = pattern.replace(/\?/g, ".");
+        var regEx = new RegExp(pattern, "i");
+        return regEx.test(source);
+    }
+    DashCI.wildcardMatch = wildcardMatch;
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
 "use strict";
@@ -347,14 +355,14 @@ var DashCI;
                         project_list: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v3/projects?order_by=name&per_page=100",
+                            url: globalOptions.gitlab.host + "/api/v3/projects?order_by=last_activity_at&sort=desc&per_page=100",
                             headers: headers,
                             transformResponse: transform
                         },
                         group_list: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&per_page=100",
+                            url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&sort=asc&per_page=100",
                             headers: headers,
                             transformResponse: transform
                         },
@@ -835,6 +843,10 @@ var DashCI;
                     var txt = this.$scope.$element.find("h4");
                     fontSize = Math.round(altura / 7) + "px";
                     txt.css('font-size', fontSize);
+                    var img = this.$scope.$element.find(".avatar");
+                    var size = Math.round(altura - 30);
+                    img.width(size);
+                    img.height(size);
                 };
                 GitlabPipelineController.prototype.config = function () {
                     var _this = this;
@@ -877,7 +889,7 @@ var DashCI;
                         console.log("end request: " + _this.data.id + "; " + _this.data.title);
                         var new_pipeline = null;
                         var refList = _this.data.refs.split(",");
-                        pipelines = pipelines.filter(function (i) { return refList.indexOf(i.ref) > -1; });
+                        pipelines = pipelines.filter(function (i) { return refList.filter(function (r) { return DashCI.wildcardMatch(r, i.ref); }).length > 0; });
                         if (pipelines.length >= 1)
                             new_pipeline = pipelines[0];
                         _this.latest = new_pipeline;
@@ -1162,7 +1174,7 @@ var DashCI;
                 };
                 return TfsBuildConfigController;
             }());
-            TfsBuildConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "config"];
+            TfsBuildConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
             TfsBuild.TfsBuildConfigController = TfsBuildConfigController;
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
@@ -1218,6 +1230,10 @@ var DashCI;
                     var txt = this.$scope.$element.find("h4");
                     fontSize = Math.round(altura / 7) + "px";
                     txt.css('font-size', fontSize);
+                    var img = this.$scope.$element.find(".avatar");
+                    var size = Math.round(altura - 30);
+                    img.width(size);
+                    img.height(size);
                 };
                 TfsBuildController.prototype.config = function () {
                     var _this = this;
@@ -1441,6 +1457,10 @@ var DashCI;
                     var lineSize = Math.round((altura) - 60) + "px";
                     p.css('font-size', fontSize);
                     p.css('line-height', lineSize);
+                    var img = this.$scope.$element.find(".avatar");
+                    var size = Math.round(altura - 32);
+                    img.width(size);
+                    img.height(size);
                 };
                 TfsQueryCountController.prototype.config = function () {
                     var _this = this;

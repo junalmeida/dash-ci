@@ -70,6 +70,11 @@
             var txt = this.$scope.$element.find("h4");
             fontSize = Math.round(altura / 7) + "px";
             txt.css('font-size', fontSize);
+
+            var img = this.$scope.$element.find(".avatar");
+            var size = Math.round(altura - 30);
+            img.width(size);
+            img.height(size);
         }
 
         public config() {

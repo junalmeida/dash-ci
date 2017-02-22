@@ -2,7 +2,7 @@
 namespace DashCI.Widgets.TfsBuild {
 
     export class TfsBuildConfigController implements ng.IController {
-        public static $inject = ["$scope", "$mdDialog", "tfsResources", "colors", "config"];
+        public static $inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
         constructor(
             private $scope: ng.IScope,
             private $mdDialog: ng.material.IDialogService,

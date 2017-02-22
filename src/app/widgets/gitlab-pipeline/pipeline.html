@@ -12,6 +12,9 @@
             <h4 ng-if="ctrl.latest.ref">{{ctrl.latest.ref}} - {{ctrl.latest.id}}</h4>
             <h4 ng-if="ctrl.latest.finished_at">{{ctrl.latest.status}} at {{ctrl.latest.finished_at | date:'MMM dd hh:mm'}}</h4>
             <h4 ng-if="ctrl.latest.created_at && !ctrl.latest.finished_at">Requested at {{ctrl.latest.created_at | date:'MMM dd hh:mm'}}</h4>
+            <div ng-if="ctrl.latest.user.avatar_url" class="avatar">
+                <i style="background-image: url({{ctrl.latest.user.avatar_url}})"></i>
+            </div>
         </div>
     </div>
     <!--
