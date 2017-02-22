@@ -14,11 +14,15 @@
             <div layout="column" layout-fill>
                 <div layout="row" layout-align="start" flex>
                     <md-input-container flex="20">
-                        <label>Rows:</label>
+                        <label>Pages:</label>
+                        <input ng-model="ctrl.pageCount" placeholder="0" type="number" required />
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Grid Rows:</label>
                         <input ng-model="ctrl.vm.rows" placeholder="0" type="number" required />
                     </md-input-container>
                     <md-input-container flex="20">
-                        <label>Columns:</label>
+                        <label>Grid Columns:</label>
                         <input ng-model="ctrl.vm.columns" placeholder="0" type="number" required />
                     </md-input-container>
                 </div>
@@ -40,7 +44,7 @@
                     </md-input-container>
                     <md-input-container flex="40">
                         <label>Tfs Personal Private Key:</label>
-                        <input ng-model="ctrl.vm.tfs.privateToken" placeholder="Private Key" type="password" />
+                        <input ng-model="ctrl.vm.tfs.privateToken" placeholder="Your private key. Leave empty for default credentials (NTLM)" type="password" />
                         <div class="hint"><a href="https://www.visualstudio.com/en-us/docs/integrate/get-started/auth/overview" target="_blank">How to generate a token?</a></div>
                     </md-input-container>
                 </div>
