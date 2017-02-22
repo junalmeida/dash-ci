@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.css" />
+    <Content Include="app.js" />
     <Content Include="app\core\add-widget.html" />
     <Content Include="app\core\global-config.html" />
     <Content Include="app\widgets\clock\clock.css" />

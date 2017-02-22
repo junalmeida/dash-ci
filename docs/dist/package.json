@@ -1,26 +1,27 @@
 {
-    "name": "dash-ci",
-    "version": "1.0.0",
-    "description": "Dashboard for continuous integration",
-    "main": "index.html",
-    "author": "Marcos Junior <junalmeida@gmail.com>",
-    "license": "MIT",
-    "dependencies": {
-        "angular": "~1.6.2",
-        "angular-animate": "~1.6.2",
-        "angular-material": "~1.1.3",
-        "angular-widget-grid": "~0.3.0",
-        "angular-aria": "~1.6.2",
-        "angular-css": "~1.0.8",
-        "angular-resource": "~1.6.2",
-        "jquery": "~3.1.1"
-    },
-    "scripts": { "start": "http-server -a 127.0.0.1 -p 8080" },
-    "devDependencies": {
-        "@types/angular": "~1.6.6",
-        "@types/angular-material": "~1.1.45",
-        "@types/angular-resource": "1.5.8",
-        "http-server": "~0.9.0"
+  "name": "dash-ci",
+  "version": "1.0.0",
+  "description": "Dashboard for continuous integration",
+  "main": "index.html",
+  "author": "Marcos Junior <junalmeida@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "angular": "~1.6.2",
+    "angular-animate": "~1.6.2",
+    "angular-material": "~1.1.3",
+    "angular-widget-grid": "~0.3.0",
+    "angular-aria": "~1.6.2",
+    "angular-css": "~1.0.8",
+    "angular-resource": "~1.6.2",
+    "jquery": "~3.1.1",
+    "moment": "~2.17.1"
+  },
+  "scripts": { "start": "http-server -a 127.0.0.1 -p 8080" },
+  "devDependencies": {
+    "@types/angular": "~1.6.6",
+    "@types/angular-material": "~1.1.45",
+    "@types/angular-resource": "1.5.8",
+    "http-server": "~0.9.0"
 
-    }
+  }
 }

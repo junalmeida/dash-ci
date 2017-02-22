@@ -345,6 +345,8 @@ var DashCI;
             WidgetType[WidgetType["tfsQueryCount"] = 4] = "tfsQueryCount";
             WidgetType[WidgetType["labelTitle"] = 5] = "labelTitle";
             WidgetType[WidgetType["tfsBuild"] = 6] = "tfsBuild";
+            WidgetType[WidgetType["gitlabPipelineGraph"] = 7] = "gitlabPipelineGraph";
+            WidgetType[WidgetType["tfsBuildGraph"] = 8] = "tfsBuildGraph";
         })(WidgetType = Models.WidgetType || (Models.WidgetType = {}));
         DashCI.app.constant("widgets", [
             {
@@ -365,22 +367,34 @@ var DashCI;
                 desc: "The (almost) real time pipeline status for a branch."
             },
             {
+                type: WidgetType.gitlabPipelineGraph,
+                directive: "gitlab-pipeline-graph",
+                title: "GitLab - Pipeline Graph",
+                desc: "The pipeline graph for last N status for a branch."
+            },
+            {
                 type: WidgetType.gitlabIssues,
                 directive: "gitlab-issues",
                 title: "GitLab - Issue Query",
                 desc: "The count of an issue query against a project."
             },
             {
-                type: WidgetType.tfsQueryCount,
-                directive: "tfs-query-count",
-                title: "TFS - Query Count",
-                desc: "The count of a saved query against a project."
-            },
-            {
                 type: WidgetType.tfsBuild,
                 directive: "tfs-build",
                 title: "TFS - Build",
                 desc: "The (almost) real time build definition status for a project."
+            },
+            {
+                type: WidgetType.tfsBuildGraph,
+                directive: "tfs-build-graph",
+                title: "TFS - Build Graph",
+                desc: "The build graph for last N builds of a branch."
+            },
+            {
+                type: WidgetType.tfsQueryCount,
+                directive: "tfs-query-count",
+                title: "TFS - Query Count",
+                desc: "The count of a saved query against a project."
             },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
@@ -395,12 +409,6 @@ var DashCI;
         (function (Gitlab) {
             DashCI.app.factory('gitlabResources', ['$resource', 'globalOptions',
                 function ($resource, globalOptions) { return function () {
-                    var transform = function (data, headers) {
-                        var data = angular.fromJson(data);
-                        if (data && typeof (data) === "object")
-                            data.headers = headers();
-                        return data;
-                    };
                     if (!globalOptions || !globalOptions.gitlab || !globalOptions.gitlab.host)
                         return null;
                     var headers = {
@@ -410,6 +418,38 @@ var DashCI;
                         headers["PRIVATE-TOKEN"] = globalOptions.gitlab.privateToken;
                     else
                         delete headers["PRIVATE-TOKEN"];
+                    var transform = function (data, headers) {
+                        var data = angular.fromJson(data);
+                        if (data && typeof (data) === "object")
+                            data.headers = headers();
+                        return data;
+                    };
+                    var countParser = function (data, getHeaders, status) {
+                        if (status == 200) {
+                            data = angular.fromJson(data);
+                            var headers = getHeaders();
+                            var parsedCount = parseInt(headers["X-Total"]);
+                            if (isNaN(parsedCount)) {
+                                parsedCount = 0;
+                                //cannot access X-Total today, let's parse
+                                var links = headers.link.split('>');
+                                angular.forEach(links, function (item) {
+                                    var matches = item.match(/page=(\d*)/);
+                                    if (matches && matches.length > 1) {
+                                        var page = Number(matches[1]);
+                                        if (page > parsedCount)
+                                            parsedCount = page;
+                                    }
+                                });
+                            }
+                            var ret = {
+                                count: parsedCount
+                            };
+                            return ret;
+                        }
+                        else
+                            return data;
+                    };
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.gitlab.host, {}, {
                         project_list: {
@@ -434,32 +474,7 @@ var DashCI;
                             url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
                             headers: headers,
                             cache: false,
-                            transformResponse: function (data, getHeaders, status) {
-                                if (status == 200) {
-                                    data = angular.fromJson(data);
-                                    var headers = getHeaders();
-                                    var parsedCount = parseInt(headers["X-Total"]);
-                                    if (isNaN(parsedCount)) {
-                                        parsedCount = 0;
-                                        //cannot access X-Total today, let's parse
-                                        var links = headers.link.split('>');
-                                        angular.forEach(links, function (item) {
-                                            var matches = item.match(/page=(\d*)/);
-                                            if (matches && matches.length > 1) {
-                                                var page = Number(matches[1]);
-                                                if (page > parsedCount)
-                                                    parsedCount = page;
-                                            }
-                                        });
-                                    }
-                                    var ret = {
-                                        count: parsedCount
-                                    };
-                                    return ret;
-                                }
-                                else
-                                    return data;
-                            }
+                            transformResponse: countParser
                         },
                         latest_pipeline: {
                             method: 'GET',
@@ -467,6 +482,20 @@ var DashCI;
                             url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
                             cache: false,
                             headers: headers
+                        },
+                        recent_pipelines: {
+                            method: 'GET',
+                            isArray: true,
+                            url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?ref=:ref&per_page=:count",
+                            cache: false,
+                            headers: headers
+                        },
+                        commit_count: {
+                            method: 'GET',
+                            isArray: true,
+                            url: globalOptions.gitlab.host + "/api/v3/projects/:project/repository/commits?ref_name=:ref&since=:since&per_page=1",
+                            cache: false,
+                            transformResponse: countParser
                         }
                     });
                 }; }]);
@@ -527,6 +556,14 @@ var DashCI;
                             method: 'GET',
                             isArray: false,
                             url: globalOptions.tfs.host + "/:project/_apis/build/builds?definitions=:build&$top=1&api-version=2.2",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        recent_builds: {
+                            method: 'GET',
+                            isArray: false,
+                            url: globalOptions.tfs.host + "/:project/_apis/build/builds?definitions=:build&$top=:count&api-version=2.2",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -1061,6 +1098,193 @@ var DashCI;
 (function (DashCI) {
     var Widgets;
     (function (Widgets) {
+        var GitlabPipelineGraph;
+        (function (GitlabPipelineGraph) {
+            var GitlabPipelineGraphConfigController = (function () {
+                function GitlabPipelineGraphConfigController($mdDialog, gitlabResources, colors, intervals, vm) {
+                    this.$mdDialog = $mdDialog;
+                    this.gitlabResources = gitlabResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.init();
+                }
+                GitlabPipelineGraphConfigController.prototype.init = function () {
+                    var _this = this;
+                    var res = this.gitlabResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
+                        .then(function (result) {
+                        _this.projects = result;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
+                };
+                //public cancel() {
+                //    this.$mdDialog.cancel();
+                //}
+                GitlabPipelineGraphConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return GitlabPipelineGraphConfigController;
+            }());
+            GitlabPipelineGraphConfigController.$inject = ["$mdDialog", "gitlabResources", "colors", "intervals", "config"];
+            GitlabPipelineGraph.GitlabPipelineGraphConfigController = GitlabPipelineGraphConfigController;
+        })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GitlabPipelineGraph;
+        (function (GitlabPipelineGraph) {
+            var GitlabPipelineGraphController = (function () {
+                function GitlabPipelineGraphController($scope, $q, $timeout, $interval, $mdDialog, gitlabResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.gitlabResources = gitlabResources;
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.gitlabPipelineGraph;
+                    this.data.footer = false;
+                    this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                GitlabPipelineGraphController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                GitlabPipelineGraphController.prototype.init = function () {
+                    this.data.title = this.data.title || "Pipeline Graph";
+                    this.data.color = this.data.color || "blue";
+                    //default values
+                    this.data.ref = this.data.ref || "master";
+                    this.data.poolInterval = this.data.poolInterval || 10000;
+                    this.updateInterval();
+                    this.update();
+                };
+                GitlabPipelineGraphController.prototype.sizeFont = function (height) {
+                    var histogram = this.$scope.$element.find(".histogram");
+                    histogram.height(height - 60);
+                };
+                GitlabPipelineGraphController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: GitlabPipelineGraph.GitlabPipelineGraphConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/gitlab-pipeline-graph/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                GitlabPipelineGraphController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
+                };
+                GitlabPipelineGraphController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.project)
+                        return;
+                    var res = this.gitlabResources();
+                    if (!res)
+                        return;
+                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    res.recent_pipelines({
+                        project: this.data.project,
+                        ref: this.data.ref,
+                        count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
+                    }).$promise.then(function (pipelines) {
+                        console.log("end request: " + _this.data.id + "; " + _this.data.title);
+                        pipelines = pipelines.filter(function (item) { return DashCI.wildcardMatch(_this.data.ref, item.ref); }).slice(0, _this.data.count).reverse();
+                        var maxDuration = 1;
+                        angular.forEach(pipelines, function (item) {
+                            if (maxDuration < item.duration)
+                                maxDuration = item.duration;
+                        });
+                        var width = (100 / pipelines.length);
+                        angular.forEach(pipelines, function (item, i) {
+                            item.css = {
+                                height: Math.round((100 * item.duration) / maxDuration).toString() + "%",
+                                width: width.toFixed(2) + "%",
+                                left: (width * i).toFixed(2) + "%"
+                            };
+                        });
+                        _this.pipelines = pipelines;
+                    }).catch(function (reason) {
+                        _this.pipelines = null;
+                        console.error(reason);
+                    });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                };
+                return GitlabPipelineGraphController;
+            }());
+            GitlabPipelineGraphController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "gitlabResources"];
+            GitlabPipelineGraph.GitlabPipelineGraphController = GitlabPipelineGraphController;
+        })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GitlabPipelineGraph;
+        (function (GitlabPipelineGraph) {
+            var GitlabPipelineGraphDirective = (function () {
+                function GitlabPipelineGraphDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/gitlab-pipeline-graph/pipeline-graph.html";
+                    this.replace = false;
+                    this.controller = GitlabPipelineGraph.GitlabPipelineGraphController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/gitlab-pipeline-graph/pipeline-graph.css",
+                        persist: true
+                    };
+                }
+                GitlabPipelineGraphDirective.create = function () {
+                    var directive = function () { return new GitlabPipelineGraphDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return GitlabPipelineGraphDirective;
+            }());
+            DashCI.app.directive("gitlabPipelineGraph", GitlabPipelineGraphDirective.create());
+        })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
         var Label;
         (function (Label) {
             var LabelConfigController = (function () {
@@ -1107,7 +1331,7 @@ var DashCI;
                 }
                 LabelController.prototype.init = function () {
                     this.data.title = this.data.title || "Label";
-                    this.data.color = this.data.color || "green";
+                    this.data.color = this.data.color || "semi-transp";
                 };
                 LabelController.prototype.config = function () {
                     var _this = this;
@@ -1459,6 +1683,212 @@ var DashCI;
             }());
             DashCI.app.directive("tfsBuild", TfsBuildDirective.create());
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsBuildGraph;
+        (function (TfsBuildGraph) {
+            var TfsBuildGraphDirective = (function () {
+                function TfsBuildGraphDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/tfs-build-graph/build-graph.html";
+                    this.replace = false;
+                    this.controller = TfsBuildGraph.TfsBuildGraphController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/tfs-build-graph/build-graph.css",
+                        persist: true
+                    };
+                }
+                TfsBuildGraphDirective.create = function () {
+                    var directive = function () { return new TfsBuildGraphDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return TfsBuildGraphDirective;
+            }());
+            DashCI.app.directive("tfsBuildGraph", TfsBuildGraphDirective.create());
+        })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsBuildGraph;
+        (function (TfsBuildGraph) {
+            var TfsBuildGraphConfigController = (function () {
+                function TfsBuildGraphConfigController($scope, $mdDialog, tfsResources, colors, intervals, vm) {
+                    this.$scope = $scope;
+                    this.$mdDialog = $mdDialog;
+                    this.tfsResources = tfsResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.init();
+                }
+                TfsBuildGraphConfigController.prototype.init = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
+                        .then(function (result) {
+                        _this.projects = result.value;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
+                    this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getBuilds(); });
+                };
+                TfsBuildGraphConfigController.prototype.getBuilds = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res || !this.vm.project)
+                        return;
+                    res.build_definition_list({ project: this.vm.project }).$promise
+                        .then(function (result) {
+                        _this.builds = result.value;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.builds = [];
+                    });
+                };
+                //public cancel() {
+                //    this.$mdDialog.cancel();
+                //}
+                TfsBuildGraphConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return TfsBuildGraphConfigController;
+            }());
+            TfsBuildGraphConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
+            TfsBuildGraph.TfsBuildGraphConfigController = TfsBuildGraphConfigController;
+        })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsBuildGraph;
+        (function (TfsBuildGraph) {
+            var TfsBuildGraphController = (function () {
+                function TfsBuildGraphController($scope, $q, $timeout, $interval, $mdDialog, tfsResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.tfsResources = tfsResources;
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.tfsBuildGraph;
+                    this.data.footer = false;
+                    this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                TfsBuildGraphController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                TfsBuildGraphController.prototype.init = function () {
+                    this.data.title = this.data.title || "Build Graph";
+                    this.data.color = this.data.color || "blue";
+                    //default values
+                    this.data.poolInterval = this.data.poolInterval || 10000;
+                    this.updateInterval();
+                    this.update();
+                };
+                TfsBuildGraphController.prototype.sizeFont = function (height) {
+                    var histogram = this.$scope.$element.find(".histogram");
+                    histogram.height(height - 60);
+                };
+                TfsBuildGraphController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: TfsBuildGraph.TfsBuildGraphConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/Tfs-Build-graph/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                TfsBuildGraphController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
+                };
+                TfsBuildGraphController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.project || !this.data.build)
+                        return;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    res.recent_builds({
+                        project: this.data.project,
+                        build: this.data.build,
+                        count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
+                    }).$promise.then(function (result) {
+                        console.log("end request: " + _this.data.id + "; " + _this.data.title);
+                        var builds = result.value.reverse();
+                        var maxDuration = 1;
+                        angular.forEach(builds, function (item) {
+                            if (item.finishTime) {
+                                var duration = moment(item.finishTime).subtract(moment(item.finishTime));
+                                item.duration = duration.seconds();
+                                if (maxDuration < item.duration)
+                                    maxDuration = item.duration;
+                            }
+                        });
+                        var width = (100 / builds.length);
+                        angular.forEach(builds, function (item, i) {
+                            item.css = {
+                                height: Math.round((100 * item.duration) / maxDuration).toString() + "%",
+                                width: width.toFixed(2) + "%",
+                                left: (width * i).toFixed(2) + "%"
+                            };
+                        });
+                        _this.builds = builds;
+                    }).catch(function (reason) {
+                        _this.builds = [];
+                        console.error(reason);
+                    });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                };
+                return TfsBuildGraphController;
+            }());
+            TfsBuildGraphController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
+            TfsBuildGraph.TfsBuildGraphController = TfsBuildGraphController;
+        })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 "use strict";
