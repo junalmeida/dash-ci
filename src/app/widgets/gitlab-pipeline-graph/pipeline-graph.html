@@ -1,0 +1,11 @@
+﻿<md-button title="Configure" class="configure-widget md-icon-button md-mini" ng-show="editable" ng-click="ctrl.config()">
+    <md-icon>settings</md-icon>
+</md-button>
+<div>
+    <div class="header">{{data.title}}</div>
+    <div class="content" layout="row" flex>
+        <div class="histogram">
+            <div class="bar" ng-repeat="item in ctrl.pipelines" ng-class="{success: item.status == 'success', failed: item.status == 'failed' }" style="height: {{item.css.height}}; width: {{item.css.width}}; left: {{item.css.left}}" title="{{item.duration}}s at {{item.finished_at}} ({{item.ref}})"></div>
+        </div>
+    </div>
+</div>

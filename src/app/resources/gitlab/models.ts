@@ -16,7 +16,7 @@
 
     }
 
-    export interface IIssueCount extends IGitlabObject {
+    export interface ICount extends IGitlabObject {
         count: number;
     }
 
@@ -30,8 +30,12 @@
             avatar_url: string;
         };
         finished_at: string;
-        duration: string;
+        duration: number;
         coverage: string;
+
+        css: { //ugly
+            width: string; height: string; left: string;
+        }
     }
 
     export interface IGroup extends IGitlabObject {

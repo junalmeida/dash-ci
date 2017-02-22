@@ -8,6 +8,7 @@ namespace DashCI.Models {
         tfsQueryCount = 4,
         labelTitle = 5,
         tfsBuild = 6,
+        gitlabPipelineGraph = 7,
     }
 
     DashCI.app.constant("widgets", <IWidgetDescription[]>[
@@ -27,6 +28,12 @@ namespace DashCI.Models {
             directive: "gitlab-pipeline",
             title: "GitLab - Pipeline",
             desc: "The (almost) real time pipeline status for a branch."
+        },
+        {
+            type: WidgetType.gitlabPipelineGraph,
+            directive: "gitlab-pipeline-graph",
+            title: "GitLab - Pipeline Graph",
+            desc: "The pipeline graph for last N status for a branch."
         },
         {
             type: WidgetType.gitlabIssues,

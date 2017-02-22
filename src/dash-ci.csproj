@@ -31,6 +31,9 @@
     <Content Include="app\widgets\gitlab-issues\config.html" />
     <Content Include="app\widgets\gitlab-issues\issues.css" />
     <Content Include="app\widgets\gitlab-issues\issues.html" />
+    <Content Include="app\widgets\gitlab-pipeline-graph\config.html" />
+    <Content Include="app\widgets\gitlab-pipeline-graph\pipeline-graph.css" />
+    <Content Include="app\widgets\gitlab-pipeline-graph\pipeline-graph.html" />
     <Content Include="app\widgets\gitlab-pipeline\config.html" />
     <Content Include="app\widgets\gitlab-pipeline\pipeline.css" />
     <Content Include="app\widgets\gitlab-pipeline\pipeline.html" />
@@ -68,6 +71,9 @@
     <TypeScriptCompile Include="app\resources\tfs\resources.ts" />
     <TypeScriptCompile Include="app\widgets\clock\controller.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-issues\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline-graph\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline-graph\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\gitlab-pipeline-graph\pipeline-graph.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-pipeline\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-pipeline\controller.ts" />
     <TypeScriptCompile Include="app\widgets\label\config-controller.ts" />
