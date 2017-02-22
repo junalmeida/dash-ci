@@ -78,9 +78,10 @@
             if (this.handle)
                 this.$interval.cancel(this.handle);
             this.handle = this.$interval(() => this.update(), this.data.poolInterval);
+            this.update();
         }
         private update() {
-            if (!this.data.project)
+            if (!this.data.project && !this.data.group)
                 return;
             var res = this.gitlabResources();
             if (!res)
@@ -106,7 +107,7 @@
                 this.issueCount = null;
                 console.error(reason);
             });
-
+            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

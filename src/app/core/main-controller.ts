@@ -111,7 +111,6 @@ namespace DashCI.Core {
         }
 
         private saveData() {
-            window.localStorage['dash-ci'] = angular.toJson([this.currentPage]);
             window.localStorage['dash-ci-options'] = angular.toJson(this.options);
         }
 
@@ -120,19 +119,16 @@ namespace DashCI.Core {
                 columns: 30,
                 rows: 20,
                 tfs: null,
-                gitlab: null
+                gitlab: null,
+                pages: [{
+                    id: "1",
+                    widgets: []
+                }]
             }
             var savedOpts = <Models.IOptions>(angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
-            angular.extend(this.options, savedOpts);
+            angular.extend(this.options, defOptions, savedOpts);
 
-            var defPage = <Models.IDashBoardPage>{
-                id: "1",
-                widgets: []
-            };
-
-            var lista = <Models.IDashBoardPage[]> (angular.fromJson(window.localStorage['dash-ci']) || [defPage]);
-
-            this.currentPage = lista[0]; //preparing to support multiple pages
+            this.currentPage = this.options.pages[0]; //preparing to support multiple pages
         }
     }
     DashCI.app.controller("MainController", MainController);

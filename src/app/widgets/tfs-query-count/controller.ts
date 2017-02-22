@@ -104,11 +104,11 @@
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
             })
-                .catch((reason) => {
-                    this.queryCount = null;
-                    console.error(reason);
-                });
-
+            .catch((reason) => {
+                this.queryCount = null;
+                console.error(reason);
+            });
+            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

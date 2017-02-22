@@ -42,7 +42,6 @@
 
             this.updateInterval();
             this.update();
-            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
         private sizeFont(altura: number) {
@@ -98,6 +97,7 @@
             if (this.handle)
                 this.$interval.cancel(this.handle);
             this.handle = this.$interval(() => this.update(), this.data.poolInterval);
+            this.update();
         }
 
         public icon = "help";
@@ -147,12 +147,11 @@
 
                 //p.addClass('changed');
                 //this.$timeout(() => p.removeClass('changed'), 1000);
-
             }).catch((reason) => {
                 this.latest = null;
                 console.error(reason);
             });
-
+            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

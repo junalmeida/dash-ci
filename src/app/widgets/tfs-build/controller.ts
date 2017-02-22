@@ -168,7 +168,7 @@
                 this.latest = null;
                 console.error(reason);
             });
-
+            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

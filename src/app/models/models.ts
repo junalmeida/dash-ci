@@ -42,6 +42,8 @@ namespace DashCI.Models {
             host: string;
             privateToken: string;
         },
+
+        pages: IDashBoardPage[]
     }
     app.value("globalOptions", <IOptions>{});
 
