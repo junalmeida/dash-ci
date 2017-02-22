@@ -18,18 +18,6 @@
             this.data.footer = false;
             this.data.header = true;
 
-            this.data.title = this.data.title || "Query";
-            this.data.color = this.data.color || "green";
-
-            //default values
-            this.data.queryId = this.data.queryId || "";
-            this.data.poolInterval = this.data.poolInterval || 20000;
-
-            this.init();
-        }
-
-        private handle: ng.IPromise<any>;
-        private init() {
             this.$scope.$watch(
                 () => this.$scope.$element.height(),
                 (height: number) => this.sizeFont(height)
@@ -38,7 +26,25 @@
                 () => this.data.poolInterval,
                 (value: number) => this.updateInterval()
             );
+            this.$scope.$on("$destroy", () => this.finalize());
 
+            this.init();
+        }
+
+        private handle: ng.IPromise<any>;
+        private finalize() {
+            if (this.handle)
+                this.$interval.cancel(this.handle);
+            console.log("dispose: " + this.data.id + "-" + this.data.title);
+        }
+
+        private init() {
+            this.data.title = this.data.title || "Query";
+            this.data.color = this.data.color || "green";
+
+            //default values
+            this.data.queryId = this.data.queryId || "";
+            this.data.poolInterval = this.data.poolInterval || 20000;
             this.updateInterval();
             this.update();
         }
@@ -104,11 +110,11 @@
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
             })
-                .catch((reason) => {
-                    this.queryCount = null;
-                    console.error(reason);
-                });
-
+            .catch((reason) => {
+                this.queryCount = null;
+                console.error(reason);
+            });
+            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

@@ -20,11 +20,8 @@
     <script type="text/javascript" src="app.js"></script>
 </head>
 <body ng-controller="MainController as main" ng-cloak>
-    <md-nav-bar md-selected-nav-item="main.selectedDashboard" ng-init="main.selectedDashboard = 'page1'">
-        <md-nav-item md-nav-click="main.Go('page1')" name="page1">Dash-CI</md-nav-item>
-        <!--<md-nav-item md-nav-click="goto('page2')" name="page2">Page Two</md-nav-item>
-        <md-nav-item md-nav-click="goto('page3')" name="page3">Page Three</md-nav-item>
-        <md-nav-item md-nav-click="goto('page4')" name="page4">Page Four</md-nav-item>-->
+    <md-nav-bar md-selected-nav-item="main.selectedPageId" nav-bar-aria-label="navigation links" ng-init="main.selectedPageId = main.options.pages[0].id">
+        <md-nav-item ng-repeat="page in main.options.pages" md-nav-click="main.Go(page)" name="{{page.id}}" value="{{page.id}}">{{page.name}}</md-nav-item>
         <section class="config">
             <span flex> </span>
             <md-button ng-click="main.toggleEditable()" title="{{main.editable ? 'Concluir' : 'Editar'}}" class="md-icon-button" ng-class="{ mdPrimary: main.editable }" aria-label="Edit dashboard page">

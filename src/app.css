@@ -141,6 +141,9 @@ span {
 .md-input-focused .md-input {
     border-color: rgb(255,171,64) !important;
 }
+.md-select:focus {
+    border-bottom-color: rgb(255,171,64) !important;
+}
 
 .md-input-focused label {
     color: rgb(255,171,64) !important;

@@ -14,21 +14,21 @@
             this.data = this.$scope.data;
             this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
             this.data.type = Models.WidgetType.labelTitle;
-
-            this.data.title = this.data.title || "Label";
             this.data.footer = false;
             this.data.header = false;
-            this.data.color = this.data.color || "green";
+            this.$scope.$watch(
+                () => this.$scope.$element.height(),
+                (height: number) => this.sizeFont(height)
+            );
 
             this.init();
         }
 
 
         private init() {
-            this.$scope.$watch(
-                () => this.$scope.$element.height(),
-                (height: number) => this.sizeFont(height)
-            );
+
+            this.data.title = this.data.title || "Label";
+            this.data.color = this.data.color || "green";
         }
 
         public config() {

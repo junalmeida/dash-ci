@@ -19,18 +19,6 @@
             this.data.footer = false;
             this.data.header = false;
 
-            this.data.title = this.data.title || "Pipeline";
-            this.data.color = this.data.color || "green";
-
-            //default values
-            this.data.refs = this.data.refs || "master";
-            this.data.poolInterval = this.data.poolInterval || 10000;
-
-            this.init();
-        }
-
-        private handle: ng.IPromise<any>;
-        private init() {
             this.$scope.$watch(
                 () => this.$scope.$element.height(),
                 (height: number) => this.sizeFont(height)
@@ -39,10 +27,29 @@
                 () => this.data.poolInterval,
                 (value: number) => this.updateInterval()
             );
+            this.$scope.$on("$destroy", () => this.finalize());
+
+            this.init();
+        }
+
+        private handle: ng.IPromise<any>;
+        private finalize() {
+            if (this.handle)
+                this.$interval.cancel(this.handle);
+            console.log("dispose: " + this.data.id + "-" + this.data.title);
+        }
+
+        private init() {
+            this.data.title = this.data.title || "Pipeline";
+            this.data.color = this.data.color || "green";
+
+            //default values
+            this.data.refs = this.data.refs || "master";
+            this.data.poolInterval = this.data.poolInterval || 10000;
+
 
             this.updateInterval();
             this.update();
-            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
         private sizeFont(altura: number) {
@@ -98,6 +105,7 @@
             if (this.handle)
                 this.$interval.cancel(this.handle);
             this.handle = this.$interval(() => this.update(), this.data.poolInterval);
+            this.update();
         }
 
         public icon = "help";
@@ -147,12 +155,11 @@
 
                 //p.addClass('changed');
                 //this.$timeout(() => p.removeClass('changed'), 1000);
-
             }).catch((reason) => {
                 this.latest = null;
                 console.error(reason);
             });
-
+            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

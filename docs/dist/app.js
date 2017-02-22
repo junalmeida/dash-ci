@@ -76,16 +76,40 @@ var DashCI;
     var Core;
     (function (Core) {
         var GlobalConfigController = (function () {
-            function GlobalConfigController($mdDialog, vm) {
+            function GlobalConfigController($mdDialog, $scope, vm) {
+                var _this = this;
                 this.$mdDialog = $mdDialog;
                 this.vm = vm;
+                this.pageCount = this.vm.pages.length;
+                $scope.$watch(function () { return _this.pageCount; }, function () { return _this.updatePages(); });
             }
             GlobalConfigController.prototype.ok = function () {
                 this.$mdDialog.hide();
             };
+            GlobalConfigController.prototype.updatePages = function () {
+                if (this.pageCount < 1)
+                    this.pageCount = 1;
+                if (this.pageCount > 5)
+                    this.pageCount = 5;
+                if (this.pageCount < this.vm.pages.length) {
+                    for (var i = this.vm.pages.length; i > this.pageCount; i--) {
+                        this.vm.pages.pop();
+                    }
+                }
+                else if (this.pageCount > this.vm.pages.length) {
+                    for (var i = this.vm.pages.length; i < this.pageCount; i++) {
+                        var id = (this.vm.pages.length + 1).toString();
+                        this.vm.pages.push({
+                            id: id,
+                            name: "Dash-CI " + id.toString(),
+                            widgets: []
+                        });
+                    }
+                }
+            };
             return GlobalConfigController;
         }());
-        GlobalConfigController.$inject = ["$mdDialog", "config"];
+        GlobalConfigController.$inject = ["$mdDialog", "$scope", "config"];
         Core.GlobalConfigController = GlobalConfigController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
@@ -129,8 +153,18 @@ var DashCI;
                 this.$scope.$on('wg-update-position', function (event, widgetInfo) {
                     console.log('A widget has changed its position!', widgetInfo);
                 });
+                this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
                 this.updateGridSize();
             }
+            MainController.prototype.changePage = function () {
+                var _this = this;
+                if (!this.currentPage || this.selectedPageId != this.currentPage.id) {
+                    this.currentPage = null;
+                    this.$timeout(function () {
+                        _this.currentPage = _this.options.pages.filter(function (item) { return item.id == _this.selectedPageId; })[0];
+                    }, 500);
+                }
+            };
             MainController.prototype.addWidgetDialog = function (ev) {
                 var _this = this;
                 if (this.additionPossible) {
@@ -185,7 +219,6 @@ var DashCI;
                 this.saveData();
             };
             MainController.prototype.saveData = function () {
-                window.localStorage['dash-ci'] = angular.toJson([this.currentPage]);
                 window.localStorage['dash-ci-options'] = angular.toJson(this.options);
             };
             MainController.prototype.loadData = function () {
@@ -193,16 +226,19 @@ var DashCI;
                     columns: 30,
                     rows: 20,
                     tfs: null,
-                    gitlab: null
+                    gitlab: null,
+                    pages: [{
+                            id: "1",
+                            name: "Dash-CI",
+                            widgets: []
+                        }]
                 };
                 var savedOpts = (angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
-                angular.extend(this.options, savedOpts);
-                var defPage = {
-                    id: "1",
-                    widgets: []
-                };
-                var lista = (angular.fromJson(window.localStorage['dash-ci']) || [defPage]);
-                this.currentPage = lista[0]; //preparing to support multiple pages
+                angular.extend(this.options, defOptions, savedOpts);
+                angular.forEach(savedOpts.pages, function (item) {
+                    item.name = item.name || "Dash-CI";
+                });
+                this.currentPage = this.options.pages[0]; //preparing to support multiple pages
             };
             return MainController;
         }());
@@ -459,6 +495,7 @@ var DashCI;
                     }
                     else {
                         delete headers.Authorization;
+                        withCredentials = true;
                     }
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.tfs.host, {}, {
@@ -547,26 +584,34 @@ var DashCI;
         (function (Clock) {
             var ClockController = (function () {
                 function ClockController($scope, $interval) {
+                    var _this = this;
                     this.$scope = $scope;
                     this.$interval = $interval;
-                    this.$scope.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-                    this.$scope.data.type = DashCI.Models.WidgetType.clock;
-                    this.$scope.data.title = "Clock";
-                    this.$scope.data.footer = false;
-                    this.$scope.data.header = true;
-                    this.$scope.data.color = "green";
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.clock;
+                    this.data.footer = false;
+                    this.data.header = true;
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.fontSize(height); });
                     this.init();
                 }
                 ClockController.prototype.init = function () {
                     var _this = this;
-                    this.$interval(function () { return _this.setClock(); }, 1000);
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.atualizarFonte(height); });
+                    this.data.title = this.$scope.data.title || "Clock";
+                    this.data.color = this.$scope.data.color || "green";
+                    this.handle = this.$interval(function () { return _this.setClock(); }, 1000);
                 };
-                ClockController.prototype.atualizarFonte = function (altura) {
-                    var fontSizeTime = Math.round(altura / 3.8) + "px";
-                    var lineTime = Math.round((altura / 2) - 20) + "px";
-                    var fontSizeDate = Math.round(altura / 5.9) + "px";
-                    var lineDate = Math.round((altura / 2) - 30) + "px";
+                ClockController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                ClockController.prototype.fontSize = function (height) {
+                    var fontSizeTime = Math.round(height / 3.8) + "px";
+                    var lineTime = Math.round((height / 2) - 20) + "px";
+                    var fontSizeDate = Math.round(height / 5.9) + "px";
+                    var lineDate = Math.round((height / 2) - 30) + "px";
                     var date = this.$scope.$element.find(".date");
                     var time = this.$scope.$element.find(".time");
                     date.css('font-size', fontSizeDate);
@@ -658,6 +703,7 @@ var DashCI;
         (function (GitlabIssues) {
             var GitlabIssuesController = (function () {
                 function GitlabIssuesController($scope, $q, $timeout, $interval, $mdDialog, gitlabResources) {
+                    var _this = this;
                     this.$scope = $scope;
                     this.$q = $q;
                     this.$timeout = $timeout;
@@ -669,25 +715,30 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.gitlabIssues;
                     this.data.footer = false;
                     this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                GitlabIssuesController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                GitlabIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
                     this.data.color = this.data.color || "red";
                     //default values
                     this.data.labels = this.data.labels || "bug";
                     this.data.status = this.data.status || "opened";
                     this.data.poolInterval = this.data.poolInterval || 10000;
-                    this.init();
-                }
-                GitlabIssuesController.prototype.init = function () {
-                    var _this = this;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
-                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.updateInterval();
                     this.update();
                 };
-                GitlabIssuesController.prototype.sizeFont = function (altura) {
+                GitlabIssuesController.prototype.sizeFont = function (height) {
                     var p = this.$scope.$element.find("p");
-                    var fontSize = Math.round(altura / 1.3) + "px";
-                    var lineSize = Math.round((altura) - 60) + "px";
+                    var fontSize = Math.round(height / 1.3) + "px";
+                    var lineSize = Math.round((height) - 60) + "px";
                     p.css('font-size', fontSize);
                     p.css('line-height', lineSize);
                 };
@@ -716,10 +767,11 @@ var DashCI;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
                     this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
                 };
                 GitlabIssuesController.prototype.update = function () {
                     var _this = this;
-                    if (!this.data.project)
+                    if (!this.data.project && !this.data.group)
                         return;
                     var res = this.gitlabResources();
                     if (!res)
@@ -742,6 +794,7 @@ var DashCI;
                         _this.issueCount = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return GitlabIssuesController;
             }());
@@ -833,6 +886,7 @@ var DashCI;
         (function (GitlabPipeline) {
             var GitlabPipelineController = (function () {
                 function GitlabPipelineController($scope, $q, $timeout, $interval, $mdDialog, gitlabResources) {
+                    var _this = this;
                     this.$scope = $scope;
                     this.$q = $q;
                     this.$timeout = $timeout;
@@ -845,20 +899,24 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.gitlabPipeline;
                     this.data.footer = false;
                     this.data.header = false;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                GitlabPipelineController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                GitlabPipelineController.prototype.init = function () {
                     this.data.title = this.data.title || "Pipeline";
                     this.data.color = this.data.color || "green";
                     //default values
                     this.data.refs = this.data.refs || "master";
                     this.data.poolInterval = this.data.poolInterval || 10000;
-                    this.init();
-                }
-                GitlabPipelineController.prototype.init = function () {
-                    var _this = this;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
-                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.updateInterval();
                     this.update();
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 GitlabPipelineController.prototype.sizeFont = function (altura) {
                     var icon = this.$scope.$element.find(".play-status md-icon");
@@ -906,6 +964,7 @@ var DashCI;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
                     this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
                 };
                 GitlabPipelineController.prototype.update = function () {
                     var _this = this;
@@ -957,6 +1016,7 @@ var DashCI;
                         _this.latest = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return GitlabPipelineController;
             }());
@@ -1032,6 +1092,7 @@ var DashCI;
         (function (Label) {
             var LabelController = (function () {
                 function LabelController($scope, $timeout, $mdDialog, $q) {
+                    var _this = this;
                     this.$scope = $scope;
                     this.$timeout = $timeout;
                     this.$mdDialog = $mdDialog;
@@ -1039,15 +1100,14 @@ var DashCI;
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                     this.data.type = DashCI.Models.WidgetType.labelTitle;
-                    this.data.title = this.data.title || "Label";
                     this.data.footer = false;
                     this.data.header = false;
-                    this.data.color = this.data.color || "green";
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
                     this.init();
                 }
                 LabelController.prototype.init = function () {
-                    var _this = this;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.data.title = this.data.title || "Label";
+                    this.data.color = this.data.color || "green";
                 };
                 LabelController.prototype.config = function () {
                     var _this = this;
@@ -1221,6 +1281,7 @@ var DashCI;
         (function (TfsBuild) {
             var TfsBuildController = (function () {
                 function TfsBuildController($scope, $q, $timeout, $interval, $mdDialog, tfsResources) {
+                    var _this = this;
                     this.$scope = $scope;
                     this.$q = $q;
                     this.$timeout = $timeout;
@@ -1233,19 +1294,23 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.tfsBuild;
                     this.data.footer = false;
                     this.data.header = false;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                TfsBuildController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                TfsBuildController.prototype.init = function () {
                     this.data.title = this.data.title || "Build";
                     this.data.color = this.data.color || "green";
                     //default values
                     this.data.poolInterval = this.data.poolInterval || 10000;
-                    this.init();
-                }
-                TfsBuildController.prototype.init = function () {
-                    var _this = this;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
-                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.updateInterval();
                     this.update();
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 TfsBuildController.prototype.sizeFont = function (altura) {
                     var icon = this.$scope.$element.find(".play-status md-icon");
@@ -1356,6 +1421,7 @@ var DashCI;
                         _this.latest = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return TfsBuildController;
             }());
@@ -1459,6 +1525,7 @@ var DashCI;
         (function (TfsQueryCount) {
             var TfsQueryCountController = (function () {
                 function TfsQueryCountController($scope, $q, $timeout, $interval, $mdDialog, tfsResources) {
+                    var _this = this;
                     this.$scope = $scope;
                     this.$q = $q;
                     this.$timeout = $timeout;
@@ -1470,17 +1537,22 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.tfsQueryCount;
                     this.data.footer = false;
                     this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                TfsQueryCountController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                TfsQueryCountController.prototype.init = function () {
                     this.data.title = this.data.title || "Query";
                     this.data.color = this.data.color || "green";
                     //default values
                     this.data.queryId = this.data.queryId || "";
                     this.data.poolInterval = this.data.poolInterval || 20000;
-                    this.init();
-                }
-                TfsQueryCountController.prototype.init = function () {
-                    var _this = this;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
-                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.updateInterval();
                     this.update();
                 };
@@ -1544,6 +1616,7 @@ var DashCI;
                         _this.queryCount = null;
                         console.error(reason);
                     });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return TfsQueryCountController;
             }());
