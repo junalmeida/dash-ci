@@ -381,20 +381,23 @@ var DashCI;
                             isArray: true,
                             url: globalOptions.gitlab.host + "/api/v3/projects?order_by=last_activity_at&sort=desc&per_page=100",
                             headers: headers,
-                            transformResponse: transform
+                            transformResponse: transform,
+                            cache: true
                         },
                         group_list: {
                             method: 'GET',
                             isArray: true,
                             url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&sort=asc&per_page=100",
                             headers: headers,
-                            transformResponse: transform
+                            transformResponse: transform,
+                            cache: true
                         },
                         issue_count: {
                             method: 'GET',
                             isArray: false,
                             url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
                             headers: headers,
+                            cache: false,
                             transformResponse: function (data, getHeaders, status) {
                                 if (status == 200) {
                                     data = angular.fromJson(data);
@@ -426,6 +429,7 @@ var DashCI;
                             method: 'GET',
                             isArray: true,
                             url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
+                            cache: false,
                             headers: headers
                         }
                     });
@@ -463,6 +467,7 @@ var DashCI;
                             isArray: false,
                             url: globalOptions.tfs.host + "/_apis/projects?api-version=2.2",
                             headers: headers,
+                            cache: true,
                             withCredentials: withCredentials
                         },
                         query_list: {
@@ -470,6 +475,7 @@ var DashCI;
                             isArray: false,
                             url: globalOptions.tfs.host + "/:project/_apis/wit/queries?$depth=2&$expand=all&api-version=2.2",
                             headers: headers,
+                            cache: true,
                             withCredentials: withCredentials
                         },
                         run_query: {
@@ -477,6 +483,7 @@ var DashCI;
                             isArray: false,
                             url: globalOptions.tfs.host + "/:project/_apis/wit/wiql/:queryId?api-version=2.2",
                             headers: headers,
+                            cache: false,
                             withCredentials: withCredentials
                         },
                         latest_build: {
@@ -484,6 +491,7 @@ var DashCI;
                             isArray: false,
                             url: globalOptions.tfs.host + "/:project/_apis/build/builds?definitions=:build&$top=1&api-version=2.2",
                             headers: headers,
+                            cache: false,
                             withCredentials: withCredentials
                         },
                         build_definition_list: {
@@ -491,6 +499,7 @@ var DashCI;
                             isArray: false,
                             url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2",
                             headers: headers,
+                            cache: false,
                             withCredentials: withCredentials
                         },
                     });
@@ -868,7 +877,7 @@ var DashCI;
                     fontSize = Math.round(altura / 7) + "px";
                     txt.css('font-size', fontSize);
                     var img = this.$scope.$element.find(".avatar");
-                    var size = Math.round(altura - 30);
+                    var size = Math.round(altura - 32);
                     img.width(size);
                     img.height(size);
                 };
@@ -1255,7 +1264,7 @@ var DashCI;
                     fontSize = Math.round(altura / 7) + "px";
                     txt.css('font-size', fontSize);
                     var img = this.$scope.$element.find(".avatar");
-                    var size = Math.round(altura - 30);
+                    var size = Math.round(altura - 32);
                     img.width(size);
                     img.height(size);
                 };

@@ -37,15 +37,17 @@ gitlab-pipeline .content
 gitlab-pipeline .content div:last-child {
     margin-top: 30px;
 }
-
+gitlab-pipeline .content div h4 {
+    z-index: 1;
+}
 gitlab-pipeline .content .avatar
 {
-    position: absolute;
     z-index: 0;
+    position: absolute;
     opacity: 0.5;
     width: 30px;
     height: 30px;
-    top: 0;
+    bottom: 0px;
     right: 0;
 }
 gitlab-pipeline .content .avatar i

@@ -72,7 +72,7 @@
             txt.css('font-size', fontSize);
 
             var img = this.$scope.$element.find(".avatar");
-            var size = Math.round(altura - 30);
+            var size = Math.round(altura - 32);
             img.width(size);
             img.height(size);
         }

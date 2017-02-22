@@ -33,6 +33,7 @@
                         isArray: false,
                         url: globalOptions.tfs.host + "/_apis/projects?api-version=2.2",
                         headers: headers,
+                        cache: true,
                         withCredentials: withCredentials 
                     },
 
@@ -41,6 +42,7 @@
                         isArray: false,
                         url: globalOptions.tfs.host + "/:project/_apis/wit/queries?$depth=2&$expand=all&api-version=2.2",
                         headers: headers,
+                        cache: true,
                         withCredentials: withCredentials 
                     },
 
@@ -49,6 +51,7 @@
                         isArray: false,
                         url: globalOptions.tfs.host + "/:project/_apis/wit/wiql/:queryId?api-version=2.2",
                         headers: headers,
+                        cache: false,
                         withCredentials: withCredentials 
                    },
 
@@ -57,6 +60,7 @@
                         isArray: false,
                         url: globalOptions.tfs.host + "/:project/_apis/build/builds?definitions=:build&$top=1&api-version=2.2",
                         headers: headers,
+                        cache: false,
                         withCredentials: withCredentials 
                     },
 
@@ -65,6 +69,7 @@
                         isArray: false,
                         url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2",
                         headers: headers,
+                        cache: false,
                         withCredentials: withCredentials 
                    },
 
