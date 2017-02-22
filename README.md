@@ -13,10 +13,10 @@ There are two options for running Dash-CI: Online from github.io or local at you
 
 To run online, goto http://junalmeida.github.io/dash-ci/dist
 
-To run from source, download, extract and run `npm install` and `npm server`.
+To run from source, download, extract and run `npm install` and `npm start`.
 
 
-Dash-Ci does not need a back-end. It uses browser local storage to save settings and service API's.
+Dash-Ci does not need a back-end. It uses browser local storage to save settings and service API's, but you need a server to serve static files since CORS does not allow XHR requests to local files.
 
 First version ships with Microsoft TFS (or Visual Studio Online) widgets and Gitlab widgets. 
 
