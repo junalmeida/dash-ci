@@ -24,8 +24,8 @@
                 }
                 else {
                     delete headers.Authorization;
+                    withCredentials = true;
                 }
-
                 // Return the resource, include your custom actions
                 return <ITfsResource>$resource(globalOptions.tfs.host, {}, {
                     project_list: <ng.resource.IActionDescriptor>{
