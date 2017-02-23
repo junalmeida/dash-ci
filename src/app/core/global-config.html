@@ -53,9 +53,14 @@
 
         <md-dialog-actions layout="row">
             <span flex></span>
-            <!--<md-button ng-click="ctrl.cancel()">
-                Cancel
-            </md-button>-->
+            <input id="import" type="file" onchange="$('#import2').click()" style="display: none" />
+            <a id="import2" ng-click="ctrl.import()" style="display: none"></a>
+            <md-button onclick="$('#import').trigger('click')">
+                Import
+            </md-button>
+            <md-button ng-click="ctrl.export()">
+                Export
+            </md-button>
         </md-dialog-actions>
     </form>
 </md-dialog>

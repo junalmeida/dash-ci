@@ -26,6 +26,11 @@ namespace DashCI.Core {
                 console.log('A widget has changed its position!', widgetInfo);
             });
 
+            this.$scope.$on("dashci-refresh", () => {
+                this.currentPage = null;
+                this.selectedPageId = this.options.pages[0].id;
+                this.changePage();
+            });
             this.$scope.$watch(() => this.selectedPageId, () => this.changePage());
             this.updateGridSize();
 
