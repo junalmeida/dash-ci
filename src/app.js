@@ -27,10 +27,11 @@ var DashCI;
         return Config;
     }());
     $(Config.supressIosRubberEffect);
-    DashCI.app.config(["$mdThemingProvider", function ($mdThemingProvider) {
+    DashCI.app.config(["$mdThemingProvider", "$resourceProvider", function ($mdThemingProvider, $resourceProvider) {
             $mdThemingProvider.theme('default')
                 .dark()
                 .accentPalette('orange');
+            //$resourceProvider.defaults.stripTrailingSlashes = true;
         }]);
     DashCI.app.run(["$rootScope", function ($rootScope) {
             angular.element(window).on("resize", function () {
@@ -278,6 +279,8 @@ var DashCI;
                     rows: 20,
                     tfs: null,
                     gitlab: null,
+                    github: [],
+                    circleci: [],
                     pages: [{
                             id: "1",
                             name: "Dash-CI",
@@ -398,6 +401,7 @@ var DashCI;
             WidgetType[WidgetType["tfsBuild"] = 6] = "tfsBuild";
             WidgetType[WidgetType["gitlabPipelineGraph"] = 7] = "gitlabPipelineGraph";
             WidgetType[WidgetType["tfsBuildGraph"] = 8] = "tfsBuildGraph";
+            WidgetType[WidgetType["githubIssues"] = 9] = "githubIssues";
         })(WidgetType = Models.WidgetType || (Models.WidgetType = {}));
         DashCI.app.constant("widgets", [
             {
@@ -447,8 +451,92 @@ var DashCI;
                 title: "TFS - Query Count",
                 desc: "The count of a saved query against a project."
             },
+            {
+                type: WidgetType.githubIssues,
+                directive: "github-issues",
+                title: "GitHub - Issue Query",
+                desc: "The count of an issue query against a repository."
+            },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Resources;
+    (function (Resources) {
+        var Github;
+        (function (Github) {
+            DashCI.app.factory('githubResources', ['$resource', 'globalOptions',
+                function ($resource, globalOptions) { return function (username) {
+                    if (!globalOptions || !globalOptions.github || globalOptions.github.length == 0)
+                        return null;
+                    var accounts = globalOptions.github.filter(function (item) { return item.username == username; });
+                    if (!accounts || accounts.length != 1)
+                        return null;
+                    var host = "https://api.github.com";
+                    var headers = {
+                        "Authorization": null,
+                    };
+                    if (accounts[0].privateToken)
+                        headers.Authorization = "Basic " + btoa(accounts[0].username + ":" + accounts[0].privateToken);
+                    else
+                        delete headers.Authorization;
+                    var transform = function (data, headers) {
+                        var data = angular.fromJson(data);
+                        if (data && typeof (data) === "object")
+                            data.headers = headers();
+                        return data;
+                    };
+                    var countParser = function (data, getHeaders, status) {
+                        if (status == 200) {
+                            data = angular.fromJson(data);
+                            var headers = getHeaders();
+                            var parsedCount = parseInt(headers["X-Total"]);
+                            if (isNaN(parsedCount)) {
+                                parsedCount = 0;
+                                //cannot access X-Total today, let's parse
+                                var links = headers.link.split('>');
+                                angular.forEach(links, function (item) {
+                                    var matches = item.match(/&page=(\d*)/);
+                                    if (matches && matches.length > 1) {
+                                        var page = Number(matches[1]);
+                                        if (page > parsedCount)
+                                            parsedCount = page;
+                                    }
+                                });
+                            }
+                            var ret = {
+                                count: parsedCount
+                            };
+                            return ret;
+                        }
+                        else
+                            return data;
+                    };
+                    // Return the resource, include your custom actions
+                    return $resource(host, {}, {
+                        repository_list: {
+                            method: 'GET',
+                            isArray: true,
+                            url: host + "/user/repos?sort=updated&direction=desc&per_page=100",
+                            headers: headers,
+                            transformResponse: transform,
+                            cache: true
+                        },
+                        issue_count: {
+                            method: 'GET',
+                            isArray: false,
+                            url: host + "/repos/:owner/:repository/issues?labels=:labels&state=:state&per_page=1",
+                            headers: headers,
+                            cache: false,
+                            transformResponse: countParser
+                        },
+                    });
+                }; }]);
+        })(Github = Resources.Github || (Resources.Github = {}));
+    })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
 "use strict";
 "use strict";
@@ -729,6 +817,199 @@ var DashCI;
             ClockController.$inject = ["$scope", "$interval"];
             Clock.ClockController = ClockController;
         })(Clock = Widgets.Clock || (Widgets.Clock = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GithubIssues;
+        (function (GithubIssues) {
+            var GithubIssuesConfigController = (function () {
+                function GithubIssuesConfigController($mdDialog, $scope, globalOptions, githubResources, colors, intervals, vm) {
+                    var _this = this;
+                    this.$mdDialog = $mdDialog;
+                    this.$scope = $scope;
+                    this.globalOptions = globalOptions;
+                    this.githubResources = githubResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.$scope.$watch(function () { return _this.vm.username; }, function () { return _this.listRepositories(); });
+                    this.init();
+                }
+                GithubIssuesConfigController.prototype.init = function () {
+                    var _this = this;
+                    this.users = [];
+                    angular.forEach(this.globalOptions.github, function (item) { return _this.users.push(item.username); });
+                };
+                GithubIssuesConfigController.prototype.listRepositories = function () {
+                    var _this = this;
+                    this.repositories = [];
+                    var res = this.githubResources(this.vm.username);
+                    if (!res)
+                        return;
+                    res.repository_list().$promise
+                        .then(function (result) {
+                        _this.repositories = result;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                    });
+                };
+                //public cancel() {
+                //    this.$mdDialog.cancel();
+                //}
+                GithubIssuesConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return GithubIssuesConfigController;
+            }());
+            GithubIssuesConfigController.$inject = ["$mdDialog", "$scope", "globalOptions", "githubResources", "colors", "intervals", "config"];
+            GithubIssues.GithubIssuesConfigController = GithubIssuesConfigController;
+        })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GithubIssues;
+        (function (GithubIssues) {
+            var GithubIssuesController = (function () {
+                function GithubIssuesController($scope, $q, $timeout, $interval, $mdDialog, githubResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.githubResources = githubResources;
+                    this.issueCount = null;
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.githubIssues;
+                    this.data.footer = false;
+                    this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                GithubIssuesController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                GithubIssuesController.prototype.init = function () {
+                    this.data.title = this.data.title || "Issues";
+                    this.data.color = this.data.color || "red";
+                    //default values
+                    this.data.labels = this.data.labels || "bug";
+                    this.data.status = this.data.status || "open";
+                    this.data.poolInterval = this.data.poolInterval || 10000;
+                    this.updateInterval();
+                    this.update();
+                };
+                GithubIssuesController.prototype.sizeFont = function (height) {
+                    var p = this.$scope.$element.find("p");
+                    var fontSize = Math.round(height / 1.3) + "px";
+                    var lineSize = Math.round((height) - 60) + "px";
+                    p.css('font-size', fontSize);
+                    p.css('line-height', lineSize);
+                };
+                GithubIssuesController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: GithubIssues.GithubIssuesConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/github-issues/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                GithubIssuesController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
+                };
+                GithubIssuesController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.repository && !this.data.username)
+                        return;
+                    var res = this.githubResources(this.data.username);
+                    if (!res)
+                        return;
+                    res.issue_count({
+                        owner: this.data.repository.split('/')[0],
+                        repository: this.data.repository.split('/')[1],
+                        labels: this.data.labels,
+                        state: this.data.status
+                    }).$promise.then(function (newCount) {
+                        //var newCount = Math.round(Math.random() * 100);
+                        if (newCount.count != _this.issueCount) {
+                            _this.issueCount = newCount.count;
+                            var p = _this.$scope.$element.find("p");
+                            p.addClass('changed');
+                            _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                    })
+                        .catch(function (reason) {
+                        _this.issueCount = null;
+                        console.error(reason);
+                    });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                };
+                return GithubIssuesController;
+            }());
+            GithubIssuesController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "githubResources"];
+            GithubIssues.GithubIssuesController = GithubIssuesController;
+        })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GithubIssues;
+        (function (GithubIssues) {
+            var GithubIssuesDirective = (function () {
+                function GithubIssuesDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/github-issues/issues.html";
+                    this.replace = false;
+                    this.controller = GithubIssues.GithubIssuesController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/github-issues/issues.css",
+                        persist: true
+                    };
+                }
+                GithubIssuesDirective.create = function () {
+                    var directive = function () { return new GithubIssuesDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return GithubIssuesDirective;
+            }());
+            DashCI.app.directive("githubIssues", GithubIssuesDirective.create());
+        })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 "use strict";

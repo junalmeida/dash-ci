@@ -139,6 +139,8 @@ namespace DashCI.Core {
                 rows: 20,
                 tfs: null,
                 gitlab: null,
+                github: [],
+                circleci: [],
                 pages: [{
                     id: "1",
                     name: "Dash-CI",

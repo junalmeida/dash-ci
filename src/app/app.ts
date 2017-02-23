@@ -29,10 +29,12 @@
 
     $(Config.supressIosRubberEffect);
 
-    app.config(["$mdThemingProvider", ($mdThemingProvider: angular.material.IThemingProvider) => {
+    app.config(["$mdThemingProvider", "$resourceProvider", ($mdThemingProvider: angular.material.IThemingProvider, $resourceProvider: ng.resource.IResourceServiceProvider) => {
         $mdThemingProvider.theme('default')
             .dark()
             .accentPalette('orange');
+
+        //$resourceProvider.defaults.stripTrailingSlashes = true;
     }]);
     app.run(["$rootScope", ($rootScope: ng.IRootScopeService) => {
         angular.element(window).on("resize", () => {

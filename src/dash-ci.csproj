@@ -29,6 +29,9 @@
     <Content Include="app\core\global-config.html" />
     <Content Include="app\widgets\clock\clock.css" />
     <Content Include="app\widgets\clock\clock.html" />
+    <Content Include="app\widgets\github-issues\config.html" />
+    <Content Include="app\widgets\github-issues\issues.css" />
+    <Content Include="app\widgets\github-issues\issues.html" />
     <Content Include="app\widgets\gitlab-issues\config.html" />
     <Content Include="app\widgets\gitlab-issues\issues.css" />
     <Content Include="app\widgets\gitlab-issues\issues.html" />
@@ -73,9 +76,14 @@
     <TypeScriptCompile Include="app\core\add-widget-controller.ts" />
     <TypeScriptCompile Include="app\core\global-config-controller.ts" />
     <TypeScriptCompile Include="app\models\widgets.ts" />
+    <TypeScriptCompile Include="app\resources\github\models.ts" />
+    <TypeScriptCompile Include="app\resources\github\resources.ts" />
     <TypeScriptCompile Include="app\resources\tfs\models.ts" />
     <TypeScriptCompile Include="app\resources\tfs\resources.ts" />
     <TypeScriptCompile Include="app\widgets\clock\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\github-issues\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\github-issues\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\github-issues\issues.ts" />
     <TypeScriptCompile Include="app\widgets\gitlab-issues\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build-graph\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build-graph\controller.ts" />

@@ -10,6 +10,7 @@ namespace DashCI.Models {
         tfsBuild = 6,
         gitlabPipelineGraph = 7,
         tfsBuildGraph = 8,
+        githubIssues = 9,
     }
 
     DashCI.app.constant("widgets", <IWidgetDescription[]>[
@@ -59,6 +60,12 @@ namespace DashCI.Models {
             directive: "tfs-query-count",
             title: "TFS - Query Count",
             desc: "The count of a saved query against a project."
+        },
+        {
+            type: WidgetType.githubIssues,
+            directive: "github-issues",
+            title: "GitHub - Issue Query",
+            desc: "The count of an issue query against a repository."
         },
     ]);
 }

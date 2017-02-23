@@ -44,6 +44,16 @@ namespace DashCI.Models {
             privateToken: string;
         },
 
+        github: {
+            username: string;
+            privateToken: string
+        }[],
+
+        circleci: {
+            username: string;
+            privateToken: string
+        }[],
+
         pages: IDashBoardPage[]
     }
     app.value("globalOptions", <IOptions>{});
