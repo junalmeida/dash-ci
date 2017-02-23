@@ -76,9 +76,11 @@ var DashCI;
     var Core;
     (function (Core) {
         var GlobalConfigController = (function () {
-            function GlobalConfigController($mdDialog, $scope, vm) {
+            function GlobalConfigController($timeout, $mdDialog, $scope, $rootscope, vm) {
                 var _this = this;
+                this.$timeout = $timeout;
                 this.$mdDialog = $mdDialog;
+                this.$rootscope = $rootscope;
                 this.vm = vm;
                 this.pageCount = this.vm.pages.length;
                 $scope.$watch(function () { return _this.pageCount; }, function () { return _this.updatePages(); });
@@ -107,9 +109,53 @@ var DashCI;
                     }
                 }
             };
+            GlobalConfigController.prototype.reset = function () {
+            };
+            GlobalConfigController.prototype.import = function () {
+                var _this = this;
+                var inputFile = $("#import").get(0);
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    try {
+                        var obj = angular.fromJson(event.target.result);
+                        if (obj && obj.pages && obj.pages.length && obj.pages.length > 0) {
+                            if (confirm("This will reset your current configuration and replace with the file imported.\n\nConfirm importing the file?")) {
+                                _this.vm.pages = null;
+                                angular.extend(_this.vm, obj);
+                            }
+                            alert("File imported successfully");
+                            _this.$rootscope.$apply();
+                            _this.$rootscope.$broadcast("dashci-refresh");
+                        }
+                        else
+                            throw "File format not supported.";
+                    }
+                    catch (e) {
+                        alert(e);
+                    }
+                };
+                reader.readAsText(inputFile.files[0]);
+                inputFile.value = null;
+            };
+            GlobalConfigController.prototype.export = function () {
+                var data = jQuery.extend(true, {}, this.vm);
+                data.gitlab.privateToken = null;
+                data.tfs.privateToken = null;
+                var datatxt = angular.toJson(data);
+                var myBlob = new Blob([datatxt], { type: "application/json" });
+                var url = window.URL.createObjectURL(myBlob);
+                var a = document.createElement("a");
+                a.style.display = "none";
+                document.body.appendChild(a);
+                a.href = url;
+                a.download = "dash-ci.json";
+                a.click();
+                this.$timeout(function () { return window.URL.revokeObjectURL(url); }, 1000);
+                alert("Your configuration was exported. Take note of your private keys, they are not saved to the exported file.");
+            };
             return GlobalConfigController;
         }());
-        GlobalConfigController.$inject = ["$mdDialog", "$scope", "config"];
+        GlobalConfigController.$inject = ["$timeout", "$mdDialog", "$scope", "$rootScope", "config"];
         Core.GlobalConfigController = GlobalConfigController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
@@ -152,6 +198,11 @@ var DashCI;
                 });
                 this.$scope.$on('wg-update-position', function (event, widgetInfo) {
                     console.log('A widget has changed its position!', widgetInfo);
+                });
+                this.$scope.$on("dashci-refresh", function () {
+                    _this.currentPage = null;
+                    _this.selectedPageId = _this.options.pages[0].id;
+                    _this.changePage();
                 });
                 this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
                 this.updateGridSize();
