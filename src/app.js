@@ -402,6 +402,7 @@ var DashCI;
             WidgetType[WidgetType["gitlabPipelineGraph"] = 7] = "gitlabPipelineGraph";
             WidgetType[WidgetType["tfsBuildGraph"] = 8] = "tfsBuildGraph";
             WidgetType[WidgetType["githubIssues"] = 9] = "githubIssues";
+            WidgetType[WidgetType["tfsRelease"] = 10] = "tfsRelease";
         })(WidgetType = Models.WidgetType || (Models.WidgetType = {}));
         DashCI.app.constant("widgets", [
             {
@@ -444,6 +445,12 @@ var DashCI;
                 directive: "tfs-build-graph",
                 title: "TFS - Build Graph",
                 desc: "The build graph for last N builds of a branch."
+            },
+            {
+                type: WidgetType.tfsRelease,
+                directive: "tfs-release",
+                title: "TFS - Release Status",
+                desc: "The release status for a release definition."
             },
             {
                 type: WidgetType.tfsQueryCount,
@@ -711,6 +718,22 @@ var DashCI;
                             method: 'GET',
                             isArray: false,
                             url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        release_definition_list: {
+                            method: 'GET',
+                            isArray: false,
+                            url: globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com") + "/:project/_apis/release/definitions?api-version=3.0-preview.1",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        recent_releases: {
+                            method: 'GET',
+                            isArray: false,
+                            url: globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com") + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=1&queryOrder=descending",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -2416,6 +2439,200 @@ var DashCI;
             }());
             DashCI.app.directive("tfsQueryCount", TfsQueryCountDirective.create());
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsRelease;
+        (function (TfsRelease) {
+            var TfsReleaseConfigController = (function () {
+                function TfsReleaseConfigController($scope, $mdDialog, tfsResources, colors, intervals, vm) {
+                    this.$scope = $scope;
+                    this.$mdDialog = $mdDialog;
+                    this.tfsResources = tfsResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.init();
+                }
+                TfsReleaseConfigController.prototype.init = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
+                        .then(function (result) {
+                        _this.projects = result.value;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
+                    this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getReleaseDefs(); });
+                };
+                TfsReleaseConfigController.prototype.getReleaseDefs = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res || !this.vm.project)
+                        return;
+                    res.release_definition_list({ project: this.vm.project }).$promise
+                        .then(function (result) {
+                        _this.releases = result.value;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.releases = [];
+                    });
+                };
+                //public cancel() {
+                //    this.$mdDialog.cancel();
+                //}
+                TfsReleaseConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return TfsReleaseConfigController;
+            }());
+            TfsReleaseConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
+            TfsRelease.TfsReleaseConfigController = TfsReleaseConfigController;
+        })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsRelease;
+        (function (TfsRelease) {
+            var TfsReleaseController = (function () {
+                function TfsReleaseController($scope, $q, $timeout, $interval, $mdDialog, tfsResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.tfsResources = tfsResources;
+                    this.icon = "help";
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.tfsRelease;
+                    this.data.footer = false;
+                    this.data.header = false;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                TfsReleaseController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                TfsReleaseController.prototype.init = function () {
+                    this.data.title = this.data.title || "Release";
+                    this.data.color = this.data.color || "green";
+                    //default values
+                    this.data.poolInterval = this.data.poolInterval || 10000;
+                    this.updateInterval();
+                    this.update();
+                };
+                TfsReleaseController.prototype.sizeFont = function (altura) {
+                    //var icon = this.$scope.$element.find(".play-status md-icon");
+                    //var fontSize = Math.round(altura / 1) + "px";
+                    ////var lineSize = Math.round((altura) - 60) + "px";
+                    //icon.css('font-size', fontSize);
+                    //icon.parent().width(Math.round(altura / 1));
+                    ////p.css('line-height', lineSize);
+                    //var header = this.$scope.$element.find(".header");
+                    //fontSize = Math.round(altura / 1) + "px";
+                    //header.css('text-indent', fontSize);
+                    ////var title = this.$scope.$element.find("h2");
+                    ////fontSize = Math.round(altura / 6) + "px";
+                    ////title.css('font-size', fontSize);
+                    //var txt = this.$scope.$element.find("h4");
+                    //fontSize = Math.round(altura / 7) + "px";
+                    //txt.css('font-size', fontSize);
+                    //var img = this.$scope.$element.find(".avatar");
+                    //var size = Math.round(altura - 32);
+                    //img.width(size);
+                    //img.height(size);
+                };
+                TfsReleaseController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: TfsRelease.TfsReleaseConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/tfs-release/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                TfsReleaseController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                };
+                TfsReleaseController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.project || !this.data.release)
+                        return;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                };
+                return TfsReleaseController;
+            }());
+            TfsReleaseController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
+            TfsRelease.TfsReleaseController = TfsReleaseController;
+        })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsRelease;
+        (function (TfsRelease) {
+            var TfsReleaseDirective = (function () {
+                function TfsReleaseDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/tfs-release/release.html";
+                    this.replace = false;
+                    this.controller = TfsRelease.TfsReleaseController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/tfs-release/release.css",
+                        persist: true
+                    };
+                }
+                TfsReleaseDirective.create = function () {
+                    var directive = function () { return new TfsReleaseDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return TfsReleaseDirective;
+            }());
+            DashCI.app.directive("tfsRelease", TfsReleaseDirective.create());
+        })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 //# sourceMappingURL=app.js.map

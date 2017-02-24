@@ -11,9 +11,17 @@
         count: number;
         value: IBuild[];
     }
+    export interface IReleaseResult extends ng.resource.IResource<IReleaseResult> {
+        count: number;
+        value: IRelease[];
+    }
     export interface IBuildDefinitionResult extends ng.resource.IResource<IBuildDefinitionResult> {
         count: number;
         value: IBuildDefinition[];
+    }
+    export interface IReleaseDefinitionResult extends ng.resource.IResource<IReleaseDefinitionResult> {
+        count: number;
+        value: IReleaseDefinition[];
     }
     export interface IQueryResult extends ng.resource.IResource<IQueryResult> {
         count: number;
@@ -59,5 +67,27 @@
     export interface IBuildDefinition {
         id: string;
         name: string;
+    }
+    export interface IReleaseDefinition {
+        id: string;
+        name: string;
+    }
+
+
+
+    export interface IRelease {
+        id: string;
+        name: string;
+
+        status: string;
+        reason: string;
+        environments: IReleaseEnvironment[]
+    }
+
+    export interface IReleaseEnvironment {
+        id: number;
+        name: string;
+        rank: number;
+        status: string;
     }
 }

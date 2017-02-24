@@ -53,6 +53,9 @@
     <Content Include="app\widgets\tfs-query-count\config.html" />
     <Content Include="app\widgets\tfs-query-count\tfs-query-count.css" />
     <Content Include="app\widgets\tfs-query-count\tfs-query-count.html" />
+    <Content Include="app\widgets\tfs-release\release.css" />
+    <Content Include="app\widgets\tfs-release\release.html" />
+    <Content Include="app\widgets\tfs-release\config.html" />
     <Content Include="index.html" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +115,9 @@
     <TypeScriptCompile Include="app\models\models.ts" />
     <TypeScriptCompile Include="app\resources\gitlab\resources.ts" />
     <TypeScriptCompile Include="app\resources\gitlab\models.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-release\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-release\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-release\directive.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="tsconfig.json" />
