@@ -12,8 +12,6 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
-    "pretty": true,
-    "listFiles":  true,
 
     "module": "none",
     "moduleResolution": "node",
