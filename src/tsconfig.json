@@ -20,7 +20,6 @@
     "outFile": "./app.js",
     "sourceMap": true,
     "target": "es5",
-    "sourceRoot": "./app",
     "typeRoots": [
       "./node_modules/@types",
       "./@dev-types"
