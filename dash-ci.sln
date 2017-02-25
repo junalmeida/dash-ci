@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dash-ci", "dash-ci.csproj", "{3B2A4FB1-B27A-4FC4-AF5D-26C6DFB1CD43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dash-ci", "src/dash-ci.csproj", "{3B2A4FB1-B27A-4FC4-AF5D-26C6DFB1CD43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

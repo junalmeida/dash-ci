@@ -12,13 +12,15 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
-    "pretty": false,
+    "pretty": true,
+    "listFiles":  true,
 
     "module": "none",
     "moduleResolution": "node",
     "outFile": "./app.js",
     "sourceMap": true,
     "target": "es5",
+    "sourceRoot": "./app",
     "typeRoots": [
       "./node_modules/@types",
       "./@dev-types"

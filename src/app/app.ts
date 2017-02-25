@@ -13,11 +13,11 @@
         public static supressIosRubberEffect() {
             var firstMove: boolean = false;
 
-            window.addEventListener('touchstart', function (e) {
+            window.addEventListener('touchstart', (e) => {
                 firstMove = true;
             });
 
-            window.addEventListener('touchmove', function (e) {
+            window.addEventListener('touchmove', (e) => {
                 if (firstMove) {
                     e.preventDefault();
                     firstMove = false;
