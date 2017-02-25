@@ -125,8 +125,10 @@
     <Content Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="github-pages.pubxml" />
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\PublishProfiles\github-pages.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
