@@ -9,6 +9,7 @@
         build_definition_list(param: { project: string; }): IBuildDefinitionResult;
 
         release_definition_list(param: { project: string; }): IReleaseDefinitionResult;
+        latest_release(param: { project: string; release: number }): IReleaseResult;
         recent_releases(param: { project: string; release: number }): IReleaseResult;
     }
 
@@ -30,6 +31,8 @@
                     delete headers.Authorization;
                     withCredentials = true;
                 }
+
+                var tfs_release_preview = globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com");
                 // Return the resource, include your custom actions
                 return <ITfsResource>$resource(globalOptions.tfs.host, {}, {
                     project_list: <ng.resource.IActionDescriptor>{
@@ -89,7 +92,16 @@
                     release_definition_list: <ng.resource.IActionDescriptor>{
                         method: 'GET',
                         isArray: false,
-                        url: globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com") + "/:project/_apis/release/definitions?api-version=3.0-preview.1",
+                        url: tfs_release_preview + "/:project/_apis/release/definitions?api-version=3.0-preview.1",
+                        headers: headers,
+                        cache: false,
+                        withCredentials: withCredentials
+                    },
+
+                    latest_release: <ng.resource.IActionDescriptor>{
+                        method: 'GET',
+                        isArray: false,
+                        url: tfs_release_preview + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=1&queryOrder=descending",
                         headers: headers,
                         cache: false,
                         withCredentials: withCredentials
@@ -98,7 +110,7 @@
                     recent_releases: <ng.resource.IActionDescriptor>{
                         method: 'GET',
                         isArray: false,
-                        url: globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com") + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=1&queryOrder=descending",
+                        url: tfs_release_preview + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=25&queryOrder=descending",
                         headers: headers,
                         cache: false,
                         withCredentials: withCredentials

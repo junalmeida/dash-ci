@@ -672,6 +672,7 @@ var DashCI;
                         delete headers.Authorization;
                         withCredentials = true;
                     }
+                    var tfs_release_preview = globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com");
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.tfs.host, {}, {
                         project_list: {
@@ -725,7 +726,15 @@ var DashCI;
                         release_definition_list: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com") + "/:project/_apis/release/definitions?api-version=3.0-preview.1",
+                            url: tfs_release_preview + "/:project/_apis/release/definitions?api-version=3.0-preview.1",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        latest_release: {
+                            method: 'GET',
+                            isArray: false,
+                            url: tfs_release_preview + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=1&queryOrder=descending",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -733,7 +742,7 @@ var DashCI;
                         recent_releases: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com") + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=1&queryOrder=descending",
+                            url: tfs_release_preview + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=25&queryOrder=descending",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -2516,7 +2525,6 @@ var DashCI;
                     this.$interval = $interval;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
-                    this.icon = "help";
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                     this.data.type = DashCI.Models.WidgetType.tfsRelease;
@@ -2540,9 +2548,12 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                TfsReleaseController.prototype.sizeFont = function (altura) {
+                TfsReleaseController.prototype.sizeFont = function (height) {
+                    var help_icon = this.$scope.$element.find(".unknown");
+                    var size = Math.round(height / 1) - 30;
+                    help_icon.css("font-size", size);
+                    help_icon.height(size);
                     //var icon = this.$scope.$element.find(".play-status md-icon");
-                    //var fontSize = Math.round(altura / 1) + "px";
                     ////var lineSize = Math.round((altura) - 60) + "px";
                     //icon.css('font-size', fontSize);
                     //icon.parent().width(Math.round(altura / 1));
@@ -2595,6 +2606,14 @@ var DashCI;
                     if (!res)
                         return;
                     console.log("start request: " + this.data.id + "; " + this.data.title);
+                    res.latest_release({ project: this.data.project, release: this.data.release })
+                        .$promise.then(function (result) {
+                        _this.latest = result.value.length > 0 ? result.value[0] : null;
+                    })
+                        .catch(function (error) {
+                        _this.latest = null;
+                        console.error(error);
+                    });
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return TfsReleaseController;

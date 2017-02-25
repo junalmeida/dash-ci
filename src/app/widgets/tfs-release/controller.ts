@@ -57,9 +57,13 @@
             this.update();
         }
 
-        private sizeFont(altura: number) {
+        private sizeFont(height: number) {
+            var help_icon = this.$scope.$element.find(".unknown");
+            var size = Math.round(height / 1) - 30;
+            help_icon.css("font-size", size);
+            help_icon.height(size);
+
             //var icon = this.$scope.$element.find(".play-status md-icon");
-            //var fontSize = Math.round(altura / 1) + "px";
             ////var lineSize = Math.round((altura) - 60) + "px";
             //icon.css('font-size', fontSize);
             //icon.parent().width(Math.round(altura / 1));
@@ -110,8 +114,7 @@
             this.handle = this.$interval(() => this.update(), this.data.poolInterval);
         }
 
-        public icon = "help";
-        public latest: Resources.Tfs.IBuild;
+        public latest: Resources.Tfs.IRelease;
 
         private update() {
             if (!this.data.project || !this.data.release)
@@ -122,6 +125,14 @@
 
 
             console.log("start request: " + this.data.id + "; " + this.data.title);
+            res.latest_release({ project: this.data.project, release: this.data.release })
+                .$promise.then((result) => {
+                    this.latest = result.value.length > 0 ? result.value[0] : null; 
+                })
+                .catch((error) => {
+                    this.latest = null;
+                    console.error(error);
+                })
 
             this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
