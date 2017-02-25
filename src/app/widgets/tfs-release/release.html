@@ -3,9 +3,20 @@
 </md-button>
 <div>
     <div class="header">{{data.title}}</div>
-    <div class="content" layout="row" flex>
-        <md-icon class="unknown" ng-if="!ctrl.latest">help</md-icon>
-
+    <div class="content" flex>
+        <md-icon class="unknown" ng-show="!ctrl.latest">help</md-icon>
+        <div class="env-row" ng-repeat="e0 in ctrl.environments | filter: ctrl.filterAutomaticAfterReleaseOrManual">
+            <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}">
+                <div class="env" style="height: {{ctrl.env.height}}">
+                    <header>{{e0.name}}</header>
+                </div>
+            </div>
+            <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}" ng-repeat="e1 in ctrl.environments | filter: ctrl.filterSubSequentEnvironments(e0.name)">
+                <div class="env" style="height: {{ctrl.env.height}}">
+                    <header>{{e1.name}}</header>
+                </div>
+            </div>
+        </div>
     </div>
     <!--
         <md-icon>help_outline</md-icon>

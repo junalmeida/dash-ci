@@ -4,4 +4,34 @@
     text-align: center;
 }
 
+tfs-release .env-row {
+    box-sizing: border-box;
+    position: relative;
+    padding-right: 10px;
+}
 
+tfs-release .env-row .envcontainer {
+    box-sizing: border-box;
+    display: inline-block;
+
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+
+tfs-release .env-row .env
+{
+    background-color: rgba(0, 0, 0, 0.24);
+    display: block;
+    width: 100%;
+    min-width: 30px;
+    min-height: 30px;
+}
+
+tfs-release .env-row  .env header {
+    color: #fff;
+    background: rgba(0,0,0,.18);
+    text-align:center;
+    font-weight: normal;
+    padding: 5px 0;
+}

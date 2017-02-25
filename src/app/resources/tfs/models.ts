@@ -15,6 +15,11 @@
         count: number;
         value: IRelease[];
     }
+    export interface IReleaseEnvironmentResult extends ng.resource.IResource<IReleaseEnvironmentResult> {
+        environments: IReleaseEnvironment[]
+        releaseDefinition: IReleaseDefinition;
+        releases: IRelease[]
+    }
     export interface IBuildDefinitionResult extends ng.resource.IResource<IBuildDefinitionResult> {
         count: number;
         value: IBuildDefinition[];
@@ -89,5 +94,11 @@
         name: string;
         rank: number;
         status: string;
+        lastReleases: IRelease[],
+        conditions: {
+            conditionType: string;
+            name: string;
+            value: string;
+        }[]
     }
 }

@@ -58,34 +58,24 @@
         }
 
         private sizeFont(height: number) {
+            var header_size = this.$scope.$element.find(".header").height();
             var help_icon = this.$scope.$element.find(".unknown");
-            var size = Math.round(height / 1) - 30;
+            var size = Math.round(height / 1) - header_size - 5;
             help_icon.css("font-size", size);
             help_icon.height(size);
 
-            //var icon = this.$scope.$element.find(".play-status md-icon");
-            ////var lineSize = Math.round((altura) - 60) + "px";
-            //icon.css('font-size', fontSize);
-            //icon.parent().width(Math.round(altura / 1));
-            ////p.css('line-height', lineSize);
+            var padding = Number(this.$scope.$element.find(".envcontainer").css("padding-top")) || 5;
 
-
-            //var header = this.$scope.$element.find(".header");
-            //fontSize = Math.round(altura / 1) + "px";
-            //header.css('text-indent', fontSize);
-
-            ////var title = this.$scope.$element.find("h2");
-            ////fontSize = Math.round(altura / 6) + "px";
-            ////title.css('font-size', fontSize);
-            //var txt = this.$scope.$element.find("h4");
-            //fontSize = Math.round(altura / 7) + "px";
-            //txt.css('font-size', fontSize);
-
-            //var img = this.$scope.$element.find(".avatar");
-            //var size = Math.round(altura - 32);
-            //img.width(size);
-            //img.height(size);
+            this.env.height = ((height - header_size - 25) / this.rowCount() - (padding * 2)).toFixed(2) + "px";
+            this.envcontainer.width = ((100 / this.maxColumnCount()) - 0.5).toFixed(2) + "%";
         }
+
+        public envcontainer = {
+            width: "0%"
+        };
+        public env = {
+            height: "0px"
+        };
 
         public config() {
             this.$mdDialog.show({
@@ -115,6 +105,8 @@
         }
 
         public latest: Resources.Tfs.IRelease;
+        public environments: Resources.Tfs.IReleaseEnvironment[];
+        public releaseDefinition: Resources.Tfs.IReleaseDefinition;
 
         private update() {
             if (!this.data.project || !this.data.release)
@@ -125,17 +117,62 @@
 
 
             console.log("start request: " + this.data.id + "; " + this.data.title);
-            res.latest_release({ project: this.data.project, release: this.data.release })
+            res.latest_release_environments({ project: this.data.project, release: this.data.release })
                 .$promise.then((result) => {
-                    this.latest = result.value.length > 0 ? result.value[0] : null; 
+                    this.latest = result.releases.length > 0 ? result.releases[0] : null; 
+                    if (this.latest) {
+                        this.environments = this.latest.environments;
+                        angular.forEach(this.environments, (item) => {
+                            var global = result.environments.filter((e) => e.id == item.id);
+                            if (global && global.length == 1)
+                                item.lastReleases = global[0].lastReleases;
+                        });
+                    }
+                    else
+                        this.environments = null;
+                    this.releaseDefinition = result.releaseDefinition;
+                    this.sizeFont(this.$scope.$element.height());
                 })
                 .catch((error) => {
                     this.latest = null;
+                    this.environments = null;
+                    this.releaseDefinition = null;
                     console.error(error);
+                    this.sizeFont(this.$scope.$element.height());
                 })
 
-            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
+
+        private rowCount() {
+            var items = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
+            return items.length;
+        }
+
+        private maxColumnCount() {
+            var items = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
+            var maxColumns = 0;
+            angular.forEach(items, (item) => {
+                var columns = this.environments.filter((e) => this.filterSubSequentEnvironments(item.name)(e));
+                if (columns.length + 1> maxColumns)
+                    maxColumns = columns.length + 1;
+            });
+            return maxColumns;
+        }
+
+        public filterAutomaticAfterReleaseOrManual(element: Resources.Tfs.IReleaseEnvironment) {
+            return (element.conditions && element.conditions[0] && element.conditions[0].name == "ReleaseStarted") ||
+                    (element.conditions && element.conditions.length == 0)//manual
+                ;
+        }
+
+
+        public filterSubSequentEnvironments(rootName: string) {
+            return (element: Resources.Tfs.IReleaseEnvironment) =>
+                element.conditions && element.conditions[0] &&
+                element.conditions[0].conditionType == "environmentState" &&
+                element.conditions[0].name == rootName;
+        }
+
 
     }
 

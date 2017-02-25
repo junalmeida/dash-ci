@@ -9,7 +9,7 @@
         build_definition_list(param: { project: string; }): IBuildDefinitionResult;
 
         release_definition_list(param: { project: string; }): IReleaseDefinitionResult;
-        latest_release(param: { project: string; release: number }): IReleaseResult;
+        latest_release_environments(param: { project: string; release: number }): IReleaseEnvironmentResult;
         recent_releases(param: { project: string; release: number }): IReleaseResult;
     }
 
@@ -98,10 +98,10 @@
                         withCredentials: withCredentials
                     },
 
-                    latest_release: <ng.resource.IActionDescriptor>{
+                    latest_release_environments: <ng.resource.IActionDescriptor>{
                         method: 'GET',
                         isArray: false,
-                        url: tfs_release_preview + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=1&queryOrder=descending",
+                        url: tfs_release_preview + "/:project/_apis/release/releases?definitionId=:release&releaseCount=1&includeArtifact=false",
                         headers: headers,
                         cache: false,
                         withCredentials: withCredentials
