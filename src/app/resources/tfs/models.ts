@@ -106,5 +106,8 @@
         preDeployApprovals: {
             status: string;
         }[];
+        postDeployApprovals: {
+            status: string;
+        }[];
     }
 }

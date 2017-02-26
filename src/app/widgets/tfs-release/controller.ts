@@ -237,7 +237,14 @@
             preDeploy = item.preDeployApprovals.filter((p) => p.status == "rejected");
             if (preDeploy.length > 0)
                 item.icon = "assignment_late";
-        }
+
+            var postDeploy = item.postDeployApprovals.filter((p) => p.status == "pending");
+            if (postDeploy.length > 0)
+                item.icon = "assignment_ind";
+            postDeploy = item.postDeployApprovals.filter((p) => p.status == "rejected");
+            if (postDeploy.length > 0)
+                item.icon = "assignment_late";
+       }
     }
 
 }
