@@ -2676,7 +2676,7 @@ var DashCI;
                 };
                 TfsReleaseController.prototype.setIcon = function (item) {
                     switch (item.status) {
-                        case "inprogress":
+                        case "inProgress":
                             item.icon = "play_circle_filled";
                             break;
                         case "canceled":

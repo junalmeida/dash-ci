@@ -210,7 +210,7 @@
 
         private setIcon(item: Resources.Tfs.IReleaseEnvironment) {
             switch (item.status) {
-                case "inprogress":
+                case "inProgress":
                     item.icon = "play_circle_filled"; break;
                 case "canceled":
                     item.icon = "remove_circle"; break;

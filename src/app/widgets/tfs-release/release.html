@@ -7,13 +7,13 @@
         <md-icon class="unknown" ng-show="!ctrl.latest">help</md-icon>
         <div class="env-row" ng-repeat="row in ctrl.environment_rows">
             <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}" ng-repeat="env in row">
-                <div class="play-status" style="height: {{ctrl.env.height}}; width: {{ctrl.env.height}};" ng-class="{ blink: env.icon == 'play_circle_filled', error: env.icon == 'error'}">
+                <div ng-if="env.lastReleases.length > 0" class="play-status" style="height: {{ctrl.env.height}}; width: {{ctrl.env.height}};" ng-class="{ blink: env.icon == 'play_circle_filled', error: env.icon == 'error'}">
                     <md-icon style="font-size: {{ctrl.env.iconSize}}">{{env.icon}}</md-icon>
                 </div>
                 <div class="env" style="height: {{ctrl.env.height}}">
                     <header style="padding-left: {{ctrl.env.iconSize}}">{{env.name}}</header>
-                    <p ng-if="!env.release">No deployments yet</p>
-                    <p style="padding-left: {{ctrl.env.iconSize}}" ng-if="env.release">{{env.release.name}} <span ng-if="env.modifiedOn">at {{env.modifiedOn | date:'MMM dd hh:mm'}}</span></p>
+                    <p ng-if="env.lastReleases.length == 0" style="padding-left: {{ctrl.env.iconSize}}">No deployments yet</p>
+                    <p ng-if="env.lastReleases.length > 0" style="padding-left: {{ctrl.env.iconSize}}">{{env.release.name}} <span ng-if="env.modifiedOn">at {{env.modifiedOn | date:'MMM dd HH:mm'}}</span></p>
                 </div>
             </div>
         </div>
