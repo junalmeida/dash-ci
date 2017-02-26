@@ -126,27 +126,34 @@
             console.log("start request: " + this.data.id + "; " + this.data.title);
             res.latest_release_environments({ project: this.data.project, release: this.data.release })
                 .$promise.then((result) => {
-                    this.latest = result.releases.length > 0 ? result.releases[0] : null;
-                    if (this.latest) {
-                        this.environments = this.latest.environments;
+                    this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
+                    angular.forEach(result.environments, (e) => {
+                        var findRelease = result.releases.filter((r) => e.lastReleases.length > 0 && r.id == e.lastReleases[0].id);
+                        var lastestDef = this.latest.environments.filter((re) => re.definitionEnvironmentId == e.id)[0];
+                        if (lastestDef && lastestDef.status == "inProgress") {
+                            angular.extend(e, lastestDef);
+                        }
+                        else if (findRelease.length == 1) {
+                            var releaseEnv = findRelease[0].environments.filter((re) => re.definitionEnvironmentId == e.id);
+                            if (releaseEnv.length > 0)
+                                angular.extend(e, releaseEnv[0]);
+                        }
+                        else if (lastestDef) {
+                            e.name = lastestDef.name;
+                            e.conditions = lastestDef.conditions;
+                        }
+                        this.setIcon(e)
+                    });
+                    this.environments = result.environments;
 
+                    if (this.latest) {
                         var baseEnvs = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
 
                         var rows: Resources.Tfs.IReleaseEnvironment[][] = [];
                         angular.forEach(baseEnvs, (item) => {
                             var row: Resources.Tfs.IReleaseEnvironment[] = [];
                             row.push(item);
-                            this.setIcon(item);
-                            angular.forEach(this.filterSubSequentEnvironments(item), (e) => {
-                                this.setIcon(e)
-                                row.push(e);
-                            });
-
-                            angular.forEach(row, (e) => {
-                                var baseE = result.environments.filter((f) => f.id == e.definitionEnvironmentId);
-                                if (baseE && baseE[0])
-                                    e.lastReleases = baseE[0].lastReleases;
-                            });
+                            angular.forEach(this.filterSubSequentEnvironments(item), (e) => row.push(e));
                             rows.push(row);
                         });
                         this.environment_rows = rows;
@@ -218,9 +225,15 @@
                     item.icon = "pause_circle_filled"; break;
                 case "rejected":
                     item.icon = "error"; break;
+                case "succeeded":
+                    item.icon = "check"; break;
                 default:
                     item.icon = "help"; break;
             }
+
+            var preDeploy = item.preDeployApprovals.filter((p) => p.status == "pending");
+            if (preDeploy.length > 0)
+                item.icon = "people_outline";
         }
     }
 

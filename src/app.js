@@ -2604,24 +2604,32 @@ var DashCI;
                     console.log("start request: " + this.data.id + "; " + this.data.title);
                     res.latest_release_environments({ project: this.data.project, release: this.data.release })
                         .$promise.then(function (result) {
-                        _this.latest = result.releases.length > 0 ? result.releases[0] : null;
+                        _this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
+                        angular.forEach(result.environments, function (e) {
+                            var findRelease = result.releases.filter(function (r) { return e.lastReleases.length > 0 && r.id == e.lastReleases[0].id; });
+                            var lastestDef = _this.latest.environments.filter(function (re) { return re.definitionEnvironmentId == e.id; })[0];
+                            if (lastestDef && lastestDef.status == "inProgress") {
+                                angular.extend(e, lastestDef);
+                            }
+                            else if (findRelease.length == 1) {
+                                var releaseEnv = findRelease[0].environments.filter(function (re) { return re.definitionEnvironmentId == e.id; });
+                                if (releaseEnv.length > 0)
+                                    angular.extend(e, releaseEnv[0]);
+                            }
+                            else if (lastestDef) {
+                                e.name = lastestDef.name;
+                                e.conditions = lastestDef.conditions;
+                            }
+                            _this.setIcon(e);
+                        });
+                        _this.environments = result.environments;
                         if (_this.latest) {
-                            _this.environments = _this.latest.environments;
                             var baseEnvs = _this.environments.filter(_this.filterAutomaticAfterReleaseOrManual);
                             var rows = [];
                             angular.forEach(baseEnvs, function (item) {
                                 var row = [];
                                 row.push(item);
-                                _this.setIcon(item);
-                                angular.forEach(_this.filterSubSequentEnvironments(item), function (e) {
-                                    _this.setIcon(e);
-                                    row.push(e);
-                                });
-                                angular.forEach(row, function (e) {
-                                    var baseE = result.environments.filter(function (f) { return f.id == e.definitionEnvironmentId; });
-                                    if (baseE && baseE[0])
-                                        e.lastReleases = baseE[0].lastReleases;
-                                });
+                                angular.forEach(_this.filterSubSequentEnvironments(item), function (e) { return row.push(e); });
                                 rows.push(row);
                             });
                             _this.environment_rows = rows;
@@ -2688,10 +2696,16 @@ var DashCI;
                         case "rejected":
                             item.icon = "error";
                             break;
+                        case "succeeded":
+                            item.icon = "check";
+                            break;
                         default:
                             item.icon = "help";
                             break;
                     }
+                    var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                    if (preDeploy.length > 0)
+                        item.icon = "people_outline";
                 };
                 return TfsReleaseController;
             }());

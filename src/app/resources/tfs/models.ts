@@ -101,6 +101,10 @@
             conditionType: string;
             name: string;
             value: string;
-        }[]
+        }[];
+
+        preDeployApprovals: {
+            status: string;
+        }[];
     }
 }
