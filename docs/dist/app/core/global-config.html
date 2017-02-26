@@ -48,7 +48,18 @@
                         <div class="hint"><a href="https://www.visualstudio.com/en-us/docs/integrate/get-started/auth/overview" target="_blank">How to generate a token?</a></div>
                     </md-input-container>
                 </div>
-            </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="60">
+                        <label>GitHub Username:</label>
+                        <input ng-model="ctrl.vm.github[0].username" placeholder="username" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="40">
+                        <label>GitHub Personal Private Key:</label>
+                        <input ng-model="ctrl.vm.github[0].privateToken" placeholder="Your private key." type="password" />
+                        <div class="hint"><a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">How to generate a token?</a></div>
+                    </md-input-container>
+                </div>
+           </div>
         </md-dialog-content>
 
         <md-dialog-actions layout="row">
