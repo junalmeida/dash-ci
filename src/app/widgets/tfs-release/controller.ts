@@ -48,7 +48,7 @@
 
         private init() {
             this.data.title = this.data.title || "Release";
-            this.data.color = this.data.color || "green";
+            this.data.color = this.data.color || "brown";
 
             //default values
             this.data.poolInterval = this.data.poolInterval || 10000;
@@ -64,17 +64,23 @@
             help_icon.css("font-size", size);
             help_icon.height(size);
 
+
+
             var padding = Number(this.$scope.$element.find(".envcontainer").css("padding-top")) || 5;
 
             this.env.height = ((height - header_size - 25) / this.rowCount() - (padding * 2)).toFixed(2) + "px";
             this.envcontainer.width = ((100 / this.maxColumnCount()) - 0.5).toFixed(2) + "%";
+
+
+            this.env.iconSize = this.env.height;
         }
 
         public envcontainer = {
             width: "0%"
         };
         public env = {
-            height: "0px"
+            height: "0px",
+            iconSize: "0px"
         };
 
         public config() {
@@ -106,6 +112,7 @@
 
         public latest: Resources.Tfs.IRelease;
         public environments: Resources.Tfs.IReleaseEnvironment[];
+        public environment_rows: Resources.Tfs.IReleaseEnvironment[][];
         public releaseDefinition: Resources.Tfs.IReleaseDefinition;
 
         private update() {
@@ -119,17 +126,35 @@
             console.log("start request: " + this.data.id + "; " + this.data.title);
             res.latest_release_environments({ project: this.data.project, release: this.data.release })
                 .$promise.then((result) => {
-                    this.latest = result.releases.length > 0 ? result.releases[0] : null; 
+                    this.latest = result.releases.length > 0 ? result.releases[0] : null;
                     if (this.latest) {
                         this.environments = this.latest.environments;
-                        angular.forEach(this.environments, (item) => {
-                            var global = result.environments.filter((e) => e.id == item.id);
-                            if (global && global.length == 1)
-                                item.lastReleases = global[0].lastReleases;
+
+                        var baseEnvs = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
+
+                        var rows: Resources.Tfs.IReleaseEnvironment[][] = [];
+                        angular.forEach(baseEnvs, (item) => {
+                            var row: Resources.Tfs.IReleaseEnvironment[] = [];
+                            row.push(item);
+                            this.setIcon(item);
+                            angular.forEach(this.filterSubSequentEnvironments(item), (e) => {
+                                this.setIcon(e)
+                                row.push(e);
+                            });
+
+                            angular.forEach(row, (e) => {
+                                var baseE = result.environments.filter((f) => f.id == e.definitionEnvironmentId);
+                                if (baseE && baseE[0])
+                                    e.lastReleases = baseE[0].lastReleases;
+                            });
+                            rows.push(row);
                         });
+                        this.environment_rows = rows;
                     }
-                    else
+                    else {
                         this.environments = null;
+                        this.environment_rows = null;
+                    }
                     this.releaseDefinition = result.releaseDefinition;
                     this.sizeFont(this.$scope.$element.height());
                 })
@@ -137,24 +162,24 @@
                     this.latest = null;
                     this.environments = null;
                     this.releaseDefinition = null;
+                    this.environment_rows = null;
                     console.error(error);
                     this.sizeFont(this.$scope.$element.height());
-                })
+                });
 
         }
 
         private rowCount() {
-            var items = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
-            return items.length;
+            return this.environment_rows ? this.environment_rows.length : 0;
         }
 
         private maxColumnCount() {
-            var items = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
+            if (!this.environment_rows)
+                return 0;
             var maxColumns = 0;
-            angular.forEach(items, (item) => {
-                var columns = this.environments.filter((e) => this.filterSubSequentEnvironments(item.name)(e));
-                if (columns.length + 1> maxColumns)
-                    maxColumns = columns.length + 1;
+            angular.forEach(this.environment_rows, (row) => {
+                if (row.length > maxColumns)
+                    maxColumns = row.length;
             });
             return maxColumns;
         }
@@ -166,14 +191,37 @@
         }
 
 
-        public filterSubSequentEnvironments(rootName: string) {
-            return (element: Resources.Tfs.IReleaseEnvironment) =>
+        private filterSubSequentEnvironments(rootElement: Resources.Tfs.IReleaseEnvironment) {
+
+            var list = this.environments.filter((element: Resources.Tfs.IReleaseEnvironment) =>
                 element.conditions && element.conditions[0] &&
                 element.conditions[0].conditionType == "environmentState" &&
-                element.conditions[0].name == rootName;
+                element.conditions[0].name == rootElement.name
+            );
+
+            angular.forEach(list, (item) => {
+                var moreList = this.filterSubSequentEnvironments(item);
+                if (moreList.length > 0)
+                    angular.forEach(moreList, (mi) => list.push(mi));
+            });
+
+            return list;
         }
 
-
+        private setIcon(item: Resources.Tfs.IReleaseEnvironment) {
+            switch (item.status) {
+                case "inprogress":
+                    item.icon = "play_circle_filled"; break;
+                case "canceled":
+                    item.icon = "remove_circle"; break;
+                case "notStarted":
+                    item.icon = "pause_circle_filled"; break;
+                case "rejected":
+                    item.icon = "error"; break;
+                default:
+                    item.icon = "help"; break;
+            }
+        }
     }
 
 }

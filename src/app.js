@@ -1398,7 +1398,7 @@ var DashCI;
                                     _this.icon = "remove_circle";
                                     break;
                                 case "success":
-                                    _this.icon = "check_circle";
+                                    _this.icon = "check";
                                     break;
                                 case "failed":
                                     _this.icon = "error";
@@ -2531,7 +2531,8 @@ var DashCI;
                         width: "0%"
                     };
                     this.env = {
-                        height: "0px"
+                        height: "0px",
+                        iconSize: "0px"
                     };
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -2550,7 +2551,7 @@ var DashCI;
                 };
                 TfsReleaseController.prototype.init = function () {
                     this.data.title = this.data.title || "Release";
-                    this.data.color = this.data.color || "green";
+                    this.data.color = this.data.color || "brown";
                     //default values
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
@@ -2565,6 +2566,7 @@ var DashCI;
                     var padding = Number(this.$scope.$element.find(".envcontainer").css("padding-top")) || 5;
                     this.env.height = ((height - header_size - 25) / this.rowCount() - (padding * 2)).toFixed(2) + "px";
                     this.envcontainer.width = ((100 / this.maxColumnCount()) - 0.5).toFixed(2) + "%";
+                    this.env.iconSize = this.env.height;
                 };
                 TfsReleaseController.prototype.config = function () {
                     var _this = this;
@@ -2605,14 +2607,29 @@ var DashCI;
                         _this.latest = result.releases.length > 0 ? result.releases[0] : null;
                         if (_this.latest) {
                             _this.environments = _this.latest.environments;
-                            angular.forEach(_this.environments, function (item) {
-                                var global = result.environments.filter(function (e) { return e.id == item.id; });
-                                if (global && global.length == 1)
-                                    item.lastReleases = global[0].lastReleases;
+                            var baseEnvs = _this.environments.filter(_this.filterAutomaticAfterReleaseOrManual);
+                            var rows = [];
+                            angular.forEach(baseEnvs, function (item) {
+                                var row = [];
+                                row.push(item);
+                                _this.setIcon(item);
+                                angular.forEach(_this.filterSubSequentEnvironments(item), function (e) {
+                                    _this.setIcon(e);
+                                    row.push(e);
+                                });
+                                angular.forEach(row, function (e) {
+                                    var baseE = result.environments.filter(function (f) { return f.id == e.definitionEnvironmentId; });
+                                    if (baseE && baseE[0])
+                                        e.lastReleases = baseE[0].lastReleases;
+                                });
+                                rows.push(row);
                             });
+                            _this.environment_rows = rows;
                         }
-                        else
+                        else {
                             _this.environments = null;
+                            _this.environment_rows = null;
+                        }
                         _this.releaseDefinition = result.releaseDefinition;
                         _this.sizeFont(_this.$scope.$element.height());
                     })
@@ -2620,22 +2637,21 @@ var DashCI;
                         _this.latest = null;
                         _this.environments = null;
                         _this.releaseDefinition = null;
+                        _this.environment_rows = null;
                         console.error(error);
                         _this.sizeFont(_this.$scope.$element.height());
                     });
                 };
                 TfsReleaseController.prototype.rowCount = function () {
-                    var items = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
-                    return items.length;
+                    return this.environment_rows ? this.environment_rows.length : 0;
                 };
                 TfsReleaseController.prototype.maxColumnCount = function () {
-                    var _this = this;
-                    var items = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
+                    if (!this.environment_rows)
+                        return 0;
                     var maxColumns = 0;
-                    angular.forEach(items, function (item) {
-                        var columns = _this.environments.filter(function (e) { return _this.filterSubSequentEnvironments(item.name)(e); });
-                        if (columns.length + 1 > maxColumns)
-                            maxColumns = columns.length + 1;
+                    angular.forEach(this.environment_rows, function (row) {
+                        if (row.length > maxColumns)
+                            maxColumns = row.length;
                     });
                     return maxColumns;
                 };
@@ -2644,12 +2660,38 @@ var DashCI;
                         (element.conditions && element.conditions.length == 0) //manual
                     ;
                 };
-                TfsReleaseController.prototype.filterSubSequentEnvironments = function (rootName) {
-                    return function (element) {
+                TfsReleaseController.prototype.filterSubSequentEnvironments = function (rootElement) {
+                    var _this = this;
+                    var list = this.environments.filter(function (element) {
                         return element.conditions && element.conditions[0] &&
                             element.conditions[0].conditionType == "environmentState" &&
-                            element.conditions[0].name == rootName;
-                    };
+                            element.conditions[0].name == rootElement.name;
+                    });
+                    angular.forEach(list, function (item) {
+                        var moreList = _this.filterSubSequentEnvironments(item);
+                        if (moreList.length > 0)
+                            angular.forEach(moreList, function (mi) { return list.push(mi); });
+                    });
+                    return list;
+                };
+                TfsReleaseController.prototype.setIcon = function (item) {
+                    switch (item.status) {
+                        case "inprogress":
+                            item.icon = "play_circle_filled";
+                            break;
+                        case "canceled":
+                            item.icon = "remove_circle";
+                            break;
+                        case "notStarted":
+                            item.icon = "pause_circle_filled";
+                            break;
+                        case "rejected":
+                            item.icon = "error";
+                            break;
+                        default:
+                            item.icon = "help";
+                            break;
+                    }
                 };
                 return TfsReleaseController;
             }());

@@ -94,7 +94,9 @@
         name: string;
         rank: number;
         status: string;
-        lastReleases: IRelease[],
+        icon: string;
+        lastReleases: IRelease[];
+        definitionEnvironmentId: number;
         conditions: {
             conditionType: string;
             name: string;

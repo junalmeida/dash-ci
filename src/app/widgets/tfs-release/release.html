@@ -5,15 +5,15 @@
     <div class="header">{{data.title}}</div>
     <div class="content" flex>
         <md-icon class="unknown" ng-show="!ctrl.latest">help</md-icon>
-        <div class="env-row" ng-repeat="e0 in ctrl.environments | filter: ctrl.filterAutomaticAfterReleaseOrManual">
-            <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}">
-                <div class="env" style="height: {{ctrl.env.height}}">
-                    <header>{{e0.name}}</header>
+        <div class="env-row" ng-repeat="row in ctrl.environment_rows">
+            <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}" ng-repeat="env in row">
+                <div class="play-status" style="height: {{ctrl.env.height}}; width: {{ctrl.env.height}};" ng-class="{ blink: env.icon == 'play_circle_filled', error: env.icon == 'error'}">
+                    <md-icon style="font-size: {{ctrl.env.iconSize}}">{{env.icon}}</md-icon>
                 </div>
-            </div>
-            <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}" ng-repeat="e1 in ctrl.environments | filter: ctrl.filterSubSequentEnvironments(e0.name)">
                 <div class="env" style="height: {{ctrl.env.height}}">
-                    <header>{{e1.name}}</header>
+                    <header style="padding-left: {{ctrl.env.iconSize}}">{{env.name}}</header>
+                    <p ng-if="!env.release">No deployments yet</p>
+                    <p style="padding-left: {{ctrl.env.iconSize}}" ng-if="env.release">{{env.release.name}} <span ng-if="env.modifiedOn">at {{env.modifiedOn | date:'MMM dd hh:mm'}}</span></p>
                 </div>
             </div>
         </div>
