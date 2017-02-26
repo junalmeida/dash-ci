@@ -27,10 +27,11 @@ var DashCI;
         return Config;
     }());
     $(Config.supressIosRubberEffect);
-    DashCI.app.config(["$mdThemingProvider", function ($mdThemingProvider) {
+    DashCI.app.config(["$mdThemingProvider", "$resourceProvider", function ($mdThemingProvider, $resourceProvider) {
             $mdThemingProvider.theme('default')
                 .dark()
                 .accentPalette('orange');
+            //$resourceProvider.defaults.stripTrailingSlashes = true;
         }]);
     DashCI.app.run(["$rootScope", function ($rootScope) {
             angular.element(window).on("resize", function () {
@@ -278,6 +279,8 @@ var DashCI;
                     rows: 20,
                     tfs: null,
                     gitlab: null,
+                    github: [],
+                    circleci: [],
                     pages: [{
                             id: "1",
                             name: "Dash-CI",
@@ -398,6 +401,8 @@ var DashCI;
             WidgetType[WidgetType["tfsBuild"] = 6] = "tfsBuild";
             WidgetType[WidgetType["gitlabPipelineGraph"] = 7] = "gitlabPipelineGraph";
             WidgetType[WidgetType["tfsBuildGraph"] = 8] = "tfsBuildGraph";
+            WidgetType[WidgetType["githubIssues"] = 9] = "githubIssues";
+            WidgetType[WidgetType["tfsRelease"] = 10] = "tfsRelease";
         })(WidgetType = Models.WidgetType || (Models.WidgetType = {}));
         DashCI.app.constant("widgets", [
             {
@@ -442,13 +447,103 @@ var DashCI;
                 desc: "The build graph for last N builds of a branch."
             },
             {
+                type: WidgetType.tfsRelease,
+                directive: "tfs-release",
+                title: "TFS - Release Status",
+                desc: "The release status for a release definition."
+            },
+            {
                 type: WidgetType.tfsQueryCount,
                 directive: "tfs-query-count",
                 title: "TFS - Query Count",
                 desc: "The count of a saved query against a project."
             },
+            {
+                type: WidgetType.githubIssues,
+                directive: "github-issues",
+                title: "GitHub - Issue Query",
+                desc: "The count of an issue query against a repository."
+            },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Resources;
+    (function (Resources) {
+        var Github;
+        (function (Github) {
+            DashCI.app.factory('githubResources', ['$resource', 'globalOptions',
+                function ($resource, globalOptions) { return function (username) {
+                    if (!globalOptions || !globalOptions.github || globalOptions.github.length == 0)
+                        return null;
+                    var accounts = globalOptions.github.filter(function (item) { return item.username == username; });
+                    if (!accounts || accounts.length != 1)
+                        return null;
+                    var host = "https://api.github.com";
+                    var headers = {
+                        "Authorization": null,
+                    };
+                    if (accounts[0].privateToken)
+                        headers.Authorization = "Basic " + btoa(accounts[0].username + ":" + accounts[0].privateToken);
+                    else
+                        delete headers.Authorization;
+                    var transform = function (data, headers) {
+                        var data = angular.fromJson(data);
+                        if (data && typeof (data) === "object")
+                            data.headers = headers();
+                        return data;
+                    };
+                    var countParser = function (data, getHeaders, status) {
+                        if (status == 200) {
+                            data = angular.fromJson(data);
+                            var headers = getHeaders();
+                            var parsedCount = parseInt(headers["X-Total"]);
+                            if (isNaN(parsedCount)) {
+                                parsedCount = 0;
+                                //cannot access X-Total today, let's parse
+                                var links = headers.link.split('>');
+                                angular.forEach(links, function (item) {
+                                    var matches = item.match(/&page=(\d*)/);
+                                    if (matches && matches.length > 1) {
+                                        var page = Number(matches[1]);
+                                        if (page > parsedCount)
+                                            parsedCount = page;
+                                    }
+                                });
+                            }
+                            var ret = {
+                                count: parsedCount
+                            };
+                            return ret;
+                        }
+                        else
+                            return data;
+                    };
+                    // Return the resource, include your custom actions
+                    return $resource(host, {}, {
+                        repository_list: {
+                            method: 'GET',
+                            isArray: true,
+                            url: host + "/user/repos?sort=updated&direction=desc&per_page=100",
+                            headers: headers,
+                            transformResponse: transform,
+                            cache: true
+                        },
+                        issue_count: {
+                            method: 'GET',
+                            isArray: false,
+                            url: host + "/repos/:owner/:repository/issues?labels=:labels&state=:state&per_page=1",
+                            headers: headers,
+                            cache: false,
+                            transformResponse: countParser
+                        },
+                    });
+                }; }]);
+        })(Github = Resources.Github || (Resources.Github = {}));
+    })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
 "use strict";
 "use strict";
@@ -577,6 +672,7 @@ var DashCI;
                         delete headers.Authorization;
                         withCredentials = true;
                     }
+                    var tfs_release_preview = globalOptions.tfs.host.replace(".visualstudio.com", ".vsrm.visualstudio.com");
                     // Return the resource, include your custom actions
                     return $resource(globalOptions.tfs.host, {}, {
                         project_list: {
@@ -623,6 +719,30 @@ var DashCI;
                             method: 'GET',
                             isArray: false,
                             url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        release_definition_list: {
+                            method: 'GET',
+                            isArray: false,
+                            url: tfs_release_preview + "/:project/_apis/release/definitions?api-version=3.0-preview.1",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        latest_release_environments: {
+                            method: 'GET',
+                            isArray: false,
+                            url: tfs_release_preview + "/:project/_apis/release/releases?definitionId=:release&releaseCount=1&includeArtifact=false",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        recent_releases: {
+                            method: 'GET',
+                            isArray: false,
+                            url: tfs_release_preview + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=25&queryOrder=descending",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -729,6 +849,199 @@ var DashCI;
             ClockController.$inject = ["$scope", "$interval"];
             Clock.ClockController = ClockController;
         })(Clock = Widgets.Clock || (Widgets.Clock = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GithubIssues;
+        (function (GithubIssues) {
+            var GithubIssuesConfigController = (function () {
+                function GithubIssuesConfigController($mdDialog, $scope, globalOptions, githubResources, colors, intervals, vm) {
+                    var _this = this;
+                    this.$mdDialog = $mdDialog;
+                    this.$scope = $scope;
+                    this.globalOptions = globalOptions;
+                    this.githubResources = githubResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.$scope.$watch(function () { return _this.vm.username; }, function () { return _this.listRepositories(); });
+                    this.init();
+                }
+                GithubIssuesConfigController.prototype.init = function () {
+                    var _this = this;
+                    this.users = [];
+                    angular.forEach(this.globalOptions.github, function (item) { return _this.users.push(item.username); });
+                };
+                GithubIssuesConfigController.prototype.listRepositories = function () {
+                    var _this = this;
+                    this.repositories = [];
+                    var res = this.githubResources(this.vm.username);
+                    if (!res)
+                        return;
+                    res.repository_list().$promise
+                        .then(function (result) {
+                        _this.repositories = result;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                    });
+                };
+                //public cancel() {
+                //    this.$mdDialog.cancel();
+                //}
+                GithubIssuesConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return GithubIssuesConfigController;
+            }());
+            GithubIssuesConfigController.$inject = ["$mdDialog", "$scope", "globalOptions", "githubResources", "colors", "intervals", "config"];
+            GithubIssues.GithubIssuesConfigController = GithubIssuesConfigController;
+        })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GithubIssues;
+        (function (GithubIssues) {
+            var GithubIssuesController = (function () {
+                function GithubIssuesController($scope, $q, $timeout, $interval, $mdDialog, githubResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.githubResources = githubResources;
+                    this.issueCount = null;
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.githubIssues;
+                    this.data.footer = false;
+                    this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                GithubIssuesController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                GithubIssuesController.prototype.init = function () {
+                    this.data.title = this.data.title || "Issues";
+                    this.data.color = this.data.color || "red";
+                    //default values
+                    this.data.labels = this.data.labels || "bug";
+                    this.data.status = this.data.status || "open";
+                    this.data.poolInterval = this.data.poolInterval || 10000;
+                    this.updateInterval();
+                    this.update();
+                };
+                GithubIssuesController.prototype.sizeFont = function (height) {
+                    var p = this.$scope.$element.find("p");
+                    var fontSize = Math.round(height / 1.3) + "px";
+                    var lineSize = Math.round((height) - 60) + "px";
+                    p.css('font-size', fontSize);
+                    p.css('line-height', lineSize);
+                };
+                GithubIssuesController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: GithubIssues.GithubIssuesConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/github-issues/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                GithubIssuesController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
+                };
+                GithubIssuesController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.repository && !this.data.username)
+                        return;
+                    var res = this.githubResources(this.data.username);
+                    if (!res)
+                        return;
+                    res.issue_count({
+                        owner: this.data.repository.split('/')[0],
+                        repository: this.data.repository.split('/')[1],
+                        labels: this.data.labels,
+                        state: this.data.status
+                    }).$promise.then(function (newCount) {
+                        //var newCount = Math.round(Math.random() * 100);
+                        if (newCount.count != _this.issueCount) {
+                            _this.issueCount = newCount.count;
+                            var p = _this.$scope.$element.find("p");
+                            p.addClass('changed');
+                            _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                    })
+                        .catch(function (reason) {
+                        _this.issueCount = null;
+                        console.error(reason);
+                    });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                };
+                return GithubIssuesController;
+            }());
+            GithubIssuesController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "githubResources"];
+            GithubIssues.GithubIssuesController = GithubIssuesController;
+        })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var GithubIssues;
+        (function (GithubIssues) {
+            var GithubIssuesDirective = (function () {
+                function GithubIssuesDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/github-issues/issues.html";
+                    this.replace = false;
+                    this.controller = GithubIssues.GithubIssuesController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/github-issues/issues.css",
+                        persist: true
+                    };
+                }
+                GithubIssuesDirective.create = function () {
+                    var directive = function () { return new GithubIssuesDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return GithubIssuesDirective;
+            }());
+            DashCI.app.directive("githubIssues", GithubIssuesDirective.create());
+        })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 "use strict";
@@ -1085,10 +1398,10 @@ var DashCI;
                                     _this.icon = "remove_circle";
                                     break;
                                 case "success":
-                                    _this.icon = "check_circle";
+                                    _this.icon = "check";
                                     break;
                                 case "failed":
-                                    _this.icon = "error";
+                                    _this.icon = "cancel";
                                     break;
                                 case "default":
                                     _this.icon = "help";
@@ -1100,11 +1413,12 @@ var DashCI;
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
+                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
+                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                     });
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return GitlabPipelineController;
             }());
@@ -1672,7 +1986,7 @@ var DashCI;
                                             _this.icon = "check";
                                             break;
                                         case "failed":
-                                            _this.icon = "error";
+                                            _this.icon = "cancel";
                                             break;
                                         case "canceled":
                                             _this.icon = "remove_circle";
@@ -1692,11 +2006,12 @@ var DashCI;
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
+                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
+                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                     });
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return TfsBuildController;
             }());
@@ -2135,6 +2450,308 @@ var DashCI;
             }());
             DashCI.app.directive("tfsQueryCount", TfsQueryCountDirective.create());
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsRelease;
+        (function (TfsRelease) {
+            var TfsReleaseConfigController = (function () {
+                function TfsReleaseConfigController($scope, $mdDialog, tfsResources, colors, intervals, vm) {
+                    this.$scope = $scope;
+                    this.$mdDialog = $mdDialog;
+                    this.tfsResources = tfsResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.init();
+                }
+                TfsReleaseConfigController.prototype.init = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
+                        .then(function (result) {
+                        _this.projects = result.value;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
+                    this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getReleaseDefs(); });
+                };
+                TfsReleaseConfigController.prototype.getReleaseDefs = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res || !this.vm.project)
+                        return;
+                    res.release_definition_list({ project: this.vm.project }).$promise
+                        .then(function (result) {
+                        _this.releases = result.value;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.releases = [];
+                    });
+                };
+                //public cancel() {
+                //    this.$mdDialog.cancel();
+                //}
+                TfsReleaseConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return TfsReleaseConfigController;
+            }());
+            TfsReleaseConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
+            TfsRelease.TfsReleaseConfigController = TfsReleaseConfigController;
+        })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsRelease;
+        (function (TfsRelease) {
+            var TfsReleaseController = (function () {
+                function TfsReleaseController($scope, $q, $timeout, $interval, $mdDialog, tfsResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.tfsResources = tfsResources;
+                    this.envcontainer = {
+                        width: "0%"
+                    };
+                    this.env = {
+                        height: "0px",
+                        iconSize: "0px"
+                    };
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.tfsRelease;
+                    this.data.footer = false;
+                    this.data.header = false;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                TfsReleaseController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                TfsReleaseController.prototype.init = function () {
+                    this.data.title = this.data.title || "Release";
+                    this.data.color = this.data.color || "brown";
+                    //default values
+                    this.data.poolInterval = this.data.poolInterval || 10000;
+                    this.updateInterval();
+                    this.update();
+                };
+                TfsReleaseController.prototype.sizeFont = function (height) {
+                    var header_size = this.$scope.$element.find(".header").height();
+                    var help_icon = this.$scope.$element.find(".unknown");
+                    var size = Math.round(height / 1) - header_size - 5;
+                    help_icon.css("font-size", size);
+                    help_icon.height(size);
+                    var padding = Number(this.$scope.$element.find(".envcontainer").css("padding-top")) || 5;
+                    this.env.height = ((height - header_size - 25) / this.rowCount() - (padding * 2)).toFixed(2) + "px";
+                    this.envcontainer.width = ((100 / this.maxColumnCount()) - 0.5).toFixed(2) + "%";
+                    this.env.iconSize = this.env.height;
+                };
+                TfsReleaseController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: TfsRelease.TfsReleaseConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/tfs-release/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                TfsReleaseController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                };
+                TfsReleaseController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.project || !this.data.release)
+                        return;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    res.latest_release_environments({ project: this.data.project, release: this.data.release })
+                        .$promise.then(function (result) {
+                        _this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
+                        angular.forEach(result.environments, function (e) {
+                            var findRelease = result.releases.filter(function (r) { return e.lastReleases.length > 0 && r.id == e.lastReleases[0].id; });
+                            var lastestDef = _this.latest.environments.filter(function (re) { return re.definitionEnvironmentId == e.id; })[0];
+                            if (lastestDef && lastestDef.status == "inProgress") {
+                                angular.extend(e, lastestDef);
+                            }
+                            else if (findRelease.length == 1) {
+                                var releaseEnv = findRelease[0].environments.filter(function (re) { return re.definitionEnvironmentId == e.id; });
+                                if (releaseEnv.length > 0)
+                                    angular.extend(e, releaseEnv[0]);
+                            }
+                            else if (lastestDef) {
+                                e.name = lastestDef.name;
+                                e.conditions = lastestDef.conditions;
+                            }
+                            _this.setIcon(e);
+                        });
+                        _this.environments = result.environments;
+                        if (_this.latest) {
+                            var baseEnvs = _this.environments.filter(_this.filterAutomaticAfterReleaseOrManual);
+                            var rows = [];
+                            angular.forEach(baseEnvs, function (item) {
+                                var row = [];
+                                row.push(item);
+                                angular.forEach(_this.filterSubSequentEnvironments(item), function (e) { return row.push(e); });
+                                rows.push(row);
+                            });
+                            _this.environment_rows = rows;
+                        }
+                        else {
+                            _this.environments = null;
+                            _this.environment_rows = null;
+                        }
+                        _this.releaseDefinition = result.releaseDefinition;
+                        _this.sizeFont(_this.$scope.$element.height());
+                    })
+                        .catch(function (error) {
+                        _this.latest = null;
+                        _this.environments = null;
+                        _this.releaseDefinition = null;
+                        _this.environment_rows = null;
+                        console.error(error);
+                        _this.sizeFont(_this.$scope.$element.height());
+                    });
+                };
+                TfsReleaseController.prototype.rowCount = function () {
+                    return this.environment_rows ? this.environment_rows.length : 0;
+                };
+                TfsReleaseController.prototype.maxColumnCount = function () {
+                    if (!this.environment_rows)
+                        return 0;
+                    var maxColumns = 0;
+                    angular.forEach(this.environment_rows, function (row) {
+                        if (row.length > maxColumns)
+                            maxColumns = row.length;
+                    });
+                    return maxColumns;
+                };
+                TfsReleaseController.prototype.filterAutomaticAfterReleaseOrManual = function (element) {
+                    return (element.conditions && element.conditions[0] && element.conditions[0].name == "ReleaseStarted") ||
+                        (element.conditions && element.conditions.length == 0) //manual
+                    ;
+                };
+                TfsReleaseController.prototype.filterSubSequentEnvironments = function (rootElement) {
+                    var _this = this;
+                    var list = this.environments.filter(function (element) {
+                        return element.conditions && element.conditions[0] &&
+                            element.conditions[0].conditionType == "environmentState" &&
+                            element.conditions[0].name == rootElement.name;
+                    });
+                    angular.forEach(list, function (item) {
+                        var moreList = _this.filterSubSequentEnvironments(item);
+                        if (moreList.length > 0)
+                            angular.forEach(moreList, function (mi) { return list.push(mi); });
+                    });
+                    return list;
+                };
+                TfsReleaseController.prototype.setIcon = function (item) {
+                    switch (item.status) {
+                        case "inProgress":
+                            item.icon = "play_circle_filled";
+                            break;
+                        case "canceled":
+                            item.icon = "remove_circle";
+                            break;
+                        case "notStarted":
+                            item.icon = "pause_circle_filled";
+                            break;
+                        case "rejected":
+                            item.icon = "cancel";
+                            break;
+                        case "succeeded":
+                            item.icon = "check";
+                            break;
+                        default:
+                            item.icon = "help";
+                            break;
+                    }
+                    var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                    if (preDeploy.length > 0)
+                        item.icon = "assignment_ind";
+                    preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                    if (preDeploy.length > 0)
+                        item.icon = "assignment_late";
+                    var postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                    if (postDeploy.length > 0)
+                        item.icon = "assignment_ind";
+                    postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                    if (postDeploy.length > 0)
+                        item.icon = "assignment_late";
+                };
+                return TfsReleaseController;
+            }());
+            TfsReleaseController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
+            TfsRelease.TfsReleaseController = TfsReleaseController;
+        })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsRelease;
+        (function (TfsRelease) {
+            var TfsReleaseDirective = (function () {
+                function TfsReleaseDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/tfs-release/release.html";
+                    this.replace = false;
+                    this.controller = TfsRelease.TfsReleaseController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/tfs-release/release.css",
+                        persist: true
+                    };
+                }
+                TfsReleaseDirective.create = function () {
+                    var directive = function () { return new TfsReleaseDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return TfsReleaseDirective;
+            }());
+            DashCI.app.directive("tfsRelease", TfsReleaseDirective.create());
+        })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 //# sourceMappingURL=app.js.map

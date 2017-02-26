@@ -141,9 +141,9 @@
                         case "canceled":
                             this.icon = "remove_circle"; break;
                         case "success":
-                            this.icon = "check_circle"; break;
+                            this.icon = "check"; break;
                         case "failed":
-                            this.icon = "error"; break;
+                            this.icon = "cancel"; break;
                         case "default":
                             this.icon = "help"; break;
                     }
@@ -155,11 +155,12 @@
 
                 //p.addClass('changed');
                 //this.$timeout(() => p.removeClass('changed'), 1000);
+                this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
             }).catch((reason) => {
                 this.latest = null;
                 console.error(reason);
+                this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
             });
-            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

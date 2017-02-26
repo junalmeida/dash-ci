@@ -10,6 +10,8 @@ namespace DashCI.Models {
         tfsBuild = 6,
         gitlabPipelineGraph = 7,
         tfsBuildGraph = 8,
+        githubIssues = 9,
+        tfsRelease = 10,
     }
 
     DashCI.app.constant("widgets", <IWidgetDescription[]>[
@@ -55,10 +57,22 @@ namespace DashCI.Models {
             desc: "The build graph for last N builds of a branch."
         },
         {
+            type: WidgetType.tfsRelease,
+            directive: "tfs-release",
+            title: "TFS - Release Status",
+            desc: "The release status for a release definition."
+        },
+        {
             type: WidgetType.tfsQueryCount,
             directive: "tfs-query-count",
             title: "TFS - Query Count",
             desc: "The count of a saved query against a project."
+        },
+        {
+            type: WidgetType.githubIssues,
+            directive: "github-issues",
+            title: "GitHub - Issue Query",
+            desc: "The count of an issue query against a repository."
         },
     ]);
 }

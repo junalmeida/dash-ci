@@ -13,11 +13,11 @@
         public static supressIosRubberEffect() {
             var firstMove: boolean = false;
 
-            window.addEventListener('touchstart', function (e) {
+            window.addEventListener('touchstart', (e) => {
                 firstMove = true;
             });
 
-            window.addEventListener('touchmove', function (e) {
+            window.addEventListener('touchmove', (e) => {
                 if (firstMove) {
                     e.preventDefault();
                     firstMove = false;
@@ -29,10 +29,12 @@
 
     $(Config.supressIosRubberEffect);
 
-    app.config(["$mdThemingProvider", ($mdThemingProvider: angular.material.IThemingProvider) => {
+    app.config(["$mdThemingProvider", "$resourceProvider", ($mdThemingProvider: angular.material.IThemingProvider, $resourceProvider: ng.resource.IResourceServiceProvider) => {
         $mdThemingProvider.theme('default')
             .dark()
             .accentPalette('orange');
+
+        //$resourceProvider.defaults.stripTrailingSlashes = true;
     }]);
     app.run(["$rootScope", ($rootScope: ng.IRootScopeService) => {
         angular.element(window).on("resize", () => {

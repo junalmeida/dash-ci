@@ -1,0 +1,71 @@
+﻿tfs-release .unknown 
+{
+    width: 100%;
+    text-align: center;
+}
+
+tfs-release .env-row {
+    box-sizing: border-box;
+    position: relative;
+    padding-right: 10px;
+}
+
+tfs-release .env-row .envcontainer {
+    box-sizing: border-box;
+    display: inline-block;
+
+    padding-left: 10px;
+    padding-top: 10px;
+    position: relative;
+}
+
+tfs-release .env-row .envcontainer .play-status {
+    position: absolute;
+}
+
+
+tfs-release .env-row .env
+{
+    background-color: rgba(0, 0, 0, 0.24);
+    display: block;
+    width: 100%;
+    min-width: 30px;
+    min-height: 30px;
+    overflow: hidden;
+}
+
+tfs-release .env-row .env p {
+    margin: 0;
+    padding: 0 0 0 6px;
+    text-shadow: 1px 1px 1px #000000;
+}
+
+tfs-release .env-row  .env header {
+    color: #fff;
+    background: rgba(0,0,0,.18);
+    font-weight: normal;
+    padding: 5px 0;
+    text-align: left;
+}
+
+
+tfs-release .error md-icon {
+    color: rgba(255, 0, 0, 0.60);
+    /*text-shadow: 0px 0px 3px #FFFFFF;*/
+}
+
+tfs-release .blink {
+  animation: blinker 1s linear infinite;
+}
+
+@-moz-keyframes blinker {  
+  50% { opacity: 0; }
+}
+
+@-webkit-keyframes blinker {  
+  50% { opacity: 0; }
+}
+
+@keyframes blinker {  
+  50% { opacity: 0; }
+}
