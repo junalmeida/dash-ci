@@ -1,0 +1,27 @@
+﻿<md-button title="Configure" class="configure-widget md-icon-button md-mini" ng-show="editable" ng-click="ctrl.config()">
+    <md-icon>settings</md-icon>
+</md-button>
+<div>
+    <div class="header">{{data.title}}</div>
+    <div class="content" flex>
+        <md-icon class="unknown" ng-show="!ctrl.latest">help</md-icon>
+        <div class="env-row" ng-repeat="row in ctrl.environment_rows">
+            <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}" ng-repeat="env in row">
+                <div ng-if="env.release" class="play-status" style="height: {{ctrl.env.height}}; width: {{ctrl.env.height}};" ng-class="{ blink: env.icon == 'play_circle_filled', error: env.icon == 'cancel'}">
+                    <md-icon style="font-size: {{ctrl.env.iconSize}}">{{env.icon}}</md-icon>
+                </div>
+                <div class="env" style="height: {{ctrl.env.height}}">
+                    <header style="padding-left: {{ctrl.env.iconSize}}">{{env.name}}</header>
+                    <p ng-if="!env.release" style="padding-left: {{ctrl.env.iconSize}}">No deployments yet</p>
+                    <p ng-if="env.release" style="padding-left: {{ctrl.env.iconSize}}">{{env.release.name}} <span ng-if="env.modifiedOn">at {{env.modifiedOn | date:'MMM dd HH:mm'}}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--
+        <md-icon>help_outline</md-icon>
+        <md-icon>play_circle_outline</md-icon>
+        <md-icon>pause_circle_outline</md-icon>
+        <md-icon>error_outline</md-icon>
+        -->
+</div>
