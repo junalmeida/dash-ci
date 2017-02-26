@@ -4,7 +4,7 @@
 <div>
     <div class="header">{{data.title}}</div>
     <div class="content" layout="row" flex>
-        <div class="play-status" ng-class="{ blink: ctrl.latest.status == 'running', error: ctrl.icon == 'error'}">
+        <div class="play-status" ng-class="{ blink: ctrl.latest.status == 'running', error: ctrl.icon == 'cancel'}">
             <md-icon>{{ctrl.icon}}</md-icon>
         </div>
         <div flex>

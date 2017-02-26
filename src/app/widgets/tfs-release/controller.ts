@@ -224,7 +224,7 @@
                 case "notStarted":
                     item.icon = "pause_circle_filled"; break;
                 case "rejected":
-                    item.icon = "error"; break;
+                    item.icon = "cancel"; break;
                 case "succeeded":
                     item.icon = "check"; break;
                 default:
@@ -233,7 +233,10 @@
 
             var preDeploy = item.preDeployApprovals.filter((p) => p.status == "pending");
             if (preDeploy.length > 0)
-                item.icon = "people_outline";
+                item.icon = "assignment_ind";
+            preDeploy = item.preDeployApprovals.filter((p) => p.status == "rejected");
+            if (preDeploy.length > 0)
+                item.icon = "assignment_late";
         }
     }
 

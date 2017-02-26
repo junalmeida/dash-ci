@@ -151,7 +151,7 @@
                                 case "succeeded":
                                     this.icon = "check"; break;
                                 case "failed":
-                                    this.icon = "error"; break;
+                                    this.icon = "cancel"; break;
                                 case "canceled":
                                     this.icon = "remove_circle"; break;
                                 case "default":

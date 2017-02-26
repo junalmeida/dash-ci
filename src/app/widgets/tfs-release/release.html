@@ -7,7 +7,7 @@
         <md-icon class="unknown" ng-show="!ctrl.latest">help</md-icon>
         <div class="env-row" ng-repeat="row in ctrl.environment_rows">
             <div class="envcontainer" style="width: {{ctrl.envcontainer.width}}" ng-repeat="env in row">
-                <div ng-if="env.release" class="play-status" style="height: {{ctrl.env.height}}; width: {{ctrl.env.height}};" ng-class="{ blink: env.icon == 'play_circle_filled', error: env.icon == 'error'}">
+                <div ng-if="env.release" class="play-status" style="height: {{ctrl.env.height}}; width: {{ctrl.env.height}};" ng-class="{ blink: env.icon == 'play_circle_filled', error: env.icon == 'cancel'}">
                     <md-icon style="font-size: {{ctrl.env.iconSize}}">{{env.icon}}</md-icon>
                 </div>
                 <div class="env" style="height: {{ctrl.env.height}}">

@@ -143,7 +143,7 @@
                         case "success":
                             this.icon = "check"; break;
                         case "failed":
-                            this.icon = "error"; break;
+                            this.icon = "cancel"; break;
                         case "default":
                             this.icon = "help"; break;
                     }

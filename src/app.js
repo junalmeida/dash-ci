@@ -1401,7 +1401,7 @@ var DashCI;
                                     _this.icon = "check";
                                     break;
                                 case "failed":
-                                    _this.icon = "error";
+                                    _this.icon = "cancel";
                                     break;
                                 case "default":
                                     _this.icon = "help";
@@ -1986,7 +1986,7 @@ var DashCI;
                                             _this.icon = "check";
                                             break;
                                         case "failed":
-                                            _this.icon = "error";
+                                            _this.icon = "cancel";
                                             break;
                                         case "canceled":
                                             _this.icon = "remove_circle";
@@ -2694,7 +2694,7 @@ var DashCI;
                             item.icon = "pause_circle_filled";
                             break;
                         case "rejected":
-                            item.icon = "error";
+                            item.icon = "cancel";
                             break;
                         case "succeeded":
                             item.icon = "check";
@@ -2705,7 +2705,10 @@ var DashCI;
                     }
                     var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
                     if (preDeploy.length > 0)
-                        item.icon = "people_outline";
+                        item.icon = "assignment_ind";
+                    preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                    if (preDeploy.length > 0)
+                        item.icon = "assignment_late";
                 };
                 return TfsReleaseController;
             }());

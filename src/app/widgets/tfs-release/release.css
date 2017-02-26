@@ -50,8 +50,8 @@ tfs-release .env-row  .env header {
 
 
 tfs-release .error md-icon {
-    color: red;
-    text-shadow: 0px 0px 3px #FFFFFF;
+    color: rgba(255, 0, 0, 0.60);
+    /*text-shadow: 0px 0px 3px #FFFFFF;*/
 }
 
 tfs-release .blink {
