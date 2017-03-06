@@ -96,6 +96,7 @@
             if (!res)
                 return;
 
+            console.log("tfs query: " + this.data.title);
             res.run_query({
                 project: this.data.project,
                 queryId: this.data.queryId
@@ -109,6 +110,7 @@
                     p.addClass('changed');
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
+                console.log("end tfs query: " + this.data.title);
             })
             .catch((reason) => {
                 this.queryCount = null;

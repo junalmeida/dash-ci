@@ -38,7 +38,7 @@ namespace DashCI.Widgets.TfsRelease {
             if (!res || !this.vm.project)
                 return;
             res.release_definition_list({ project: this.vm.project }).$promise
-                .then((result: Resources.Tfs.IReleaseDefinitionResult) => {
+                .then((result: Resources.Tfs.IReleaseDefinitionListResult) => {
                     this.releases = result.value;
                 })
                 .catch((reason) => {

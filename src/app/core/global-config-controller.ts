@@ -80,8 +80,12 @@ namespace DashCI.Core {
 
         public export() {
             var data = <Models.IOptions>jQuery.extend(true, {}, this.vm);
-            data.gitlab.privateToken = null;
-            data.tfs.privateToken = null;
+            if (data.gitlab)
+                data.gitlab.privateToken = null;
+            if (data.tfs)
+                data.tfs.privateToken = null;
+            if (data.github && data.github.length)
+                angular.forEach(data.github, (item) => item.privateToken = null);
 
             var datatxt = angular.toJson(data);
             var myBlob = new Blob([datatxt], { type: "application/json" });

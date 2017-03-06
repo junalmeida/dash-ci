@@ -24,13 +24,15 @@
         count: number;
         value: IBuildDefinition[];
     }
-    export interface IReleaseDefinitionResult extends ng.resource.IResource<IReleaseDefinitionResult> {
+    export interface IReleaseDefinitionListResult extends ng.resource.IResource<IReleaseDefinitionListResult> {
         count: number;
         value: IReleaseDefinition[];
     }
+
     export interface IQueryResult extends ng.resource.IResource<IQueryResult> {
         count: number;
         value: IQuery[];
+        children: IQuery[];
     }
     export interface IRunQueryResult extends ng.resource.IResource<IRunQueryResult> {
         workItems: IWorkItem[]
@@ -73,9 +75,10 @@
         id: string;
         name: string;
     }
-    export interface IReleaseDefinition {
-        id: string;
+    export interface IReleaseDefinition extends ng.resource.IResource<IReleaseDefinition> {
+        id: number;
         name: string;
+        environments: IReleaseEnvironment[]
     }
 
 
@@ -96,6 +99,7 @@
         status: string;
         icon: string;
         lastReleases: IRelease[];
+        release: IRelease;
         definitionEnvironmentId: number;
         conditions: {
             conditionType: string;

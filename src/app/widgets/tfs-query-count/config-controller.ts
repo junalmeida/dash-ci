@@ -1,10 +1,11 @@
 ﻿namespace DashCI.Widgets.TfsQueryCount {
 
     export class TfsQueryCountConfigController implements ng.IController {
-        public static $inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
+        public static $inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config"];
         constructor(
             private $scope: ng.IScope,
             private $mdDialog: ng.material.IDialogService,
+            private $q: ng.IQService,
             public tfsResources: () => Resources.Tfs.ITfsResource,
             public colors: Models.ICodeDescription[],
             public intervals: Models.IValueDescription[],
@@ -38,9 +39,14 @@
             var res = this.tfsResources();
             if (!res || !this.vm.project)
                 return;
-            res.query_list({ project: this.vm.project }).$promise
-                .then((result: Resources.Tfs.IQueryResult) => {
-                    this.queries = result.value;
+
+            var q1 = res.query_list({ project: this.vm.project, folder: "Shared Queries" }).$promise;
+            var q2 = res.query_list({ project: this.vm.project, folder: "My Queries" }).$promise;
+            this.$q.all([q1, q2])
+                .then((result) => {
+                    this.queries = [];
+                    angular.forEach(result[0].children || result[0].value, (item) => this.queries.push(item));
+                    angular.forEach(result[1].children || result[1].value, (item) => this.queries.push(item));
                 }).catch((reason) => {
                     console.error(reason);
                     this.queries = [];
