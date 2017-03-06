@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using TfsOnPremiseNtlm.Properties;
 
@@ -14,11 +15,14 @@ namespace TfsOnPremiseNtlm
             trayIcon = new NotifyIcon()
             {
                 Icon = Resources.PerfCenterCpl,
+                Text = "Dash-CI",
                 ContextMenu = new ContextMenu(new MenuItem[] {
-                new MenuItem("Exit", Exit)
-            }),
+                    new MenuItem("Open", Open) { DefaultItem = true },
+                    new MenuItem("Exit", Exit)
+                }),
                 Visible = true
             };
+            trayIcon.Click += Open;
         }
 
         void Exit(object sender, EventArgs e)
@@ -28,6 +32,14 @@ namespace TfsOnPremiseNtlm
             if (Program.server != null)
                 Program.server.Dispose();
             Application.Exit();
+        }
+        void Open(object sender, EventArgs e)
+        {
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = Program.BaseUrl + "/",
+                UseShellExecute = true
+            });
         }
     }
 }
