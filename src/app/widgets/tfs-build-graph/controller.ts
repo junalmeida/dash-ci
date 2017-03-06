@@ -105,8 +105,11 @@
                 var maxDuration = 1; 
                 angular.forEach(builds, (item) => {
                     if (item.finishTime) {
-                        var duration = moment(item.finishTime).subtract(moment(item.finishTime));
-                        item.duration = duration.seconds();
+                        var finishTime = moment(item.finishTime);
+                        var startTime = moment(item.startTime);
+                            
+                        
+                        item.duration = finishTime.diff(startTime, 'seconds');
                         if (maxDuration < item.duration)
                             maxDuration = item.duration;
                     }
