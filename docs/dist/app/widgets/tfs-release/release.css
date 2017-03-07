@@ -23,6 +23,18 @@ tfs-release .env-row .envcontainer .play-status {
     position: absolute;
 }
 
+tfs-release .align-center .env-row .envcontainer .play-status {
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}
+
+tfs-release .align-center .env-row .env .info,
+tfs-release .align-center .env-row .env header {
+    padding-left: 0 !important;
+    text-align: center !important;
+}
 
 tfs-release .env-row .env
 {

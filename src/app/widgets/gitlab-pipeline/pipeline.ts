@@ -25,12 +25,5 @@
 
     }
 
-
-    export interface IGitlabPipelineData extends Models.IWidgetData {
-        project?: number;
-        poolInterval?: number;
-        refs?: string;
-    }
-
     DashCI.app.directive("gitlabPipeline", GitlabPipelineDirective.create());
 }

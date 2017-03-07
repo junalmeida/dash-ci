@@ -2,11 +2,12 @@
 namespace DashCI.Widgets.Label {
 
     export class LabelConfigController implements ng.IController {
-        public static $inject = ["$mdDialog", "colors", "config"];
+        public static $inject = ["$mdDialog", "colors", "aligns", "config"];
         constructor(
             private $mdDialog: ng.material.IDialogService,
             public colors: Models.ICodeDescription[],
-            public vm: Models.IWidgetData
+            public aligns: Models.ICodeDescription[],
+            public vm: ILabelWidgetData
         ) { 
             this.init();
         }
@@ -18,6 +19,4 @@ namespace DashCI.Widgets.Label {
             this.$mdDialog.hide(true);
         }
     }
-    DashCI.app.controller("LabelConfigController", LabelConfigController);
-
 }

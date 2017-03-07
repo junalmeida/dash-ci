@@ -123,57 +123,77 @@
                 return;
 
 
-            console.log("start request: " + this.data.id + "; " + this.data.title);
-            res.latest_release_environments({ project: this.data.project, release: this.data.release })
-                .$promise.then((result) => {
-                    this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
-                    angular.forEach(result.environments, (e) => {
-                        var findRelease = result.releases.filter((r) => e.lastReleases.length > 0 && r.id == e.lastReleases[0].id);
-                        var lastestDef = this.latest.environments.filter((re) => re.definitionEnvironmentId == e.id)[0];
-                        if (lastestDef && lastestDef.status == "inProgress") {
-                            angular.extend(e, lastestDef);
-                        }
-                        else if (findRelease.length == 1) {
-                            var releaseEnv = findRelease[0].environments.filter((re) => re.definitionEnvironmentId == e.id);
-                            if (releaseEnv.length > 0)
-                                angular.extend(e, releaseEnv[0]);
-                        }
-                        else if (lastestDef) {
-                            e.name = lastestDef.name;
-                            e.conditions = lastestDef.conditions;
-                        }
-                        this.setIcon(e)
-                    });
-                    this.environments = result.environments;
-
-                    if (this.latest) {
-                        var baseEnvs = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
-
-                        var rows: Resources.Tfs.IReleaseEnvironment[][] = [];
-                        angular.forEach(baseEnvs, (item) => {
-                            var row: Resources.Tfs.IReleaseEnvironment[] = [];
-                            row.push(item);
-                            angular.forEach(this.filterSubSequentEnvironments(item), (e) => row.push(e));
-                            rows.push(row);
-                        });
-                        this.environment_rows = rows;
-                    }
-                    else {
-                        this.environments = null;
+            if (!this.releaseDefinition || this.releaseDefinition.id != this.data.release) {
+                this.releaseDefinition = null;
+                res.release_definition({ project: this.data.project, release: this.data.release }).$promise
+                    .then((result) => {
+                        this.releaseDefinition = result;
+                        this.update();
+                    })
+                    .catch((error) => {
+                        this.releaseDefinition = null;
                         this.environment_rows = null;
-                    }
-                    this.releaseDefinition = result.releaseDefinition;
-                    this.sizeFont(this.$scope.$element.height());
-                })
-                .catch((error) => {
-                    this.latest = null;
-                    this.environments = null;
-                    this.releaseDefinition = null;
-                    this.environment_rows = null;
-                    console.error(error);
-                    this.sizeFont(this.$scope.$element.height());
-                });
+                        console.error(error);
+                    });
 
+            }
+
+            if (this.releaseDefinition) {
+                console.log("start request: " + this.data.id + "; " + this.data.title);
+                res.latest_release_environments({ project: this.data.project, release: this.data.release })
+                    .$promise.then((result) => {
+                        this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
+                        angular.forEach(result.environments, (e) => {
+                            var findRelease = result.releases.filter((r) => e.lastReleases.length > 0 && r.id == e.lastReleases[0].id);
+                            var lastestDef = this.latest.environments.filter((re) => re.definitionEnvironmentId == e.id)[0];
+                            if (lastestDef && lastestDef.status == "inProgress") {
+                                angular.extend(e, lastestDef);
+                            }
+                            else if (findRelease.length == 1) {
+                                var releaseEnv = findRelease[0].environments.filter((re) => re.definitionEnvironmentId == e.id);
+                                if (releaseEnv.length > 0)
+                                    angular.extend(e, releaseEnv[0]);
+                            }
+                            else if (lastestDef) {
+                                e.name = lastestDef.name;
+                                e.conditions = lastestDef.conditions;
+                            }
+                            var currentEnv = this.releaseDefinition.environments.filter((re) => re.id == lastestDef.definitionEnvironmentId);
+                            e.conditions = currentEnv[0].conditions;
+
+                            if (!e.release && e.lastReleases && e.lastReleases.length > 0)
+                                e.release = result.releases.filter((r) => r.id == e.lastReleases[0].id)[0];
+                            this.setIcon(e);
+                        });
+                        this.environments = result.environments;
+
+                        if (this.latest) {
+                            var baseEnvs = this.environments.filter(this.filterAutomaticAfterReleaseOrManual);
+
+                            var rows: Resources.Tfs.IReleaseEnvironment[][] = [];
+                            angular.forEach(baseEnvs, (item) => {
+                                var row: Resources.Tfs.IReleaseEnvironment[] = [];
+                                row.push(item);
+                                angular.forEach(this.filterSubSequentEnvironments(item), (e) => row.push(e));
+                                rows.push(row);
+                            });
+                            this.environment_rows = rows;
+                        }
+                        else {
+                            this.environments = null;
+                            this.environment_rows = null;
+                        }
+                        this.sizeFont(this.$scope.$element.height());
+                    })
+                    .catch((error) => {
+                        this.latest = null;
+                        this.environments = null;
+                        this.releaseDefinition = null;
+                        this.environment_rows = null;
+                        console.error(error);
+                        this.sizeFont(this.$scope.$element.height());
+                    });
+            }
         }
 
         private rowCount() {
@@ -216,34 +236,42 @@
         }
 
         private setIcon(item: Resources.Tfs.IReleaseEnvironment) {
-            switch (item.status) {
-                case "inProgress":
-                    item.icon = "play_circle_filled"; break;
-                case "canceled":
-                    item.icon = "remove_circle"; break;
-                case "notStarted":
-                    item.icon = "pause_circle_filled"; break;
-                case "rejected":
-                    item.icon = "cancel"; break;
-                case "succeeded":
-                    item.icon = "check"; break;
-                default:
-                    item.icon = "help"; break;
+            if (item.release) {
+                switch (item.status) {
+                    case "inProgress":
+                        item.icon = "play_circle_filled"; break;
+                    case "canceled":
+                        item.icon = "remove_circle"; break;
+                    case "notStarted":
+                        item.icon = "pause_circle_filled"; break;
+                    case "rejected":
+                        item.icon = "cancel"; break;
+                    case "succeeded":
+                        item.icon = "check"; break;
+                    default:
+                        item.icon = "help"; break;
+                }
+                if (item && item.preDeployApprovals) {
+                    var preDeploy = item.preDeployApprovals.filter((p) => p.status == "pending");
+                    if (preDeploy.length > 0)
+                        item.icon = "assignment_ind";
+                    preDeploy = item.preDeployApprovals.filter((p) => p.status == "rejected");
+                    if (preDeploy.length > 0)
+                        item.icon = "assignment_late";
+                }
+                if (item && item.postDeployApprovals) {
+                    var postDeploy = item.postDeployApprovals.filter((p) => p.status == "pending");
+                    if (postDeploy.length > 0)
+                        item.icon = "assignment_ind";
+                    postDeploy = item.postDeployApprovals.filter((p) => p.status == "rejected");
+                    if (postDeploy.length > 0)
+                        item.icon = "assignment_late";
+                }
             }
-
-            var preDeploy = item.preDeployApprovals.filter((p) => p.status == "pending");
-            if (preDeploy.length > 0)
-                item.icon = "assignment_ind";
-            preDeploy = item.preDeployApprovals.filter((p) => p.status == "rejected");
-            if (preDeploy.length > 0)
-                item.icon = "assignment_late";
-
-            var postDeploy = item.postDeployApprovals.filter((p) => p.status == "pending");
-            if (postDeploy.length > 0)
-                item.icon = "assignment_ind";
-            postDeploy = item.postDeployApprovals.filter((p) => p.status == "rejected");
-            if (postDeploy.length > 0)
-                item.icon = "assignment_late";
+            else 
+            {
+                item.icon = "";
+            }
        }
     }
 

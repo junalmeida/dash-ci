@@ -1,13 +1,13 @@
 ﻿<md-button title="Configure" class="configure-widget md-icon-button md-mini" ng-show="editable" ng-click="ctrl.config()">
     <md-icon>settings</md-icon>
 </md-button>
-<div>
+<div ng-class="{'align-center': ctrl.hideDetails}">
     <div class="header">{{data.title}}</div>
     <div class="content" layout="row" flex>
-        <div class="play-status" ng-class="{ blink: ctrl.latest.status == 'running', error: ctrl.icon == 'cancel'}">
+        <div class="play-status" ng-class="{ 'blink': ctrl.latest.status == 'inProgress', 'error': ctrl.icon == 'cancel', 'flex': ctrl.hideDetails}">
             <md-icon>{{ctrl.icon}}</md-icon>
         </div>
-        <div flex>
+        <div ng-if="!ctrl.hideDetails" flex>
             <div ng-show="ctrl.latest.user.avatar_url" class="avatar">
                 <i style="background-image: url({{ctrl.latest.user.avatar_url}})"></i>
             </div>

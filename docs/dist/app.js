@@ -79,6 +79,12 @@ var DashCI;
                 desc: "Static label to create semantic areas"
             },
             {
+                type: WidgetType.githubIssues,
+                directive: "github-issues",
+                title: "GitHub - Issue Query",
+                desc: "The count of an issue query against a repository."
+            },
+            {
                 type: WidgetType.gitlabPipeline,
                 directive: "gitlab-pipeline",
                 title: "GitLab - Pipeline",
@@ -119,12 +125,6 @@ var DashCI;
                 directive: "tfs-query-count",
                 title: "TFS - Query Count",
                 desc: "The count of a saved query against a project."
-            },
-            {
-                type: WidgetType.githubIssues,
-                directive: "github-issues",
-                title: "GitHub - Issue Query",
-                desc: "The count of an issue query against a repository."
             },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
@@ -317,54 +317,72 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
-                    console.log("start request: " + this.data.id + "; " + this.data.title);
-                    res.latest_release_environments({ project: this.data.project, release: this.data.release })
-                        .$promise.then(function (result) {
-                        _this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
-                        angular.forEach(result.environments, function (e) {
-                            var findRelease = result.releases.filter(function (r) { return e.lastReleases.length > 0 && r.id == e.lastReleases[0].id; });
-                            var lastestDef = _this.latest.environments.filter(function (re) { return re.definitionEnvironmentId == e.id; })[0];
-                            if (lastestDef && lastestDef.status == "inProgress") {
-                                angular.extend(e, lastestDef);
-                            }
-                            else if (findRelease.length == 1) {
-                                var releaseEnv = findRelease[0].environments.filter(function (re) { return re.definitionEnvironmentId == e.id; });
-                                if (releaseEnv.length > 0)
-                                    angular.extend(e, releaseEnv[0]);
-                            }
-                            else if (lastestDef) {
-                                e.name = lastestDef.name;
-                                e.conditions = lastestDef.conditions;
-                            }
-                            _this.setIcon(e);
-                        });
-                        _this.environments = result.environments;
-                        if (_this.latest) {
-                            var baseEnvs = _this.environments.filter(_this.filterAutomaticAfterReleaseOrManual);
-                            var rows = [];
-                            angular.forEach(baseEnvs, function (item) {
-                                var row = [];
-                                row.push(item);
-                                angular.forEach(_this.filterSubSequentEnvironments(item), function (e) { return row.push(e); });
-                                rows.push(row);
-                            });
-                            _this.environment_rows = rows;
-                        }
-                        else {
-                            _this.environments = null;
+                    if (!this.releaseDefinition || this.releaseDefinition.id != this.data.release) {
+                        this.releaseDefinition = null;
+                        res.release_definition({ project: this.data.project, release: this.data.release }).$promise
+                            .then(function (result) {
+                            _this.releaseDefinition = result;
+                            _this.update();
+                        })
+                            .catch(function (error) {
+                            _this.releaseDefinition = null;
                             _this.environment_rows = null;
-                        }
-                        _this.releaseDefinition = result.releaseDefinition;
-                        _this.sizeFont(_this.$scope.$element.height());
-                    })
-                        .catch(function (error) {
-                        _this.latest = null;
-                        _this.environments = null;
-                        _this.releaseDefinition = null;
-                        _this.environment_rows = null;
-                        console.error(error);
-                        _this.sizeFont(_this.$scope.$element.height());
-                    });
+                            console.error(error);
+                        });
+                    }
+                    if (this.releaseDefinition) {
+                        console.log("start request: " + this.data.id + "; " + this.data.title);
+                        res.latest_release_environments({ project: this.data.project, release: this.data.release })
+                            .$promise.then(function (result) {
+                            _this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
+                            angular.forEach(result.environments, function (e) {
+                                var findRelease = result.releases.filter(function (r) { return e.lastReleases.length > 0 && r.id == e.lastReleases[0].id; });
+                                var lastestDef = _this.latest.environments.filter(function (re) { return re.definitionEnvironmentId == e.id; })[0];
+                                if (lastestDef && lastestDef.status == "inProgress") {
+                                    angular.extend(e, lastestDef);
+                                }
+                                else if (findRelease.length == 1) {
+                                    var releaseEnv = findRelease[0].environments.filter(function (re) { return re.definitionEnvironmentId == e.id; });
+                                    if (releaseEnv.length > 0)
+                                        angular.extend(e, releaseEnv[0]);
+                                }
+                                else if (lastestDef) {
+                                    e.name = lastestDef.name;
+                                    e.conditions = lastestDef.conditions;
+                                }
+                                var currentEnv = _this.releaseDefinition.environments.filter(function (re) { return re.id == lastestDef.definitionEnvironmentId; });
+                                e.conditions = currentEnv[0].conditions;
+                                if (!e.release && e.lastReleases && e.lastReleases.length > 0)
+                                    e.release = result.releases.filter(function (r) { return r.id == e.lastReleases[0].id; })[0];
+                                _this.setIcon(e);
+                            });
+                            _this.environments = result.environments;
+                            if (_this.latest) {
+                                var baseEnvs = _this.environments.filter(_this.filterAutomaticAfterReleaseOrManual);
+                                var rows = [];
+                                angular.forEach(baseEnvs, function (item) {
+                                    var row = [];
+                                    row.push(item);
+                                    angular.forEach(_this.filterSubSequentEnvironments(item), function (e) { return row.push(e); });
+                                    rows.push(row);
+                                });
+                                _this.environment_rows = rows;
+                            }
+                            else {
+                                _this.environments = null;
+                                _this.environment_rows = null;
+                            }
+                            _this.sizeFont(_this.$scope.$element.height());
+                        })
+                            .catch(function (error) {
+                            _this.latest = null;
+                            _this.environments = null;
+                            _this.releaseDefinition = null;
+                            _this.environment_rows = null;
+                            console.error(error);
+                            _this.sizeFont(_this.$scope.$element.height());
+                        });
+                    }
                 };
                 TfsReleaseController.prototype.rowCount = function () {
                     return this.environment_rows ? this.environment_rows.length : 0;
@@ -399,38 +417,47 @@ var DashCI;
                     return list;
                 };
                 TfsReleaseController.prototype.setIcon = function (item) {
-                    switch (item.status) {
-                        case "inProgress":
-                            item.icon = "play_circle_filled";
-                            break;
-                        case "canceled":
-                            item.icon = "remove_circle";
-                            break;
-                        case "notStarted":
-                            item.icon = "pause_circle_filled";
-                            break;
-                        case "rejected":
-                            item.icon = "cancel";
-                            break;
-                        case "succeeded":
-                            item.icon = "check";
-                            break;
-                        default:
-                            item.icon = "help";
-                            break;
+                    if (item.release) {
+                        switch (item.status) {
+                            case "inProgress":
+                                item.icon = "play_circle_filled";
+                                break;
+                            case "canceled":
+                                item.icon = "remove_circle";
+                                break;
+                            case "notStarted":
+                                item.icon = "pause_circle_filled";
+                                break;
+                            case "rejected":
+                                item.icon = "cancel";
+                                break;
+                            case "succeeded":
+                                item.icon = "check";
+                                break;
+                            default:
+                                item.icon = "help";
+                                break;
+                        }
+                        if (item && item.preDeployApprovals) {
+                            var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                            if (preDeploy.length > 0)
+                                item.icon = "assignment_ind";
+                            preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                            if (preDeploy.length > 0)
+                                item.icon = "assignment_late";
+                        }
+                        if (item && item.postDeployApprovals) {
+                            var postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                            if (postDeploy.length > 0)
+                                item.icon = "assignment_ind";
+                            postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                            if (postDeploy.length > 0)
+                                item.icon = "assignment_late";
+                        }
                     }
-                    var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
-                    if (preDeploy.length > 0)
-                        item.icon = "assignment_ind";
-                    preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
-                    if (preDeploy.length > 0)
-                        item.icon = "assignment_late";
-                    var postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "pending"; });
-                    if (postDeploy.length > 0)
-                        item.icon = "assignment_ind";
-                    postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "rejected"; });
-                    if (postDeploy.length > 0)
-                        item.icon = "assignment_late";
+                    else {
+                        item.icon = "";
+                    }
                 };
                 return TfsReleaseController;
             }());
@@ -478,9 +505,10 @@ var DashCI;
         var TfsQueryCount;
         (function (TfsQueryCount) {
             var TfsQueryCountConfigController = (function () {
-                function TfsQueryCountConfigController($scope, $mdDialog, tfsResources, colors, intervals, vm) {
+                function TfsQueryCountConfigController($scope, $mdDialog, $q, tfsResources, colors, intervals, vm) {
                     this.$scope = $scope;
                     this.$mdDialog = $mdDialog;
+                    this.$q = $q;
                     this.tfsResources = tfsResources;
                     this.colors = colors;
                     this.intervals = intervals;
@@ -507,9 +535,13 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res || !this.vm.project)
                         return;
-                    res.query_list({ project: this.vm.project }).$promise
+                    var q1 = res.query_list({ project: this.vm.project, folder: "Shared Queries" }).$promise;
+                    var q2 = res.query_list({ project: this.vm.project, folder: "My Queries" }).$promise;
+                    this.$q.all([q1, q2])
                         .then(function (result) {
-                        _this.queries = result.value;
+                        _this.queries = [];
+                        angular.forEach(result[0].children || result[0].value, function (item) { return _this.queries.push(item); });
+                        angular.forEach(result[1].children || result[1].value, function (item) { return _this.queries.push(item); });
                     }).catch(function (reason) {
                         console.error(reason);
                         _this.queries = [];
@@ -520,7 +552,7 @@ var DashCI;
                 };
                 return TfsQueryCountConfigController;
             }());
-            TfsQueryCountConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
+            TfsQueryCountConfigController.$inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config"];
             TfsQueryCount.TfsQueryCountConfigController = TfsQueryCountConfigController;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
@@ -609,6 +641,7 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
+                    console.log("tfs query: " + this.data.title);
                     res.run_query({
                         project: this.data.project,
                         queryId: this.data.queryId
@@ -620,6 +653,7 @@ var DashCI;
                             p.addClass('changed');
                             _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
                         }
+                        console.log("end tfs query: " + _this.data.title);
                     })
                         .catch(function (reason) {
                         _this.queryCount = null;
@@ -843,8 +877,9 @@ var DashCI;
                         var maxDuration = 1;
                         angular.forEach(builds, function (item) {
                             if (item.finishTime) {
-                                var duration = moment(item.finishTime).subtract(moment(item.finishTime));
-                                item.duration = duration.seconds();
+                                var finishTime = moment(item.finishTime);
+                                var startTime = moment(item.startTime);
+                                item.duration = finishTime.diff(startTime, 'seconds');
                                 if (maxDuration < item.duration)
                                     maxDuration = item.duration;
                             }
@@ -952,7 +987,8 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.tfsBuild;
                     this.data.footer = false;
                     this.data.header = false;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeBy(width, _this.$scope.$element.height()); });
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
@@ -970,24 +1006,25 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                TfsBuildController.prototype.sizeFont = function (altura) {
+                TfsBuildController.prototype.sizeBy = function (width, height) {
+                    this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
-                    var fontSize = Math.round(altura / 1) + "px";
+                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
                     //var lineSize = Math.round((altura) - 60) + "px";
                     icon.css('font-size', fontSize);
-                    icon.parent().width(Math.round(altura / 1));
+                    icon.parent().width(Math.round(height / 1));
                     //p.css('line-height', lineSize);
                     var header = this.$scope.$element.find(".header");
-                    fontSize = Math.round(altura / 1) + "px";
+                    fontSize = Math.round(height / 1) + "px";
                     header.css('text-indent', fontSize);
                     //var title = this.$scope.$element.find("h2");
-                    //fontSize = Math.round(altura / 6) + "px";
+                    //fontSize = Math.round(height / 6) + "px";
                     //title.css('font-size', fontSize);
                     var txt = this.$scope.$element.find("h4");
-                    fontSize = Math.round(altura / 7) + "px";
+                    fontSize = Math.round(height / 7) + "px";
                     txt.css('font-size', fontSize);
                     var img = this.$scope.$element.find(".avatar");
-                    var size = Math.round(altura - 32);
+                    var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
                 };
@@ -1075,12 +1112,16 @@ var DashCI;
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     });
+                };
+                TfsBuildController.prototype.resizeWidget = function () {
+                    var _this = this;
+                    this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 };
                 return TfsBuildController;
             }());
@@ -1128,9 +1169,10 @@ var DashCI;
         var Label;
         (function (Label) {
             var LabelConfigController = (function () {
-                function LabelConfigController($mdDialog, colors, vm) {
+                function LabelConfigController($mdDialog, colors, aligns, vm) {
                     this.$mdDialog = $mdDialog;
                     this.colors = colors;
+                    this.aligns = aligns;
                     this.vm = vm;
                     this.init();
                 }
@@ -1141,9 +1183,8 @@ var DashCI;
                 };
                 return LabelConfigController;
             }());
-            LabelConfigController.$inject = ["$mdDialog", "colors", "config"];
+            LabelConfigController.$inject = ["$mdDialog", "colors", "aligns", "config"];
             Label.LabelConfigController = LabelConfigController;
-            DashCI.app.controller("LabelConfigController", LabelConfigController);
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
@@ -1172,6 +1213,7 @@ var DashCI;
                 LabelController.prototype.init = function () {
                     this.data.title = this.data.title || "Label";
                     this.data.color = this.data.color || "semi-transp";
+                    this.data.align = this.data.align || "center";
                 };
                 LabelController.prototype.config = function () {
                     var _this = this;
@@ -1490,7 +1532,8 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.gitlabPipeline;
                     this.data.footer = false;
                     this.data.header = false;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeBy(width, _this.$scope.$element.height()); });
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
@@ -1509,24 +1552,25 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                GitlabPipelineController.prototype.sizeFont = function (altura) {
+                GitlabPipelineController.prototype.sizeBy = function (width, height) {
+                    this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
-                    var fontSize = Math.round(altura / 1) + "px";
+                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
                     //var lineSize = Math.round((altura) - 60) + "px";
                     icon.css('font-size', fontSize);
-                    icon.parent().width(Math.round(altura / 1));
+                    icon.parent().width(Math.round(height / 1));
                     //p.css('line-height', lineSize);
                     var header = this.$scope.$element.find(".header");
-                    fontSize = Math.round(altura / 1) + "px";
+                    fontSize = Math.round(height / 1) + "px";
                     header.css('text-indent', fontSize);
                     //var title = this.$scope.$element.find("h2");
                     //fontSize = Math.round(altura / 6) + "px";
                     //title.css('font-size', fontSize);
                     var txt = this.$scope.$element.find("h4");
-                    fontSize = Math.round(altura / 7) + "px";
+                    fontSize = Math.round(height / 7) + "px";
                     txt.css('font-size', fontSize);
                     var img = this.$scope.$element.find(".avatar");
-                    var size = Math.round(altura - 32);
+                    var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
                 };
@@ -1603,12 +1647,16 @@ var DashCI;
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     });
+                };
+                GitlabPipelineController.prototype.resizeWidget = function () {
+                    var _this = this;
+                    this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 };
                 return GitlabPipelineController;
             }());
@@ -2169,7 +2217,7 @@ var DashCI;
                         query_list: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.tfs.host + "/:project/_apis/wit/queries?$depth=2&$expand=all&api-version=2.2",
+                            url: globalOptions.tfs.host + "/:project/_apis/wit/queries/:folder?$depth=2&$expand=all&api-version=2.2",
                             headers: headers,
                             cache: true,
                             withCredentials: withCredentials
@@ -2209,7 +2257,15 @@ var DashCI;
                         release_definition_list: {
                             method: 'GET',
                             isArray: false,
-                            url: tfs_release_preview + "/:project/_apis/release/definitions?api-version=3.0-preview.1",
+                            url: tfs_release_preview + "/:project/_apis/release/definitions?api-version=2.2-preview.1",
+                            headers: headers,
+                            cache: false,
+                            withCredentials: withCredentials
+                        },
+                        release_definition: {
+                            method: 'GET',
+                            isArray: false,
+                            url: tfs_release_preview + "/:project/_apis/release/definitions/:release?api-version=2.2-preview.1",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -2217,7 +2273,7 @@ var DashCI;
                         latest_release_environments: {
                             method: 'GET',
                             isArray: false,
-                            url: tfs_release_preview + "/:project/_apis/release/releases?definitionId=:release&releaseCount=1&includeArtifact=false",
+                            url: tfs_release_preview + "/:project/_apis/release/releases?api-version=2.2-preview.1&definitionId=:release&releaseCount=1&includeArtifact=false",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -2225,7 +2281,7 @@ var DashCI;
                         recent_releases: {
                             method: 'GET',
                             isArray: false,
-                            url: tfs_release_preview + "/:project/_apis/release/releases?api-version=3.0-preview.1&definitionId=:release&$expand=environments&$top=25&queryOrder=descending",
+                            url: tfs_release_preview + "/:project/_apis/release/releases?api-version=2.2-preview.1&definitionId=:release&$expand=environments&$top=25&queryOrder=descending",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -2490,6 +2546,20 @@ var DashCI;
                 desc: "2 min"
             },
         ]);
+        DashCI.app.constant("aligns", [
+            {
+                code: "center",
+                desc: "Center"
+            },
+            {
+                code: "left",
+                desc: "Left"
+            },
+            {
+                code: "right",
+                desc: "Right"
+            },
+        ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
 "use strict";
@@ -2594,8 +2664,12 @@ var DashCI;
             };
             GlobalConfigController.prototype.export = function () {
                 var data = jQuery.extend(true, {}, this.vm);
-                data.gitlab.privateToken = null;
-                data.tfs.privateToken = null;
+                if (data.gitlab)
+                    data.gitlab.privateToken = null;
+                if (data.tfs)
+                    data.tfs.privateToken = null;
+                if (data.github && data.github.length)
+                    angular.forEach(data.github, function (item) { return item.privateToken = null; });
                 var datatxt = angular.toJson(data);
                 var myBlob = new Blob([datatxt], { type: "application/json" });
                 var url = window.URL.createObjectURL(myBlob);

@@ -1,9 +1,13 @@
 ﻿namespace DashCI.Widgets.Label
 {
+    export interface ILabelWidgetData extends Models.IWidgetData {
+        align?: string;
+    }
+
     export class LabelController implements ng.IController {
         public static $inject = ["$scope", "$timeout", "$mdDialog", "$q"];
 
-        public data: Models.IWidgetData;
+        public data: ILabelWidgetData;
 
         constructor(
             private $scope: Models.IWidgetScope,
@@ -29,6 +33,7 @@
 
             this.data.title = this.data.title || "Label";
             this.data.color = this.data.color || "semi-transp";
+            this.data.align = this.data.align || "center";
         }
 
         public config() {

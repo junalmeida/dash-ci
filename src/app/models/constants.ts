@@ -73,4 +73,18 @@ namespace DashCI.Models {
         },
     ]);
 
+    DashCI.app.constant("aligns", <ICodeDescription[]>[
+        {
+            code: "center",
+            desc: "Center"
+        },
+        {
+            code: "left",
+            desc: "Left"
+        },
+        {
+            code: "right",
+            desc: "Right"
+        },
+    ]);
 }

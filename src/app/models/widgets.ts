@@ -27,6 +27,12 @@ namespace DashCI.Models {
             desc: "Static label to create semantic areas"
         },
         {
+            type: WidgetType.githubIssues,
+            directive: "github-issues",
+            title: "GitHub - Issue Query",
+            desc: "The count of an issue query against a repository."
+        },
+        {
             type: WidgetType.gitlabPipeline,
             directive: "gitlab-pipeline",
             title: "GitLab - Pipeline",
@@ -67,12 +73,6 @@ namespace DashCI.Models {
             directive: "tfs-query-count",
             title: "TFS - Query Count",
             desc: "The count of a saved query against a project."
-        },
-        {
-            type: WidgetType.githubIssues,
-            directive: "github-issues",
-            title: "GitHub - Issue Query",
-            desc: "The count of an issue query against a repository."
         },
     ]);
 }
