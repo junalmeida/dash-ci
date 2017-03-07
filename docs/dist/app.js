@@ -352,9 +352,9 @@ var DashCI;
                                 }
                                 var currentEnv = _this.releaseDefinition.environments.filter(function (re) { return re.id == lastestDef.definitionEnvironmentId; });
                                 e.conditions = currentEnv[0].conditions;
-                                _this.setIcon(e);
                                 if (!e.release && e.lastReleases && e.lastReleases.length > 0)
                                     e.release = result.releases.filter(function (r) { return r.id == e.lastReleases[0].id; })[0];
+                                _this.setIcon(e);
                             });
                             _this.environments = result.environments;
                             if (_this.latest) {
@@ -417,41 +417,46 @@ var DashCI;
                     return list;
                 };
                 TfsReleaseController.prototype.setIcon = function (item) {
-                    switch (item.status) {
-                        case "inProgress":
-                            item.icon = "play_circle_filled";
-                            break;
-                        case "canceled":
-                            item.icon = "remove_circle";
-                            break;
-                        case "notStarted":
-                            item.icon = "pause_circle_filled";
-                            break;
-                        case "rejected":
-                            item.icon = "cancel";
-                            break;
-                        case "succeeded":
-                            item.icon = "check";
-                            break;
-                        default:
-                            item.icon = "help";
-                            break;
+                    if (item.release) {
+                        switch (item.status) {
+                            case "inProgress":
+                                item.icon = "play_circle_filled";
+                                break;
+                            case "canceled":
+                                item.icon = "remove_circle";
+                                break;
+                            case "notStarted":
+                                item.icon = "pause_circle_filled";
+                                break;
+                            case "rejected":
+                                item.icon = "cancel";
+                                break;
+                            case "succeeded":
+                                item.icon = "check";
+                                break;
+                            default:
+                                item.icon = "help";
+                                break;
+                        }
+                        if (item && item.preDeployApprovals) {
+                            var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                            if (preDeploy.length > 0)
+                                item.icon = "assignment_ind";
+                            preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                            if (preDeploy.length > 0)
+                                item.icon = "assignment_late";
+                        }
+                        if (item && item.postDeployApprovals) {
+                            var postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                            if (postDeploy.length > 0)
+                                item.icon = "assignment_ind";
+                            postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                            if (postDeploy.length > 0)
+                                item.icon = "assignment_late";
+                        }
                     }
-                    if (item && item.preDeployApprovals) {
-                        var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
-                        if (preDeploy.length > 0)
-                            item.icon = "assignment_ind";
-                        preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
-                        if (preDeploy.length > 0)
-                            item.icon = "assignment_late";
-                    }
-                    if (item && item.postDeployApprovals) {
-                        var postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "pending"; });
-                        if (postDeploy.length > 0)
-                            item.icon = "assignment_ind";
-                        postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "rejected"; });
-                        if (postDeploy.length > 0)
-                            item.icon = "assignment_late";
+                    else {
+                        item.icon = "";
                     }
                 };
                 return TfsReleaseController;
@@ -872,8 +877,9 @@ var DashCI;
                         var maxDuration = 1;
                         angular.forEach(builds, function (item) {
                             if (item.finishTime) {
-                                var duration = moment(item.finishTime).subtract(moment(item.finishTime));
-                                item.duration = duration.seconds();
+                                var finishTime = moment(item.finishTime);
+                                var startTime = moment(item.startTime);
+                                item.duration = finishTime.diff(startTime, 'seconds');
                                 if (maxDuration < item.duration)
                                     maxDuration = item.duration;
                             }
@@ -981,7 +987,8 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.tfsBuild;
                     this.data.footer = false;
                     this.data.header = false;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeBy(width, _this.$scope.$element.height()); });
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
@@ -999,24 +1006,25 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                TfsBuildController.prototype.sizeFont = function (altura) {
+                TfsBuildController.prototype.sizeBy = function (width, height) {
+                    this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
-                    var fontSize = Math.round(altura / 1) + "px";
+                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
                     //var lineSize = Math.round((altura) - 60) + "px";
                     icon.css('font-size', fontSize);
-                    icon.parent().width(Math.round(altura / 1));
+                    icon.parent().width(Math.round(height / 1));
                     //p.css('line-height', lineSize);
                     var header = this.$scope.$element.find(".header");
-                    fontSize = Math.round(altura / 1) + "px";
+                    fontSize = Math.round(height / 1) + "px";
                     header.css('text-indent', fontSize);
                     //var title = this.$scope.$element.find("h2");
-                    //fontSize = Math.round(altura / 6) + "px";
+                    //fontSize = Math.round(height / 6) + "px";
                     //title.css('font-size', fontSize);
                     var txt = this.$scope.$element.find("h4");
-                    fontSize = Math.round(altura / 7) + "px";
+                    fontSize = Math.round(height / 7) + "px";
                     txt.css('font-size', fontSize);
                     var img = this.$scope.$element.find(".avatar");
-                    var size = Math.round(altura - 32);
+                    var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
                 };
@@ -1104,12 +1112,16 @@ var DashCI;
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     });
+                };
+                TfsBuildController.prototype.resizeWidget = function () {
+                    var _this = this;
+                    this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 };
                 return TfsBuildController;
             }());
@@ -1157,9 +1169,10 @@ var DashCI;
         var Label;
         (function (Label) {
             var LabelConfigController = (function () {
-                function LabelConfigController($mdDialog, colors, vm) {
+                function LabelConfigController($mdDialog, colors, aligns, vm) {
                     this.$mdDialog = $mdDialog;
                     this.colors = colors;
+                    this.aligns = aligns;
                     this.vm = vm;
                     this.init();
                 }
@@ -1170,9 +1183,8 @@ var DashCI;
                 };
                 return LabelConfigController;
             }());
-            LabelConfigController.$inject = ["$mdDialog", "colors", "config"];
+            LabelConfigController.$inject = ["$mdDialog", "colors", "aligns", "config"];
             Label.LabelConfigController = LabelConfigController;
-            DashCI.app.controller("LabelConfigController", LabelConfigController);
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
@@ -1201,6 +1213,7 @@ var DashCI;
                 LabelController.prototype.init = function () {
                     this.data.title = this.data.title || "Label";
                     this.data.color = this.data.color || "semi-transp";
+                    this.data.align = this.data.align || "center";
                 };
                 LabelController.prototype.config = function () {
                     var _this = this;
@@ -1519,7 +1532,8 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.gitlabPipeline;
                     this.data.footer = false;
                     this.data.header = false;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeBy(width, _this.$scope.$element.height()); });
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
@@ -1538,24 +1552,25 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                GitlabPipelineController.prototype.sizeFont = function (altura) {
+                GitlabPipelineController.prototype.sizeBy = function (width, height) {
+                    this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
-                    var fontSize = Math.round(altura / 1) + "px";
+                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
                     //var lineSize = Math.round((altura) - 60) + "px";
                     icon.css('font-size', fontSize);
-                    icon.parent().width(Math.round(altura / 1));
+                    icon.parent().width(Math.round(height / 1));
                     //p.css('line-height', lineSize);
                     var header = this.$scope.$element.find(".header");
-                    fontSize = Math.round(altura / 1) + "px";
+                    fontSize = Math.round(height / 1) + "px";
                     header.css('text-indent', fontSize);
                     //var title = this.$scope.$element.find("h2");
                     //fontSize = Math.round(altura / 6) + "px";
                     //title.css('font-size', fontSize);
                     var txt = this.$scope.$element.find("h4");
-                    fontSize = Math.round(altura / 7) + "px";
+                    fontSize = Math.round(height / 7) + "px";
                     txt.css('font-size', fontSize);
                     var img = this.$scope.$element.find(".avatar");
-                    var size = Math.round(altura - 32);
+                    var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
                 };
@@ -1632,12 +1647,16 @@ var DashCI;
                         //var p = this.$scope.$element.find("p");
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        _this.resizeWidget();
                     });
+                };
+                GitlabPipelineController.prototype.resizeWidget = function () {
+                    var _this = this;
+                    this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 };
                 return GitlabPipelineController;
             }());
@@ -2525,6 +2544,20 @@ var DashCI;
             {
                 value: 120000,
                 desc: "2 min"
+            },
+        ]);
+        DashCI.app.constant("aligns", [
+            {
+                code: "center",
+                desc: "Center"
+            },
+            {
+                code: "left",
+                desc: "Left"
+            },
+            {
+                code: "right",
+                desc: "Right"
             },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));

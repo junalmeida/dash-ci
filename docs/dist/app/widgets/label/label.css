@@ -1,10 +1,16 @@
-﻿body {
-}
-
-label-title div {
+﻿label-title div {
     padding: 0; margin: 0;
     text-align: center;
     font-weight: bold;
     width: 100%; height: 100%;
     white-space: nowrap;
+}
+
+
+label-title div.left {
+    text-align: left;
+}
+
+label-title div.right {
+    text-align: right;
 }
