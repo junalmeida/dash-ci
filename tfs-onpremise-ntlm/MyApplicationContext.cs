@@ -22,7 +22,7 @@ namespace TfsOnPremiseNtlm
                 }),
                 Visible = true
             };
-            trayIcon.Click += Open;
+            trayIcon.DoubleClick += Open;
         }
 
         void Exit(object sender, EventArgs e)
