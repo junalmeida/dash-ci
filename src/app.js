@@ -1312,8 +1312,8 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.gitlabPipeline;
                     this.data.footer = false;
                     this.data.header = false;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeByHeight(_this.$scope.$element.width(), height); });
-                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeByWidth(width, _this.$scope.$element.height()); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeBy(width, _this.$scope.$element.height()); });
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
@@ -1332,7 +1332,7 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                GitlabPipelineController.prototype.sizeByHeight = function (width, height) {
+                GitlabPipelineController.prototype.sizeBy = function (width, height) {
                     this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
                     var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
@@ -1353,9 +1353,6 @@ var DashCI;
                     var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
-                };
-                GitlabPipelineController.prototype.sizeByWidth = function (width, height) {
-                    this.hideDetails = (width < height * 1.7);
                 };
                 GitlabPipelineController.prototype.config = function () {
                     var _this = this;
@@ -1439,7 +1436,7 @@ var DashCI;
                 };
                 GitlabPipelineController.prototype.resizeWidget = function () {
                     var _this = this;
-                    this.$timeout(function () { _this.sizeByHeight(_this.$scope.$element.width(), _this.$scope.$element.height()); _this.sizeByWidth(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
+                    this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 };
                 return GitlabPipelineController;
             }());
@@ -1904,8 +1901,8 @@ var DashCI;
                     this.data.type = DashCI.Models.WidgetType.tfsBuild;
                     this.data.footer = false;
                     this.data.header = false;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeByHeight(_this.$scope.$element.width(), height); });
-                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeByWidth(width, _this.$scope.$element.height()); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeBy(width, _this.$scope.$element.height()); });
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
@@ -1923,7 +1920,7 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                TfsBuildController.prototype.sizeByHeight = function (width, height) {
+                TfsBuildController.prototype.sizeBy = function (width, height) {
                     this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
                     var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
@@ -1944,9 +1941,6 @@ var DashCI;
                     var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
-                };
-                TfsBuildController.prototype.sizeByWidth = function (width, height) {
-                    this.hideDetails = (width < height * 1.7);
                 };
                 TfsBuildController.prototype.config = function () {
                     var _this = this;
@@ -2041,7 +2035,7 @@ var DashCI;
                 };
                 TfsBuildController.prototype.resizeWidget = function () {
                     var _this = this;
-                    this.$timeout(function () { _this.sizeByHeight(_this.$scope.$element.width(), _this.$scope.$element.height()); _this.sizeByWidth(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
+                    this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 };
                 return TfsBuildController;
             }());

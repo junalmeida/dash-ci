@@ -27,11 +27,11 @@
 
             this.$scope.$watch(
                 () => this.$scope.$element.height(),
-                (height: number) => this.sizeByHeight(this.$scope.$element.width(), height)
+                (height: number) => this.sizeBy(this.$scope.$element.width(), height)
             );
             this.$scope.$watch(
                 () => this.$scope.$element.width(),
-                (width: number) => this.sizeByWidth(width, this.$scope.$element.height())
+                (width: number) => this.sizeBy(width, this.$scope.$element.height())
             );
             this.$scope.$watch(
                 () => this.data.poolInterval,
@@ -61,7 +61,7 @@
             this.update();
         }
 
-        private sizeByHeight(width: number, height: number) {
+        private sizeBy(width: number, height: number) {
             this.hideDetails = (width < height * 1.7);
 
             var icon = this.$scope.$element.find(".play-status md-icon");
@@ -87,10 +87,6 @@
             var size = Math.round(height - 32);
             img.width(size);
             img.height(size);
-        }
-
-        private sizeByWidth(width: number, height: number) {
-            this.hideDetails = (width < height * 1.7);
         }
 
         public config() {
@@ -191,7 +187,7 @@
 
 
         private resizeWidget() {
-            this.$timeout(() => { this.sizeByHeight(this.$scope.$element.width(), this.$scope.$element.height()); this.sizeByWidth(this.$scope.$element.width(), this.$scope.$element.height()) }, 500);
+            this.$timeout(() => this.sizeBy(this.$scope.$element.width(), this.$scope.$element.height()), 500);
         }
 
     }
