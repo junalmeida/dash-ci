@@ -2674,9 +2674,9 @@ var DashCI;
                                 }
                                 var currentEnv = _this.releaseDefinition.environments.filter(function (re) { return re.id == lastestDef.definitionEnvironmentId; });
                                 e.conditions = currentEnv[0].conditions;
-                                _this.setIcon(e);
                                 if (!e.release && e.lastReleases && e.lastReleases.length > 0)
                                     e.release = result.releases.filter(function (r) { return r.id == e.lastReleases[0].id; })[0];
+                                _this.setIcon(e);
                             });
                             _this.environments = result.environments;
                             if (_this.latest) {
@@ -2739,41 +2739,46 @@ var DashCI;
                     return list;
                 };
                 TfsReleaseController.prototype.setIcon = function (item) {
-                    switch (item.status) {
-                        case "inProgress":
-                            item.icon = "play_circle_filled";
-                            break;
-                        case "canceled":
-                            item.icon = "remove_circle";
-                            break;
-                        case "notStarted":
-                            item.icon = "pause_circle_filled";
-                            break;
-                        case "rejected":
-                            item.icon = "cancel";
-                            break;
-                        case "succeeded":
-                            item.icon = "check";
-                            break;
-                        default:
-                            item.icon = "help";
-                            break;
+                    if (item.release) {
+                        switch (item.status) {
+                            case "inProgress":
+                                item.icon = "play_circle_filled";
+                                break;
+                            case "canceled":
+                                item.icon = "remove_circle";
+                                break;
+                            case "notStarted":
+                                item.icon = "pause_circle_filled";
+                                break;
+                            case "rejected":
+                                item.icon = "cancel";
+                                break;
+                            case "succeeded":
+                                item.icon = "check";
+                                break;
+                            default:
+                                item.icon = "help";
+                                break;
+                        }
+                        if (item && item.preDeployApprovals) {
+                            var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                            if (preDeploy.length > 0)
+                                item.icon = "assignment_ind";
+                            preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                            if (preDeploy.length > 0)
+                                item.icon = "assignment_late";
+                        }
+                        if (item && item.postDeployApprovals) {
+                            var postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "pending"; });
+                            if (postDeploy.length > 0)
+                                item.icon = "assignment_ind";
+                            postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "rejected"; });
+                            if (postDeploy.length > 0)
+                                item.icon = "assignment_late";
+                        }
                     }
-                    if (item && item.preDeployApprovals) {
-                        var preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "pending"; });
-                        if (preDeploy.length > 0)
-                            item.icon = "assignment_ind";
-                        preDeploy = item.preDeployApprovals.filter(function (p) { return p.status == "rejected"; });
-                        if (preDeploy.length > 0)
-                            item.icon = "assignment_late";
-                    }
-                    if (item && item.postDeployApprovals) {
-                        var postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "pending"; });
-                        if (postDeploy.length > 0)
-                            item.icon = "assignment_ind";
-                        postDeploy = item.postDeployApprovals.filter(function (p) { return p.status == "rejected"; });
-                        if (postDeploy.length > 0)
-                            item.icon = "assignment_late";
+                    else {
+                        item.icon = "";
                     }
                 };
                 return TfsReleaseController;

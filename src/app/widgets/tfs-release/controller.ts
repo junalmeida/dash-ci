@@ -161,9 +161,9 @@
                             var currentEnv = this.releaseDefinition.environments.filter((re) => re.id == lastestDef.definitionEnvironmentId);
                             e.conditions = currentEnv[0].conditions;
 
-                            this.setIcon(e)
                             if (!e.release && e.lastReleases && e.lastReleases.length > 0)
                                 e.release = result.releases.filter((r) => r.id == e.lastReleases[0].id)[0];
+                            this.setIcon(e);
                         });
                         this.environments = result.environments;
 
@@ -236,35 +236,41 @@
         }
 
         private setIcon(item: Resources.Tfs.IReleaseEnvironment) {
-            switch (item.status) {
-                case "inProgress":
-                    item.icon = "play_circle_filled"; break;
-                case "canceled":
-                    item.icon = "remove_circle"; break;
-                case "notStarted":
-                    item.icon = "pause_circle_filled"; break;
-                case "rejected":
-                    item.icon = "cancel"; break;
-                case "succeeded":
-                    item.icon = "check"; break;
-                default:
-                    item.icon = "help"; break;
+            if (item.release) {
+                switch (item.status) {
+                    case "inProgress":
+                        item.icon = "play_circle_filled"; break;
+                    case "canceled":
+                        item.icon = "remove_circle"; break;
+                    case "notStarted":
+                        item.icon = "pause_circle_filled"; break;
+                    case "rejected":
+                        item.icon = "cancel"; break;
+                    case "succeeded":
+                        item.icon = "check"; break;
+                    default:
+                        item.icon = "help"; break;
+                }
+                if (item && item.preDeployApprovals) {
+                    var preDeploy = item.preDeployApprovals.filter((p) => p.status == "pending");
+                    if (preDeploy.length > 0)
+                        item.icon = "assignment_ind";
+                    preDeploy = item.preDeployApprovals.filter((p) => p.status == "rejected");
+                    if (preDeploy.length > 0)
+                        item.icon = "assignment_late";
+                }
+                if (item && item.postDeployApprovals) {
+                    var postDeploy = item.postDeployApprovals.filter((p) => p.status == "pending");
+                    if (postDeploy.length > 0)
+                        item.icon = "assignment_ind";
+                    postDeploy = item.postDeployApprovals.filter((p) => p.status == "rejected");
+                    if (postDeploy.length > 0)
+                        item.icon = "assignment_late";
+                }
             }
-            if (item && item.preDeployApprovals) {
-                var preDeploy = item.preDeployApprovals.filter((p) => p.status == "pending");
-                if (preDeploy.length > 0)
-                    item.icon = "assignment_ind";
-                preDeploy = item.preDeployApprovals.filter((p) => p.status == "rejected");
-                if (preDeploy.length > 0)
-                    item.icon = "assignment_late";
-            }
-            if (item && item.postDeployApprovals) {
-                var postDeploy = item.postDeployApprovals.filter((p) => p.status == "pending");
-                if (postDeploy.length > 0)
-                    item.icon = "assignment_ind";
-                postDeploy = item.postDeployApprovals.filter((p) => p.status == "rejected");
-                if (postDeploy.length > 0)
-                    item.icon = "assignment_late";
+            else 
+            {
+                item.icon = "";
             }
        }
     }
