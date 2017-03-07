@@ -1,5 +1,11 @@
 ﻿namespace DashCI.Widgets.GitlabPipeline
 {
+    export interface IGitlabPipelineData extends Models.IWidgetData {
+        project?: number;
+        poolInterval?: number;
+        refs?: string;
+    }
+
     export class GitlabPipelineController implements ng.IController {
         public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "gitlabResources"];
 
@@ -21,7 +27,11 @@
 
             this.$scope.$watch(
                 () => this.$scope.$element.height(),
-                (height: number) => this.sizeFont(height)
+                (height: number) => this.sizeByHeight(this.$scope.$element.width(), height)
+            );
+            this.$scope.$watch(
+                () => this.$scope.$element.width(),
+                (width: number) => this.sizeByWidth(width, this.$scope.$element.height())
             );
             this.$scope.$watch(
                 () => this.data.poolInterval,
@@ -52,16 +62,18 @@
             this.update();
         }
 
-        private sizeFont(altura: number) {
+        private sizeByHeight(width: number, height: number) {
+            this.hideDetails = (width < height * 1.7);
+
             var icon = this.$scope.$element.find(".play-status md-icon");
-            var fontSize = Math.round(altura / 1) + "px";
+            var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
             //var lineSize = Math.round((altura) - 60) + "px";
             icon.css('font-size', fontSize);
-            icon.parent().width(Math.round(altura / 1));
+            icon.parent().width(Math.round(height / 1));
             //p.css('line-height', lineSize);
 
             var header = this.$scope.$element.find(".header");
-            fontSize = Math.round(altura / 1) + "px";
+            fontSize = Math.round(height / 1) + "px";
             header.css('text-indent', fontSize);
 
 
@@ -70,14 +82,18 @@
             //title.css('font-size', fontSize);
 
             var txt = this.$scope.$element.find("h4");
-            fontSize = Math.round(altura / 7) + "px";
+            fontSize = Math.round(height / 7) + "px";
             txt.css('font-size', fontSize);
 
             var img = this.$scope.$element.find(".avatar");
-            var size = Math.round(altura - 32);
+            var size = Math.round(height - 32);
             img.width(size);
             img.height(size);
 
+        }
+
+        private sizeByWidth(width: number, height: number) {
+            this.hideDetails = (width < height * 1.7);
         }
 
         public config() {
@@ -110,6 +126,7 @@
 
         public icon = "help";
         public latest: Resources.Gitlab.IPipeline;
+        public hideDetails: boolean;
 
         private update() {
             if (!this.data.project)
@@ -155,12 +172,16 @@
 
                 //p.addClass('changed');
                 //this.$timeout(() => p.removeClass('changed'), 1000);
-                this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
+                this.resizeWidget();
             }).catch((reason) => {
                 this.latest = null;
                 console.error(reason);
-                this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
+                this.resizeWidget();
             });
+        }
+
+        private resizeWidget() {
+            this.$timeout(() => { this.sizeByHeight(this.$scope.$element.width(), this.$scope.$element.height()); this.sizeByWidth(this.$scope.$element.width(), this.$scope.$element.height()) }, 500);
         }
 
     }
