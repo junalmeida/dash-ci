@@ -36,7 +36,7 @@ tfs-build .content .avatar
 {
     z-index: 0;
     position: absolute;
-    opacity: 0.5;
+    /*opacity: 0.5;*/
     width: 30px;
     height: 30px;
     bottom: 0;
