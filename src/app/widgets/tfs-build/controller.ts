@@ -140,6 +140,7 @@
                     new_build = build.value[0];
 
                 this.latest = new_build;
+                this.latest.sourceBranch = this.latest.sourceBranch.replace("refs/heads/", ""); //is it right?
                 
                 if (this.latest && this.latest.status) {
                     switch (this.latest.status) {

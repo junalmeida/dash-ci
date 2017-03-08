@@ -13,7 +13,7 @@
             </div>
             <h4 ng-show="ctrl.latest.requestedFor">{{ctrl.latest.requestedFor.displayName}}</h4>
             <h4 ng-show="ctrl.latest.sourceBranch">{{ctrl.latest.sourceBranch}} - {{ctrl.latest.buildNumber}}</h4>
-            <h4 ng-show="ctrl.latest.finishTime">{{ctrl.latest.result}} at {{ctrl.latest.finishTime | date:'MMM dd HH:mm'}}</h4>
+            <h4 ng-show="ctrl.latest.finishTime">{{ctrl.latest.finishTime | date:'MMM dd HH:mm'}}</h4>
             <h4 ng-show="ctrl.latest.queueTime && !ctrl.latest.finishTime">Requested at {{ctrl.latest.queueTime | date:'MMM dd HH:mm'}}</h4>
         </div>
     </div>
