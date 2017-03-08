@@ -1,8 +1,10 @@
-﻿body {
-}
-
-tfs-query-count p{
+﻿tfs-query-count p {
     padding: 0; margin: 0;
     text-align: center;
     font-weight: bold;
+}
+
+tfs-query-count .content
+{
+    height: 100%;
 }
