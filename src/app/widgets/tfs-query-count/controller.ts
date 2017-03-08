@@ -1,4 +1,19 @@
 ﻿namespace DashCI.Widgets.TfsQueryCount {
+
+    export interface ITfsQueryCountData extends Models.IWidgetData {
+        project?: string;
+        poolInterval?: number;
+        queryId?: string;
+        lowerThan?: {
+            value: number;
+            color: string;
+        },
+        greaterThan?: {
+            value: number;
+            color: string;
+        }
+    }
+
     export class TfsQueryCountController implements ng.IController {
         public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
 
@@ -40,7 +55,7 @@
 
         private init() {
             this.data.title = this.data.title || "Query";
-            this.data.color = this.data.color || "green";
+            this.data.color = this.data.color || "grey";
 
             //default values
             this.data.queryId = this.data.queryId || "";
@@ -82,7 +97,7 @@
             //.then((ok) => this.createWidget(type));
 
         }
-
+        public colorClass: string;
         public queryCount: number;
         private updateInterval() {
             if (this.handle)
@@ -110,6 +125,16 @@
                     p.addClass('changed');
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
+
+                if (this.data.lowerThan && !isNaN(this.data.lowerThan.value) && this.data.lowerThan.color) {
+                    if (this.queryCount < this.data.lowerThan.value)
+                        this.colorClass = this.data.lowerThan.color;
+                }
+                if (this.data.greaterThan && !isNaN(this.data.greaterThan.value) && this.data.greaterThan.color) {
+                    if (this.queryCount > this.data.greaterThan.value)
+                        this.colorClass = this.data.greaterThan.color;
+                }
+
                 console.log("end tfs query: " + this.data.title);
             })
             .catch((reason) => {

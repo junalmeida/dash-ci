@@ -1,14 +1,5 @@
 ﻿namespace DashCI.Widgets.GitlabIssues {
 
-    export interface IGitlabIssuesData extends Models.IWidgetData {
-        query_type?: string;
-        project?: number;
-        group?: number;
-        poolInterval?: number;
-        labels?: string;
-        status?: string;
-    }
-
     class GitlabIssuesDirective implements ng.IDirective {
         
         static create(): ng.IDirectiveFactory {

@@ -644,7 +644,7 @@ var DashCI;
                 };
                 TfsQueryCountController.prototype.init = function () {
                     this.data.title = this.data.title || "Query";
-                    this.data.color = this.data.color || "green";
+                    this.data.color = this.data.color || "grey";
                     //default values
                     this.data.queryId = this.data.queryId || "";
                     this.data.poolInterval = this.data.poolInterval || 20000;
@@ -706,6 +706,14 @@ var DashCI;
                             var p = _this.$scope.$element.find("p");
                             p.addClass('changed');
                             _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                        if (_this.data.lowerThan && !isNaN(_this.data.lowerThan.value) && _this.data.lowerThan.color) {
+                            if (_this.queryCount < _this.data.lowerThan.value)
+                                _this.colorClass = _this.data.lowerThan.color;
+                        }
+                        if (_this.data.greaterThan && !isNaN(_this.data.greaterThan.value) && _this.data.greaterThan.color) {
+                            if (_this.queryCount > _this.data.greaterThan.value)
+                                _this.colorClass = _this.data.greaterThan.color;
                         }
                         console.log("end tfs query: " + _this.data.title);
                     })
@@ -1837,7 +1845,7 @@ var DashCI;
                 };
                 GitlabIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
-                    this.data.color = this.data.color || "red";
+                    this.data.color = this.data.color || "grey";
                     //default values
                     this.data.labels = this.data.labels || "bug";
                     this.data.status = this.data.status || "opened";
@@ -1898,6 +1906,14 @@ var DashCI;
                             var p = _this.$scope.$element.find("p");
                             p.addClass('changed');
                             _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                        if (_this.data.lowerThan && !isNaN(_this.data.lowerThan.value) && _this.data.lowerThan.color) {
+                            if (_this.issueCount < _this.data.lowerThan.value)
+                                _this.colorClass = _this.data.lowerThan.color;
+                        }
+                        if (_this.data.greaterThan && !isNaN(_this.data.greaterThan.value) && _this.data.greaterThan.color) {
+                            if (_this.issueCount > _this.data.greaterThan.value)
+                                _this.colorClass = _this.data.greaterThan.color;
                         }
                     })
                         .catch(function (reason) {
@@ -2030,7 +2046,7 @@ var DashCI;
                 };
                 GithubIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
-                    this.data.color = this.data.color || "red";
+                    this.data.color = this.data.color || "grey";
                     //default values
                     this.data.labels = this.data.labels || "bug";
                     this.data.status = this.data.status || "open";
@@ -2091,6 +2107,14 @@ var DashCI;
                             var p = _this.$scope.$element.find("p");
                             p.addClass('changed');
                             _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                        if (_this.data.lowerThan && !isNaN(_this.data.lowerThan.value) && _this.data.lowerThan.color) {
+                            if (_this.issueCount < _this.data.lowerThan.value)
+                                _this.colorClass = _this.data.lowerThan.color;
+                        }
+                        if (_this.data.greaterThan && !isNaN(_this.data.greaterThan.value) && _this.data.greaterThan.color) {
+                            if (_this.issueCount > _this.data.greaterThan.value)
+                                _this.colorClass = _this.data.greaterThan.color;
                         }
                     })
                         .catch(function (reason) {

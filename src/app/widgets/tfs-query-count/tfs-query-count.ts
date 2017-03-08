@@ -25,11 +25,5 @@
 
     }
 
-    export interface ITfsQueryCountData extends Models.IWidgetData {
-        project?: string;
-        poolInterval?: number;
-        queryId?: string;
-    }
-
     DashCI.app.directive("tfsQueryCount", TfsQueryCountDirective.create());
 }
