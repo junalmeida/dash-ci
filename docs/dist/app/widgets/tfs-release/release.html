@@ -15,6 +15,7 @@
                     <!--<p class="info" ng-if="!env.release" style="padding-left: {{ctrl.env.iconSize}}">No deployments yet</p>-->
                     <p class="info" ng-if="env.release && !data.hideDetails" style="padding-left: {{ctrl.env.iconSize}}">{{env.release.name}} <span ng-if="env.modifiedOn">at {{env.modifiedOn | date:'MMM dd HH:mm'}}</span></p>
                 </div>
+                <div class="footer" ng-show="data.hideDetails && env.modifiedOn">{{env.modifiedOn | date:'MMM dd HH:mm'}}</div>
             </div>
         </div>
     </div>

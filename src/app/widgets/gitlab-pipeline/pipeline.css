@@ -1,7 +1,4 @@
-﻿body {
-}
-
-gitlab-pipeline h2, gitlab-pipeline h3, gitlab-pipeline h4 {
+﻿gitlab-pipeline h2, gitlab-pipeline h3, gitlab-pipeline h4 {
     z-index: 2;
     padding: 1px 0;
     margin: 0;
@@ -44,7 +41,7 @@ gitlab-pipeline .content .avatar
 {
     z-index: 0;
     position: absolute;
-    opacity: 0.5;
+    /*opacity: 0.5;*/
     width: 30px;
     height: 30px;
     bottom: 0px;
@@ -66,6 +63,10 @@ gitlab-pipeline .error md-icon{
     /*text-shadow: 0px 0px 3px #FFFFFF;*/
 }
 
+gitlab-pipeline  .align-center .content
+{
+    height: 90%;
+}
 gitlab-pipeline.widget .align-center .content .play-status {
     text-align: center;
     width: auto !important;
@@ -77,6 +78,14 @@ gitlab-pipeline.widget .align-center .content .play-status md-icon {
 gitlab-pipeline.widget .align-center .header {
     text-indent: 0 !important;
     text-align: center !important;
+}
+
+@-moz-keyframes blinker {  
+  50% { opacity: 0; }
+}
+
+@-webkit-keyframes blinker {  
+  50% { opacity: 0; }
 }
 
 @keyframes blinker {  

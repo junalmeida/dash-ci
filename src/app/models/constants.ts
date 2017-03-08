@@ -8,12 +8,20 @@ namespace DashCI.Models {
             desc: "Semi Transparent"
         },
         {
+            code: "transparent",
+            desc: "Transparent"
+        },
+        {
             code: "red",
             desc: "Red"
         },
         {
             code: "green",
             desc: "Green"
+        },
+        {
+            code: "deep-green",
+            desc: "Deep Green"
         },
         {
             code: "turkoise",

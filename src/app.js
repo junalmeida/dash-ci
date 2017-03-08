@@ -1009,7 +1009,7 @@ var DashCI;
                 TfsBuildController.prototype.sizeBy = function (width, height) {
                     this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
-                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
+                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 50 : 0)) + "px";
                     //var lineSize = Math.round((altura) - 60) + "px";
                     icon.css('font-size', fontSize);
                     icon.parent().width(Math.round(height / 1));
@@ -1027,6 +1027,7 @@ var DashCI;
                     var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
+                    this.hideAvatar = width < 390;
                 };
                 TfsBuildController.prototype.config = function () {
                     var _this = this;
@@ -1071,6 +1072,7 @@ var DashCI;
                         if (build.value.length >= 1)
                             new_build = build.value[0];
                         _this.latest = new_build;
+                        _this.latest.sourceBranch = _this.latest.sourceBranch.replace("refs/heads/", ""); //is it right?
                         if (_this.latest && _this.latest.status) {
                             switch (_this.latest.status) {
                                 case "notStarted":
@@ -1573,6 +1575,7 @@ var DashCI;
                     var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
+                    this.hideAvatar = width < 390;
                 };
                 GitlabPipelineController.prototype.config = function () {
                     var _this = this;
@@ -2484,12 +2487,20 @@ var DashCI;
                 desc: "Semi Transparent"
             },
             {
+                code: "transparent",
+                desc: "Transparent"
+            },
+            {
                 code: "red",
                 desc: "Red"
             },
             {
                 code: "green",
                 desc: "Green"
+            },
+            {
+                code: "deep-green",
+                desc: "Deep Green"
             },
             {
                 code: "turkoise",

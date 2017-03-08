@@ -65,7 +65,7 @@
             this.hideDetails = (width < height * 1.7);
 
             var icon = this.$scope.$element.find(".play-status md-icon");
-            var fontSize = (Math.round(height / 1) - (this.hideDetails? 30 : 0)) + "px";
+            var fontSize = (Math.round(height / 1) - (this.hideDetails? 50 : 0)) + "px";
             //var lineSize = Math.round((altura) - 60) + "px";
             icon.css('font-size', fontSize);
             icon.parent().width(Math.round(height / 1));
@@ -87,6 +87,8 @@
             var size = Math.round(height - 32);
             img.width(size);
             img.height(size);
+
+            this.hideAvatar = width < 390;
         }
 
         public config() {
@@ -119,6 +121,7 @@
         public icon = "help";
         public latest: Resources.Tfs.IBuild;
         public hideDetails: boolean;
+        public hideAvatar: boolean;
 
         private update() {
             if (!this.data.project || !this.data.build)
@@ -140,6 +143,7 @@
                     new_build = build.value[0];
 
                 this.latest = new_build;
+                this.latest.sourceBranch = this.latest.sourceBranch.replace("refs/heads/", ""); //is it right?
                 
                 if (this.latest && this.latest.status) {
                     switch (this.latest.status) {
