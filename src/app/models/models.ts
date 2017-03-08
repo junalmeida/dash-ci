@@ -8,10 +8,14 @@ namespace DashCI.Models {
         value: number;
         desc: string;
     }
-
+    export interface IEnumDescription<T> {
+        value: T;
+        desc: string;
+    }
     export interface IWidgetDescription {
 
         type: WidgetType;
+        category: WidgetCategory;
         directive: string,
         title: string;
         desc: string;

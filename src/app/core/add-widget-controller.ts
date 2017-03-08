@@ -3,11 +3,13 @@
 namespace DashCI.Core {
 
     export class AddWidgetController implements ng.IController {
-        public static $inject = ["$mdDialog", "widgets"];
+        public static $inject = ["$mdDialog", "widgets", "widgetcategories"];
         constructor(
             private $mdDialog: ng.material.IDialogService,
-            public widgets: Models.IWidgetDescription[]
-        ) { }
+            public widgets: Models.IWidgetDescription[],
+            public categories: Models.IEnumDescription<Models.WidgetCategory>[]
+        ) { 
+        }
 
         public cancel() {
             this.$mdDialog.cancel();
