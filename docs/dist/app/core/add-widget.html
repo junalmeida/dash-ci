@@ -11,17 +11,20 @@
         </md-toolbar>
 
         <md-dialog-content>
-            <md-list>
-                <md-subheader class="md-no-sticky">Select a widget to add to dashboard</md-subheader>
-                <md-list-item ng-repeat="item in ctrl.widgets"
-                              class="md-3-line" ng-click="ctrl.select(item.type)">
-                    <div class="md-list-item-text" layout="column">
-                        <h4>{{item.title}}</h4>
-                        <p>{{item.desc}}</p>
-                    </div>
-                    <!--<md-button class="md-secondary" ng-click="doSecondaryAction($event)">More Info</md-button>-->
-                </md-list-item>
-            </md-list>
+            <div layout="row" layout-align="start" flex>
+                <md-list ng-repeat="cat in ctrl.categories" flex="{{ (100 / ctrl.categories.length).toFixed(2) }}">
+                    <md-subheader class="md-no-sticky">{{ cat.desc }}</md-subheader>
+                    <md-list-item ng-repeat="item in ctrl.widgets | filter:{ category: cat.value }"
+                                  class="md-3-line" ng-click="ctrl.select(item.type)">
+                        <div class="md-list-item-text" layout="column">
+                            <h4>{{item.title}}</h4>
+                            <p>{{item.desc}}</p>
+                        </div>
+                        <!--<md-button class="md-secondary" ng-click="doSecondaryAction($event)">More Info</md-button>-->
+                    </md-list-item>
+                </md-list>
+            </div>
+
         </md-dialog-content>
 
         <md-dialog-actions layout="row">
