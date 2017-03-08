@@ -17,6 +17,7 @@
             <h4 ng-show="ctrl.latest.created_at && !ctrl.latest.finished_at">Requested at {{ctrl.latest.created_at | date:'MMM dd HH:mm'}}</h4>
         </div>
     </div>
+    <div class="footer" ng-show="ctrl.hideDetails && ctrl.latest.finished_at">{{ctrl.latest.finished_at | date:'MMM dd HH:mm'}}</div>
     <!--
         <md-icon>help_outline</md-icon>
         <md-icon>play_circle_outline</md-icon>

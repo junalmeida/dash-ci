@@ -17,6 +17,7 @@
             <h4 ng-show="ctrl.latest.queueTime && !ctrl.latest.finishTime">Requested at {{ctrl.latest.queueTime | date:'MMM dd HH:mm'}}</h4>
         </div>
     </div>
+    <div class="footer" ng-show="ctrl.hideDetails && ctrl.latest.finishTime">{{ctrl.latest.finishTime | date:'MMM dd HH:mm'}}</div>
     <!--
         <md-icon>help_outline</md-icon>
         <md-icon>play_circle_outline</md-icon>

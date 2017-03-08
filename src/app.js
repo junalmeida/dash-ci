@@ -1946,7 +1946,7 @@ var DashCI;
                 TfsBuildController.prototype.sizeBy = function (width, height) {
                     this.hideDetails = (width < height * 1.7);
                     var icon = this.$scope.$element.find(".play-status md-icon");
-                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 30 : 0)) + "px";
+                    var fontSize = (Math.round(height / 1) - (this.hideDetails ? 50 : 0)) + "px";
                     //var lineSize = Math.round((altura) - 60) + "px";
                     icon.css('font-size', fontSize);
                     icon.parent().width(Math.round(height / 1));

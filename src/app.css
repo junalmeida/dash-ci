@@ -150,6 +150,16 @@ md-nav-bar:hover{
     padding: 5px 0;
 }
 
+.widget .footer{
+    position: absolute;
+    text-align:center;
+    font-weight: normal;
+
+    left: 0; bottom: 0;
+    width: 100%;
+    padding: 3px 0;
+}
+
 .center 
 {
     text-align: center;
