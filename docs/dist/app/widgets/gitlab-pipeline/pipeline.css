@@ -63,6 +63,10 @@ gitlab-pipeline .error md-icon{
     /*text-shadow: 0px 0px 3px #FFFFFF;*/
 }
 
+gitlab-pipeline  .align-center .content
+{
+    height: 90%;
+}
 gitlab-pipeline.widget .align-center .content .play-status {
     text-align: center;
     width: auto !important;
@@ -74,6 +78,14 @@ gitlab-pipeline.widget .align-center .content .play-status md-icon {
 gitlab-pipeline.widget .align-center .header {
     text-indent: 0 !important;
     text-align: center !important;
+}
+
+@-moz-keyframes blinker {  
+  50% { opacity: 0; }
+}
+
+@-webkit-keyframes blinker {  
+  50% { opacity: 0; }
 }
 
 @keyframes blinker {  
