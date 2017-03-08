@@ -90,6 +90,7 @@
             img.width(size);
             img.height(size);
 
+            this.hideAvatar = width < 390;
         }
 
         public config() {
@@ -123,6 +124,7 @@
         public icon = "help";
         public latest: Resources.Gitlab.IPipeline;
         public hideDetails: boolean;
+        public hideAvatar: boolean;
 
         private update() {
             if (!this.data.project)

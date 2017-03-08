@@ -87,6 +87,8 @@
             var size = Math.round(height - 32);
             img.width(size);
             img.height(size);
+
+            this.hideAvatar = width < 390;
         }
 
         public config() {
@@ -119,6 +121,7 @@
         public icon = "help";
         public latest: Resources.Tfs.IBuild;
         public hideDetails: boolean;
+        public hideAvatar: boolean;
 
         private update() {
             if (!this.data.project || !this.data.build)

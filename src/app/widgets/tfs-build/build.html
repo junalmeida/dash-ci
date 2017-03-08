@@ -8,7 +8,7 @@
             <md-icon>{{ctrl.icon}}</md-icon>
         </div>
         <div ng-if="!ctrl.hideDetails" flex>
-            <div ng-show="ctrl.latest.requestedFor.imageUrl" class="avatar">
+            <div ng-show="ctrl.latest.requestedFor.imageUrl && !ctrl.hideAvatar" class="avatar">
                 <i style="background-image: url({{ctrl.latest.requestedFor.imageUrl}})"></i>
             </div>
             <h4 ng-show="ctrl.latest.requestedFor">{{ctrl.latest.requestedFor.displayName}}</h4>

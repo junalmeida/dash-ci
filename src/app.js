@@ -1375,6 +1375,7 @@ var DashCI;
                     var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
+                    this.hideAvatar = width < 390;
                 };
                 GitlabPipelineController.prototype.config = function () {
                     var _this = this;
@@ -1964,6 +1965,7 @@ var DashCI;
                     var size = Math.round(height - 32);
                     img.width(size);
                     img.height(size);
+                    this.hideAvatar = width < 390;
                 };
                 TfsBuildController.prototype.config = function () {
                     var _this = this;
