@@ -1,7 +1,7 @@
 ﻿<md-button title="Configure" class="configure-widget md-icon-button md-mini" ng-show="editable" ng-click="ctrl.config()">
     <md-icon>settings</md-icon>
 </md-button>
-<div>
+<div ng-class="ctrl.colorClass" class="content">
     <div class="header" ng-if="data.header">{{data.title}}</div>
     <p class="center">{{ctrl.queryCount == null ? '?' : ctrl.queryCount}}</p>
 </div>

@@ -12,6 +12,7 @@ namespace TfsOnPremiseNtlm
 {
     static class Program
     {
+        public const string Title = "Dash-CI";
         public static IDisposable server;
 
         //static int Port => Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
@@ -23,9 +24,12 @@ namespace TfsOnPremiseNtlm
         static void Main()
         {
             StartSelfHost();
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(true);
-            Application.Run(new MyApplicationContext());
+            if (server != null)
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(true);
+                Application.Run(new MyApplicationContext());
+            }
         }
 
 
@@ -34,17 +38,25 @@ namespace TfsOnPremiseNtlm
         private static void StartSelfHost()
         {
             var baseUrl = BaseUrl.Replace("//localhost", "//+:80");
-
-            server = WebApp.Start(baseUrl, (app) =>
+            try
             {
-                var listener = (HttpListener)app.Properties["System.Net.HttpListener"];
-                listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
+                server = WebApp.Start(baseUrl, (app) =>
+                {
+                    var listener = (HttpListener)app.Properties["System.Net.HttpListener"];
+                    listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
 
-                var config = new HttpConfiguration();
-                new HttpServer(config);
+                    var config = new HttpConfiguration();
+                    new HttpServer(config);
 
-                Configure(app, config);
-            });
+                    Configure(app, config);
+
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Cannot start the web server. Check static-files config parameter." + Environment.NewLine + ex.Message, Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+                server = null;
+            }
         }
 
         private static void Configure(IAppBuilder app, HttpConfiguration config)
@@ -52,7 +64,7 @@ namespace TfsOnPremiseNtlm
             config.Routes.MapHttpRoute(
                name: "CatchAllRoute",
                 routeTemplate: "api/{*pathValue}",
-                defaults: new { controller = "Redirect", action = "ToTfs" }
+                defaults: new { controller = nameof(RedirectController).Replace("Controller", ""), action = nameof(RedirectController.ToAnyHost) }
             );
 
             app.UseFileServer(staticFiles);

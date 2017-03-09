@@ -98,7 +98,7 @@
             res.recent_builds({
                 project: this.data.project,
                 build: this.data.build,
-                count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
+                count: 40 
             }).$promise.then((result) => {
                 console.log("end request: " + this.data.id + "; " + this.data.title);
                 var builds = result.value.reverse();

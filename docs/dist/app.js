@@ -46,6 +46,24 @@ var DashCI;
         return regEx.test(source);
     }
     DashCI.wildcardMatch = wildcardMatch;
+    var EnumEx = (function () {
+        function EnumEx() {
+        }
+        EnumEx.getNamesAndValues = function (e) {
+            return EnumEx.getNames(e).map(function (n) { return ({ name: n, value: e[n] }); });
+        };
+        EnumEx.getNames = function (e) {
+            return EnumEx.getObjValues(e).filter(function (v) { return typeof v === "string"; });
+        };
+        EnumEx.getValues = function (e) {
+            return EnumEx.getObjValues(e).filter(function (v) { return typeof v === "number"; });
+        };
+        EnumEx.getObjValues = function (e) {
+            return Object.keys(e).map(function (k) { return e[k]; });
+        };
+        return EnumEx;
+    }());
+    DashCI.EnumEx = EnumEx;
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
 "use strict";
@@ -66,65 +84,101 @@ var DashCI;
             WidgetType[WidgetType["githubIssues"] = 9] = "githubIssues";
             WidgetType[WidgetType["tfsRelease"] = 10] = "tfsRelease";
         })(WidgetType = Models.WidgetType || (Models.WidgetType = {}));
+        var WidgetCategory;
+        (function (WidgetCategory) {
+            WidgetCategory[WidgetCategory["generic"] = 1] = "generic";
+            WidgetCategory[WidgetCategory["gitlab"] = 2] = "gitlab";
+            WidgetCategory[WidgetCategory["tfs"] = 3] = "tfs";
+            WidgetCategory[WidgetCategory["github"] = 4] = "github";
+            WidgetCategory[WidgetCategory["circleci"] = 5] = "circleci";
+        })(WidgetCategory = Models.WidgetCategory || (Models.WidgetCategory = {}));
+        DashCI.app.constant("widgetcategories", [
+            {
+                value: WidgetCategory.generic,
+                desc: "Generic Widgets"
+            },
+            {
+                value: WidgetCategory.gitlab,
+                desc: "Gitlab Widgets"
+            },
+            {
+                value: WidgetCategory.tfs,
+                desc: "TFS/VSTS Widgets"
+            },
+            {
+                value: WidgetCategory.github,
+                desc: "Github Widgets"
+            },
+        ]);
         DashCI.app.constant("widgets", [
             {
                 type: WidgetType.clock,
                 title: "Clock",
-                desc: "Current date and time."
+                desc: "Current date and time.",
+                category: WidgetCategory.generic
             },
             {
                 type: WidgetType.labelTitle,
                 directive: "label-title",
                 title: "Label",
-                desc: "Static label to create semantic areas"
+                desc: "Static label to create semantic areas",
+                category: WidgetCategory.generic
             },
             {
                 type: WidgetType.githubIssues,
                 directive: "github-issues",
                 title: "GitHub - Issue Query",
-                desc: "The count of an issue query against a repository."
+                desc: "The count of an issue query against a repository.",
+                category: WidgetCategory.github
             },
             {
                 type: WidgetType.gitlabPipeline,
                 directive: "gitlab-pipeline",
                 title: "GitLab - Pipeline",
-                desc: "The (almost) real time pipeline status for a branch."
+                desc: "The (almost) real time pipeline status for a branch.",
+                category: WidgetCategory.gitlab
             },
             {
                 type: WidgetType.gitlabPipelineGraph,
                 directive: "gitlab-pipeline-graph",
                 title: "GitLab - Pipeline Graph",
-                desc: "The pipeline graph for last N status for a branch."
+                desc: "The pipeline graph for last N status for a branch.",
+                category: WidgetCategory.gitlab
             },
             {
                 type: WidgetType.gitlabIssues,
                 directive: "gitlab-issues",
                 title: "GitLab - Issue Query",
-                desc: "The count of an issue query against a project."
+                desc: "The count of an issue query against a project.",
+                category: WidgetCategory.gitlab
             },
             {
                 type: WidgetType.tfsBuild,
                 directive: "tfs-build",
                 title: "TFS - Build",
-                desc: "The (almost) real time build definition status for a project."
+                desc: "The (almost) real time build definition status for a project.",
+                category: WidgetCategory.tfs
             },
             {
                 type: WidgetType.tfsBuildGraph,
                 directive: "tfs-build-graph",
                 title: "TFS - Build Graph",
-                desc: "The build graph for last N builds of a branch."
+                desc: "The build graph for last N builds of a branch.",
+                category: WidgetCategory.tfs
             },
             {
                 type: WidgetType.tfsRelease,
                 directive: "tfs-release",
                 title: "TFS - Release Status",
-                desc: "The release status for a release definition."
+                desc: "The release status for a release definition.",
+                category: WidgetCategory.tfs
             },
             {
                 type: WidgetType.tfsQueryCount,
                 directive: "tfs-query-count",
                 title: "TFS - Query Count",
-                desc: "The count of a saved query against a project."
+                desc: "The count of a saved query against a project.",
+                category: WidgetCategory.tfs
             },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
@@ -590,7 +644,7 @@ var DashCI;
                 };
                 TfsQueryCountController.prototype.init = function () {
                     this.data.title = this.data.title || "Query";
-                    this.data.color = this.data.color || "green";
+                    this.data.color = this.data.color || "grey";
                     //default values
                     this.data.queryId = this.data.queryId || "";
                     this.data.poolInterval = this.data.poolInterval || 20000;
@@ -652,6 +706,14 @@ var DashCI;
                             var p = _this.$scope.$element.find("p");
                             p.addClass('changed');
                             _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                        if (_this.data.lowerThan && !isNaN(_this.data.lowerThan.value) && _this.data.lowerThan.color) {
+                            if (_this.queryCount < _this.data.lowerThan.value)
+                                _this.colorClass = _this.data.lowerThan.color;
+                        }
+                        if (_this.data.greaterThan && !isNaN(_this.data.greaterThan.value) && _this.data.greaterThan.color) {
+                            if (_this.queryCount > _this.data.greaterThan.value)
+                                _this.colorClass = _this.data.greaterThan.color;
                         }
                         console.log("end tfs query: " + _this.data.title);
                     })
@@ -870,7 +932,7 @@ var DashCI;
                     res.recent_builds({
                         project: this.data.project,
                         build: this.data.build,
-                        count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
+                        count: 40
                     }).$promise.then(function (result) {
                         console.log("end request: " + _this.data.id + "; " + _this.data.title);
                         var builds = result.value.reverse();
@@ -1783,7 +1845,7 @@ var DashCI;
                 };
                 GitlabIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
-                    this.data.color = this.data.color || "red";
+                    this.data.color = this.data.color || "grey";
                     //default values
                     this.data.labels = this.data.labels || "bug";
                     this.data.status = this.data.status || "opened";
@@ -1844,6 +1906,14 @@ var DashCI;
                             var p = _this.$scope.$element.find("p");
                             p.addClass('changed');
                             _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                        if (_this.data.lowerThan && !isNaN(_this.data.lowerThan.value) && _this.data.lowerThan.color) {
+                            if (_this.issueCount < _this.data.lowerThan.value)
+                                _this.colorClass = _this.data.lowerThan.color;
+                        }
+                        if (_this.data.greaterThan && !isNaN(_this.data.greaterThan.value) && _this.data.greaterThan.color) {
+                            if (_this.issueCount > _this.data.greaterThan.value)
+                                _this.colorClass = _this.data.greaterThan.color;
                         }
                     })
                         .catch(function (reason) {
@@ -1976,7 +2046,7 @@ var DashCI;
                 };
                 GithubIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
-                    this.data.color = this.data.color || "red";
+                    this.data.color = this.data.color || "grey";
                     //default values
                     this.data.labels = this.data.labels || "bug";
                     this.data.status = this.data.status || "open";
@@ -2037,6 +2107,14 @@ var DashCI;
                             var p = _this.$scope.$element.find("p");
                             p.addClass('changed');
                             _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                        if (_this.data.lowerThan && !isNaN(_this.data.lowerThan.value) && _this.data.lowerThan.color) {
+                            if (_this.issueCount < _this.data.lowerThan.value)
+                                _this.colorClass = _this.data.lowerThan.color;
+                        }
+                        if (_this.data.greaterThan && !isNaN(_this.data.greaterThan.value) && _this.data.greaterThan.color) {
+                            if (_this.issueCount > _this.data.greaterThan.value)
+                                _this.colorClass = _this.data.greaterThan.color;
                         }
                     })
                         .catch(function (reason) {
@@ -2589,9 +2667,10 @@ var DashCI;
     var Core;
     (function (Core) {
         var AddWidgetController = (function () {
-            function AddWidgetController($mdDialog, widgets) {
+            function AddWidgetController($mdDialog, widgets, categories) {
                 this.$mdDialog = $mdDialog;
                 this.widgets = widgets;
+                this.categories = categories;
             }
             AddWidgetController.prototype.cancel = function () {
                 this.$mdDialog.cancel();
@@ -2601,7 +2680,7 @@ var DashCI;
             };
             return AddWidgetController;
         }());
-        AddWidgetController.$inject = ["$mdDialog", "widgets"];
+        AddWidgetController.$inject = ["$mdDialog", "widgets", "widgetcategories"];
         Core.AddWidgetController = AddWidgetController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));

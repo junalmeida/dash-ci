@@ -103,43 +103,43 @@ md-nav-bar:hover{
     display: block;
 }
 
-.widget.transparent {
+.transparent {
     background: transparent;
 }
-.widget.semi-transp {
+.semi-transp {
     background: rgba(250, 250, 250, 0.03);
 }
-.widget.red {
+.red {
     background: #F44336;
 }
-.widget.turkoise {
+.turkoise {
     background: #49bbb2;
 }
-.widget.green {
+.green {
     background: #95c049;
 }
-.widget.deep-green {
+.deep-green {
     background: #1B5E20;
 }
-.widget.purple {
+.purple {
     background: #9c4274;
 }
-.widget.pink {
+.pink {
     background: #E91E63;
 }
-.widget.blue {
+.blue {
     background: #2196F3;
 }
-.widget.amber {
+.amber {
     background: #FFC107;
 }
-.widget.orange {
+.orange {
     background: #FF5722;
 }
-.widget.brown {
+.brown {
     background: #795548;
 }
-.widget.grey {
+.grey {
     background: #9E9E9E;
 }
 .widget .header{

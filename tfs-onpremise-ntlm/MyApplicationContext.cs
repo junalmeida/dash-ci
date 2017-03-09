@@ -15,7 +15,7 @@ namespace TfsOnPremiseNtlm
             trayIcon = new NotifyIcon()
             {
                 Icon = Resources.PerfCenterCpl,
-                Text = "Dash-CI",
+                Text = Program.Title,
                 ContextMenu = new ContextMenu(new MenuItem[] {
                     new MenuItem("Open", Open) { DefaultItem = true },
                     new MenuItem("Exit", Exit)

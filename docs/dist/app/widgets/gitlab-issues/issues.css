@@ -1,8 +1,10 @@
-﻿body {
-}
-
-gitlab-issues p{
+﻿gitlab-issues p{
     padding: 0; margin: 0;
     text-align: center;
     font-weight: bold;
+}
+
+gitlab-issues .content
+{
+    height: 100%;
 }

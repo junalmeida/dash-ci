@@ -1,13 +1,5 @@
 ﻿namespace DashCI.Widgets.GithubIssues {
 
-    export interface IGithubIssuesData extends Models.IWidgetData {
-        username?: string;
-        repository?: string;
-        poolInterval?: number;
-        labels?: string;
-        status?: string;
-    }
-
     class GithubIssuesDirective implements ng.IDirective {
         
         static create(): ng.IDirectiveFactory {

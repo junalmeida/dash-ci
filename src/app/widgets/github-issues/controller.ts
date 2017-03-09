@@ -1,4 +1,21 @@
 ﻿namespace DashCI.Widgets.GithubIssues {
+    export interface IGithubIssuesData extends Models.IWidgetData {
+        username?: string;
+        repository?: string;
+        poolInterval?: number;
+        labels?: string;
+        status?: string;
+        lowerThan?: {
+            value: number;
+            color: string;
+        };
+        greaterThan?: {
+            value: number;
+            color: string;
+        };
+    }
+
+
     export class GithubIssuesController implements ng.IController {
         public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "githubResources"];
 
@@ -41,7 +58,7 @@
 
         private init() {
             this.data.title = this.data.title || "Issues";
-            this.data.color = this.data.color || "red";
+            this.data.color = this.data.color || "grey";
 
             //default values
             this.data.labels = this.data.labels || "bug";
@@ -82,6 +99,7 @@
         }
 
         public issueCount: number = null;
+        public colorClass: string;
         private updateInterval() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
@@ -110,6 +128,16 @@
                     p.addClass('changed');
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
+
+                if (this.data.lowerThan && !isNaN(this.data.lowerThan.value) && this.data.lowerThan.color) {
+                    if (this.issueCount < this.data.lowerThan.value)
+                        this.colorClass = this.data.lowerThan.color;
+                }
+                if (this.data.greaterThan && !isNaN(this.data.greaterThan.value) && this.data.greaterThan.color) {
+                    if (this.issueCount > this.data.greaterThan.value)
+                        this.colorClass = this.data.greaterThan.color;
+                }
+
             })
             .catch((reason) => {
                 this.issueCount = null;
