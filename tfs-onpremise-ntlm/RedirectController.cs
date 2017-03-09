@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -9,15 +8,15 @@ namespace TfsOnPremiseNtlm
 {
     public class RedirectController : ApiController
     {
-        private string TfsHost => ConfigurationManager.AppSettings["tfs-host"];
-
 
         [HttpGet, HttpPost, HttpOptions]
-        public async Task<HttpResponseMessage> ToTfs()
+        public async Task<HttpResponseMessage> ToAnyHost()
         {
             var url = Request.RequestUri.ToString();
             url = url.Replace(Program.BaseUrl + "/api/", "");
             url = url.Replace("http/", "http://");
+            url = url.Replace("https/", "https://");
+
             using (var client = new HttpClient(new HttpClientHandler()
             {
                 UseDefaultCredentials = true
@@ -28,9 +27,9 @@ namespace TfsOnPremiseNtlm
                     new MediaTypeWithQualityHeaderValue("application/json"));
 
                 if (Request.Method == HttpMethod.Get)
-                    return await ToTfsGet(client, url);
+                    return await ToAnyHostGet(client, url);
                 else if (Request.Method == HttpMethod.Options)
-                    return await ToTfsOptions(client, url);
+                    return await ToAnyHostOptions(client, url);
                 //else if (Request.Method == HttpMethod.Post)
                 //    return await ToTfsPost(client, url);
                 else
@@ -39,7 +38,7 @@ namespace TfsOnPremiseNtlm
             }
         }
 
-        private async Task<HttpResponseMessage> ToTfsOptions(HttpClient client, string url)
+        private async Task<HttpResponseMessage> ToAnyHostOptions(HttpClient client, string url)
         {
             return await client.SendAsync(new HttpRequestMessage()
             {
@@ -48,7 +47,7 @@ namespace TfsOnPremiseNtlm
             }, HttpCompletionOption.ResponseHeadersRead);
         }
 
-        private async Task<HttpResponseMessage> ToTfsGet(HttpClient client, string url)
+        private async Task<HttpResponseMessage> ToAnyHostGet(HttpClient client, string url)
         {
             return await client.GetAsync(url);
         }
