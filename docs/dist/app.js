@@ -876,6 +876,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
                 TfsBuildGraphController.prototype.finalize = function () {
                     if (this.handle)
@@ -891,8 +892,13 @@ var DashCI;
                     this.update();
                 };
                 TfsBuildGraphController.prototype.sizeFont = function (height) {
+                    var header_size = this.$scope.$element.find(".header").height();
                     var histogram = this.$scope.$element.find(".histogram");
                     histogram.height(height - 60);
+                    var help_icon = this.$scope.$element.find(".unknown");
+                    var size = Math.round(height / 1) - header_size - 5;
+                    help_icon.css("font-size", size);
+                    help_icon.height(size);
                 };
                 TfsBuildGraphController.prototype.config = function () {
                     var _this = this;
@@ -955,11 +961,11 @@ var DashCI;
                             };
                         });
                         _this.builds = builds;
+                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                     }).catch(function (reason) {
                         _this.builds = [];
                         console.error(reason);
                     });
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return TfsBuildGraphController;
             }());
@@ -1054,6 +1060,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
+                    this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 }
                 TfsBuildController.prototype.finalize = function () {
                     if (this.handle)
@@ -1412,6 +1419,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
                 GitlabPipelineGraphController.prototype.finalize = function () {
                     if (this.handle)
@@ -1428,8 +1436,13 @@ var DashCI;
                     this.update();
                 };
                 GitlabPipelineGraphController.prototype.sizeFont = function (height) {
+                    var header_size = this.$scope.$element.find(".header").height();
                     var histogram = this.$scope.$element.find(".histogram");
                     histogram.height(height - 60);
+                    var help_icon = this.$scope.$element.find(".unknown");
+                    var size = Math.round(height / 1) - header_size - 5;
+                    help_icon.css("font-size", size);
+                    help_icon.height(size);
                 };
                 GitlabPipelineGraphController.prototype.config = function () {
                     var _this = this;
@@ -1487,11 +1500,11 @@ var DashCI;
                             };
                         });
                         _this.pipelines = pipelines;
+                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                     }).catch(function (reason) {
                         _this.pipelines = null;
                         console.error(reason);
                     });
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
                 return GitlabPipelineGraphController;
             }());
