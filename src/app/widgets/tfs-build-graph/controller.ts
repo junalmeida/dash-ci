@@ -30,6 +30,7 @@
             this.$scope.$on("$destroy", () => this.finalize());
 
             this.init();
+            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
         private handle: ng.IPromise<any>;
@@ -52,8 +53,15 @@
         }
 
         private sizeFont(height: number) {
+            var header_size = this.$scope.$element.find(".header").height();
+
             var histogram = this.$scope.$element.find(".histogram");
             histogram.height(height - 60);
+
+            var help_icon = this.$scope.$element.find(".unknown");
+            var size = Math.round(height / 1) - header_size - 5;
+            help_icon.css("font-size", size);
+            help_icon.height(size);
         }
 
         public config() {
@@ -125,11 +133,11 @@
                 });
 
                 this.builds = builds;
+                this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
             }).catch((reason) => {
                 this.builds = [];
                 console.error(reason);
             });
-            this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
     }

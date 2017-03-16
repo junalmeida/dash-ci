@@ -4,8 +4,9 @@
 <div>
     <div class="header">{{data.title}}</div>
     <div class="content" layout="row" flex>
-        <div class="histogram">
-            <div class="bar" ng-repeat="item in ctrl.pipelines" ng-class="{success: item.status == 'success', failed: item.status == 'failed' }" style="height: {{item.css.height}}; width: {{item.css.width}}; left: {{item.css.left}}" title="{{item.duration}}s at {{item.finished_at}} ({{item.ref}})"></div>
+        <md-icon class="unknown" ng-if="!ctrl.pipelines">help</md-icon>
+        <div ng-if="ctrl.pipelines" class="histogram">
+            <div class="bar" ng-repeat="item in ctrl.pipelines" ng-class="{success: item.status == 'success', failed: item.status == 'failed', blink: item.status == 'running' }" style="height: {{item.css.height}}; width: {{item.css.width}}; left: {{item.css.left}}" title="{{item.duration}}s at {{item.finished_at}} ({{item.ref}})"></div>
         </div>
     </div>
 </div>
