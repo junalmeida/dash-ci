@@ -40,6 +40,7 @@
             this.$scope.$on("$destroy", () => this.finalize());
 
             this.init();
+            this.$timeout(() => this.sizeBy(this.$scope.$element.width(), this.$scope.$element.height()), 500);
         }
 
         private handle: ng.IPromise<any>;

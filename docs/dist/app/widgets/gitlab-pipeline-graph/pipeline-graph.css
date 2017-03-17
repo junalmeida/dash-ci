@@ -6,7 +6,7 @@ gitlab-pipeline-graph .histogram
     height: 50px;
     margin: 0 20px;
     position: relative;
-    top: 15px;
+    top: 10px;
 }
 
 
@@ -33,4 +33,26 @@ gitlab-pipeline-graph .histogram .bar.success
 gitlab-pipeline-graph .histogram .bar.failed
 {
    background-color: maroon;
+}
+
+gitlab-pipeline-graph .unknown 
+{
+    width: 100%;
+    text-align: center;
+}
+
+gitlab-pipeline-graph .blink {
+  animation: blinker 1s linear infinite;
+}
+
+@-moz-keyframes blinker {  
+  50% { opacity: 0; }
+}
+
+@-webkit-keyframes blinker {  
+  50% { opacity: 0; }
+}
+
+@keyframes blinker {  
+  50% { opacity: 0; }
 }
