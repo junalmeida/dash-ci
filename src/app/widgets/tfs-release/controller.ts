@@ -158,8 +158,10 @@
                                 e.name = lastestDef.name;
                                 e.conditions = lastestDef.conditions;
                             }
-                            var currentEnv = this.releaseDefinition.environments.filter((re) => re.id == lastestDef.definitionEnvironmentId);
-                            e.conditions = currentEnv[0].conditions;
+                            if (lastestDef) {
+                                var currentEnv = this.releaseDefinition.environments.filter((re) => re.id == lastestDef.definitionEnvironmentId);
+                                e.conditions = currentEnv[0].conditions;
+                            }
 
                             if (!e.release && e.lastReleases && e.lastReleases.length > 0)
                                 e.release = result.releases.filter((r) => r.id == e.lastReleases[0].id)[0];
