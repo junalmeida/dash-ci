@@ -404,8 +404,10 @@ var DashCI;
                                     e.name = lastestDef.name;
                                     e.conditions = lastestDef.conditions;
                                 }
-                                var currentEnv = _this.releaseDefinition.environments.filter(function (re) { return re.id == lastestDef.definitionEnvironmentId; });
-                                e.conditions = currentEnv[0].conditions;
+                                if (lastestDef) {
+                                    var currentEnv = _this.releaseDefinition.environments.filter(function (re) { return re.id == lastestDef.definitionEnvironmentId; });
+                                    e.conditions = currentEnv[0].conditions;
+                                }
                                 if (!e.release && e.lastReleases && e.lastReleases.length > 0)
                                     e.release = result.releases.filter(function (r) { return r.id == e.lastReleases[0].id; })[0];
                                 _this.setIcon(e);
