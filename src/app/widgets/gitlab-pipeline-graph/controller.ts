@@ -57,7 +57,7 @@
             var header_size = this.$scope.$element.find(".header").height();
 
             var histogram = this.$scope.$element.find(".histogram");
-            histogram.height(height - 60);
+            histogram.height(height - 50);
 
             var help_icon = this.$scope.$element.find(".unknown");
             var size = Math.round(height / 1) - header_size - 5;
@@ -119,8 +119,10 @@
 
                 var width = (100 / pipelines.length);
                 angular.forEach(pipelines, (item, i) => {
+                    var height = Math.round((100 * item.duration) / maxDuration);
+                    if (height < 1) height = 1;
                     item.css = {
-                        height: Math.round((100* item.duration) / maxDuration).toString() + "%",
+                        height: height.toString() + "%",
                         width: width.toFixed(2) + "%",
                         left: (width * i).toFixed(2) + "%"
                     };
