@@ -12,6 +12,7 @@ namespace DashCI.Models {
         tfsBuildGraph = 8,
         githubIssues = 9,
         tfsRelease = 10,
+        tfsQueryChart = 11
     }
     export enum WidgetCategory {
         generic = 1,
@@ -109,6 +110,13 @@ namespace DashCI.Models {
             directive: "tfs-query-count",
             title: "TFS - Query Count",
             desc: "The count of a saved query against a project.",
+            category: WidgetCategory.tfs
+        },
+        {
+            type: WidgetType.tfsQueryChart,
+            directive: "tfs-query-chart",
+            title: "TFS - Query Chart",
+            desc: "Shows the count of saved querys count at a chart.",
             category: WidgetCategory.tfs
         },
     ]);

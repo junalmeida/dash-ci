@@ -1,0 +1,10 @@
+﻿tfs-query-chart p {
+    padding: 0; margin: 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+tfs-query-chart .content
+{
+    height: 100%;
+}

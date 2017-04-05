@@ -52,6 +52,9 @@
     <Content Include="app\widgets\tfs-build\config.html" />
     <Content Include="app\widgets\tfs-build\build.css" />
     <Content Include="app\widgets\tfs-build\build.html" />
+    <Content Include="app\widgets\tfs-query-chart\config.html" />
+    <Content Include="app\widgets\tfs-query-chart\tfs-query-chart.css" />
+    <Content Include="app\widgets\tfs-query-chart\tfs-query-chart.html" />
     <Content Include="app\widgets\tfs-query-count\config.html" />
     <Content Include="app\widgets\tfs-query-count\tfs-query-count.css" />
     <Content Include="app\widgets\tfs-query-count\tfs-query-count.html" />
@@ -104,6 +107,9 @@
     <TypeScriptCompile Include="app\widgets\tfs-build\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\directive.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-chart\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-chart\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-chart\tfs-query-chart.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\tfs-query-count.ts" />
