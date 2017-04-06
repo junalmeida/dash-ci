@@ -882,6 +882,7 @@ var DashCI;
                     this.$interval = $interval;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
+                    this.total = null;
                     this.width = 50;
                     this.height = 50;
                     this.fontSize = 12;
@@ -915,6 +916,7 @@ var DashCI;
                     this.update();
                 };
                 TfsQueryChartController.prototype.resizeBy = function (width, height) {
+                    var _this = this;
                     this.width = width;
                     this.height = height - 40;
                     this.fontSize = Math.round(height / 1.3);
@@ -924,7 +926,7 @@ var DashCI;
                         canvas.width = this.width;
                         canvas.height = this.height;
                     }
-                    this.drawGraph();
+                    this.$timeout(function () { return _this.drawGraph(); }, 50);
                 };
                 TfsQueryChartController.prototype.config = function () {
                     var _this = this;
@@ -975,8 +977,11 @@ var DashCI;
                     this.$q.all(queries)
                         .then(function (res) {
                         var resValues = [];
-                        for (var i in res)
+                        _this.total = 0;
+                        for (var i in res) {
                             resValues.push(res[i].workItems.length);
+                            _this.total += res[i].workItems.length;
+                        }
                         _this.queryValues = resValues;
                         _this.drawGraph();
                     })
@@ -991,7 +996,8 @@ var DashCI;
                     var labels = [];
                     var colors = [];
                     console.log("chart draw start: " + this.data.title);
-                    var bgColor = this.getStyleRuleValue("background-color", "." + this.data.color);
+                    var bgColor = this.data.color == 'transparent' || this.data.color == 'semi-transparent' ? "black" :
+                        this.getStyleRuleValue("background-color", "." + this.data.color);
                     for (var i in this.queryValues) {
                         data.push(this.queryValues[i]);
                         labels.push(this.queryValues[i].toString());
@@ -1004,11 +1010,8 @@ var DashCI;
                         return;
                     var ctx = canvas.getContext("2d");
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    var total_value = 0;
+                    var total_value = this.total;
                     var color_index = 0;
-                    for (var i in data) {
-                        total_value += data[i];
-                    }
                     var start_angle = 0;
                     for (var i in data) {
                         var val = data[i];
@@ -1059,11 +1062,17 @@ var DashCI;
                 }
                 */
                 TfsQueryChartController.prototype.drawPieSlice = function (ctx, centerX, centerY, radius, startAngle, endAngle, color) {
-                    ctx.fillStyle = color;
+                    if (color)
+                        ctx.fillStyle = color;
                     ctx.beginPath();
                     ctx.moveTo(centerX, centerY);
                     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
                     ctx.closePath();
+                    //if (!color) {
+                    //    ctx.clip();
+                    //    ctx.clearRect(centerX - radius - 1, centerY - radius - 1,
+                    //        radius * 2 + 2, radius * 2 + 2);
+                    //}
                     ctx.fill();
                 };
                 TfsQueryChartController.prototype.getStyleRuleValue = function (style, selector, sheet) {
