@@ -105,6 +105,7 @@
         }
 
         public queryValues: number[];
+        public total: number = null;
         public width: number = 50;
         public height: number = 50;
         public fontSize: number = 12;
@@ -140,9 +141,12 @@
             console.log("tfs query: " + this.data.title);
             this.$q.all(queries)
                 .then(res => {
-                    var resValues : number[] = [];
-                    for (var i in res)
+                    var resValues: number[] = [];
+                    this.total = 0;
+                    for (var i in res) {
                         resValues.push(res[i].workItems.length);
+                        this.total += res[i].workItems.length;
+                    }
                     
                     this.queryValues = resValues;
                     this.drawGraph();
@@ -163,7 +167,9 @@
             console.log("chart draw start: " + this.data.title);
 
 
-            var bgColor = this.getStyleRuleValue("background-color", "." + this.data.color);
+            var bgColor =
+                this.data.color == 'transparent' || this.data.color == 'semi-transparent' ? "black" :
+                this.getStyleRuleValue("background-color", "." + this.data.color);
             for (var i in this.queryValues) {
                 data.push(this.queryValues[i]);
                 labels.push(this.queryValues[i].toString());
@@ -179,13 +185,10 @@
             var ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            var total_value = 0;
+            var total_value = this.total;
             var color_index = 0;
-            for (var i in data) {
-                total_value += data[i];
-            }
-
             var start_angle = 0;
+
             for (var i in data) {
                 var val = data[i];
                 var slice_angle = 2 * Math.PI * val / total_value;
@@ -258,11 +261,17 @@
         }
         */
         private drawPieSlice(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, startAngle: number, endAngle: number, color: string) {
-            ctx.fillStyle = color;
+            if(color)ctx.fillStyle = color;
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
             ctx.arc(centerX, centerY, radius, startAngle, endAngle);
             ctx.closePath();
+            //if (!color) {
+            //    ctx.clip();
+            //    ctx.clearRect(centerX - radius - 1, centerY - radius - 1,
+            //        radius * 2 + 2, radius * 2 + 2);
+
+            //}
             ctx.fill();
         }
 
