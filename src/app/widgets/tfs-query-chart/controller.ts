@@ -79,8 +79,7 @@
                 canvas.height = this.height;
             }
 
-
-            this.drawGraph();
+            this.$timeout(() => this.drawGraph(), 50);
         }
 
         public config() {
