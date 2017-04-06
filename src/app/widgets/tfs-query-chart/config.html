@@ -29,12 +29,20 @@
                     </md-input-container>
                 </div>
                 <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="60">
+                    <md-input-container flex="50">
                         <label>Project:</label>
                         <md-select ng-model="ctrl.vm.project" placeholder="Select a project">
                             <md-option ng-value="opt.id" ng-repeat="opt in ctrl.projects">{{ opt.name }}</md-option>
                         </md-select>
                     </md-input-container>
+                    <md-input-container flex="50">
+                        <label>Team (optional):</label>
+                        <md-select ng-model="ctrl.vm.team" placeholder="Select a team">
+                            <md-option ng-value="opt.id" ng-repeat="opt in ctrl.teams">{{ opt.name }}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="start" flex>
                     <md-input-container flex="20">
                         <label>Interval:</label>
                         <md-select ng-model="ctrl.vm.poolInterval" placeholder="Select the pool interval">

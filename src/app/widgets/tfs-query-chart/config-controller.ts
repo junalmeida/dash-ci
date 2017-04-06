@@ -27,11 +27,15 @@
                     this.projects = [];
                 });
 
-            this.$scope.$watch(() => this.vm.project, () => this.getQueries());
+            this.$scope.$watch(() => this.vm.project, () => {
+                this.getTeams();
+                this.getQueries();
+            });
             this.$scope.$watch(() => this.vm.queryCount, () => this.setQueryList());
         }
 
         public projects: Resources.Tfs.IProject[];
+        public teams: Resources.Tfs.ITeam[];
         public queries: Resources.Tfs.IQuery[];
 
 
@@ -53,6 +57,23 @@
                     this.queries = [];
                 });
 
+        }
+
+        public getTeams() {
+            var res = this.tfsResources();
+            if (!res || !this.vm.project)
+                return;
+
+            res.team_list({ project: this.vm.project })
+                .$promise
+                .then(result => {
+                    this.teams = [];
+                    angular.forEach(result.value, (item) => this.teams.push(item));
+                })
+                .catch((reason) => {
+                    console.error(reason);
+                    this.teams = [];
+                });;
         }
 
 

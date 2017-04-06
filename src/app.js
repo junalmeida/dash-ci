@@ -772,6 +772,14 @@ var DashCI;
                             cache: true,
                             withCredentials: withCredentials
                         },
+                        team_list: {
+                            method: 'GET',
+                            isArray: false,
+                            url: globalOptions.tfs.host + "/_apis/projects/:project/teams?api-version=2.2",
+                            headers: headers,
+                            cache: true,
+                            withCredentials: withCredentials
+                        },
                         query_list: {
                             method: 'GET',
                             isArray: false,
@@ -783,7 +791,7 @@ var DashCI;
                         run_query: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.tfs.host + "/:project/_apis/wit/wiql/:queryId?api-version=2.2",
+                            url: globalOptions.tfs.host + "/:project/:team/_apis/wit/wiql/:queryId?api-version=2.2",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -2437,7 +2445,10 @@ var DashCI;
                         console.error(reason);
                         _this.projects = [];
                     });
-                    this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getQueries(); });
+                    this.$scope.$watch(function () { return _this.vm.project; }, function () {
+                        _this.getTeams();
+                        _this.getQueries();
+                    });
                     this.$scope.$watch(function () { return _this.vm.queryCount; }, function () { return _this.setQueryList(); });
                 };
                 TfsQueryChartConfigController.prototype.getQueries = function () {
@@ -2456,6 +2467,23 @@ var DashCI;
                         console.error(reason);
                         _this.queries = [];
                     });
+                };
+                TfsQueryChartConfigController.prototype.getTeams = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res || !this.vm.project)
+                        return;
+                    res.team_list({ project: this.vm.project })
+                        .$promise
+                        .then(function (result) {
+                        _this.teams = [];
+                        angular.forEach(result.value, function (item) { return _this.teams.push(item); });
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.teams = [];
+                    });
+                    ;
                 };
                 TfsQueryChartConfigController.prototype.setQueryList = function () {
                     if (this.vm.queryIds.length < this.vm.queryCount) {
@@ -2501,13 +2529,14 @@ var DashCI;
                     this.height = 50;
                     this.fontSize = 12;
                     this.lineSize = 12;
+                    this.doughnutHoleSize = 0.5;
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                     this.data.type = DashCI.Models.WidgetType.tfsQueryChart;
                     this.data.footer = false;
                     this.data.header = true;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(_this.$scope.$element.width(), height); });
-                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.sizeFont(width, _this.$scope.$element.height()); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.resizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.resizeBy(width, _this.$scope.$element.height()); });
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
@@ -2528,11 +2557,17 @@ var DashCI;
                     this.updateInterval();
                     this.update();
                 };
-                TfsQueryChartController.prototype.sizeFont = function (width, height) {
+                TfsQueryChartController.prototype.resizeBy = function (width, height) {
                     this.width = width;
-                    this.height = height;
+                    this.height = height - 40;
                     this.fontSize = Math.round(height / 1.3);
                     this.lineSize = Math.round((height) - 60);
+                    var canvas = this.$scope.$element.find("canvas").get(0);
+                    if (canvas) {
+                        canvas.width = this.width;
+                        canvas.height = this.height;
+                    }
+                    this.drawGraph();
                 };
                 TfsQueryChartController.prototype.config = function () {
                     var _this = this;
@@ -2573,6 +2608,7 @@ var DashCI;
                         if (query)
                             queries.push(res.run_query({
                                 project: this.data.project,
+                                team: this.data.team,
                                 queryId: query
                             }).$promise);
                     }
@@ -2580,23 +2616,115 @@ var DashCI;
                         return;
                     console.log("tfs query: " + this.data.title);
                     this.$q.all(queries)
-                        .then(function (res) { return _this.drawGraph(res); })
+                        .then(function (res) {
+                        var resValues = [];
+                        for (var i in res)
+                            resValues.push(res[i].workItems.length);
+                        _this.queryValues = resValues;
+                        _this.drawGraph();
+                    })
                         .catch(function (reason) {
                         _this.queryValues = null;
                         console.error(reason);
                     });
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
+                    this.$timeout(function () { return _this.resizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 };
-                TfsQueryChartController.prototype.drawGraph = function (results) {
+                TfsQueryChartController.prototype.drawGraph = function () {
                     var data = [];
                     var labels = [];
                     var colors = [];
-                    for (var i = 0; i < results.length; i++) {
-                        data.push(results[i].workItems.length);
-                        labels.push(results[i].workItems.length.toString());
-                        colors.push(this.data.queryColors[i]);
+                    console.log("chart draw start: " + this.data.title);
+                    var bgColor = this.getStyleRuleValue("background-color", "." + this.data.color);
+                    for (var i in this.queryValues) {
+                        data.push(this.queryValues[i]);
+                        labels.push(this.queryValues[i].toString());
+                        var color = this.getStyleRuleValue("background-color", "." + this.data.queryColors[i]);
+                        colors.push(color);
                     }
                     //todo: draw segments at canvas.
+                    var canvas = this.$scope.$element.find("canvas").get(0);
+                    if (!canvas)
+                        return;
+                    var ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    var total_value = 0;
+                    var color_index = 0;
+                    for (var i in data) {
+                        total_value += data[i];
+                    }
+                    var start_angle = 0;
+                    for (var i in data) {
+                        var val = data[i];
+                        var slice_angle = 2 * Math.PI * val / total_value;
+                        this.drawPieSlice(ctx, canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2), start_angle, start_angle + slice_angle, colors[i]);
+                        start_angle += slice_angle;
+                        color_index++;
+                    }
+                    //drawing a white circle over the chart
+                    //to create the doughnut chart
+                    if (this.doughnutHoleSize) {
+                        this.drawPieSlice(ctx, canvas.width / 2, canvas.height / 2, this.doughnutHoleSize * Math.min(canvas.width / 2, canvas.height / 2), 0, 2 * Math.PI, bgColor);
+                    }
+                    start_angle = 0;
+                    for (i in data) {
+                        var val = data[i];
+                        slice_angle = 2 * Math.PI * val / total_value;
+                        var pieRadius = Math.min(canvas.width / 2, canvas.height / 2);
+                        var labelX = canvas.width / 2 + (pieRadius / 2) * Math.cos(start_angle + slice_angle / 2);
+                        var labelY = canvas.height / 2 + (pieRadius / 2) * Math.sin(start_angle + slice_angle / 2);
+                        if (this.doughnutHoleSize) {
+                            var offset = (pieRadius * this.doughnutHoleSize) / 2;
+                            labelX = canvas.width / 2 + (offset + pieRadius / 2) * Math.cos(start_angle + slice_angle / 2);
+                            labelY = canvas.height / 2 + (offset + pieRadius / 2) * Math.sin(start_angle + slice_angle / 2);
+                        }
+                        var labelText = Math.round(100 * val / total_value);
+                        if (labelText > 4) {
+                            ctx.fillStyle = "white";
+                            ctx.font = "bold 20px Arial";
+                            ctx.fillText(labelText + "%", labelX, labelY);
+                            start_angle += slice_angle;
+                        }
+                    }
+                    console.log("chart draw complete: " + this.data.title);
+                };
+                /*
+                private drawLine(ctx:CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number) {
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+        
+                private drawArc(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, startAngle: number, endAngle: number) {
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    ctx.stroke();
+                }
+                */
+                TfsQueryChartController.prototype.drawPieSlice = function (ctx, centerX, centerY, radius, startAngle, endAngle, color) {
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    ctx.closePath();
+                    ctx.fill();
+                };
+                TfsQueryChartController.prototype.getStyleRuleValue = function (style, selector, sheet) {
+                    var sheets = typeof sheet !== 'undefined' ? [sheet] : document.styleSheets;
+                    for (var i = 0, l = sheets.length; i < l; i++) {
+                        var currentSheet = sheets[i];
+                        var rules = currentSheet.cssRules || currentSheet.rules;
+                        if (!rules) {
+                            continue;
+                        }
+                        for (var j = 0, k = rules.length; j < k; j++) {
+                            var rule = rules[j];
+                            if (rule.selectorText && rule.selectorText.split(',').indexOf(selector) !== -1) {
+                                return rule.style[style];
+                            }
+                        }
+                    }
+                    return null;
                 };
                 return TfsQueryChartController;
             }());

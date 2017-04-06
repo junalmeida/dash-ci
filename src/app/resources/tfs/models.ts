@@ -7,6 +7,11 @@
         count: number;
         value: IProject[];
     }
+    export interface ITeamResult extends ng.resource.IResource<ITeamResult> {
+        count: number;
+        value: ITeam[];
+    }
+
     export interface IBuildResult extends ng.resource.IResource<IBuildResult> {
         count: number;
         value: IBuild[];
@@ -42,6 +47,12 @@
         name: string;
         description: string;
     }
+    export interface ITeam {
+        id: string;
+        name: string;
+        description: string;
+    }
+
     export interface IQuery {
         id: string;
         name: string;

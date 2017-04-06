@@ -4,5 +4,5 @@
 <div ng-class="ctrl.colorClass" class="content">
     <div class="header" ng-if="data.header">{{data.title}}</div>
     <p class="center" style="font-size: {{ctrl.fontSize}}px; line-height: {{ctrl.lineSize}}px;" ng-if="!ctrl.queryValues">?</p>
-    <canvas ng-if="ctrl.queryValues && ctrl.queryValue.length > 1" class="piechart" width="{{ctrl.width}}" height="{{ctrl.height}}"></canvas>
+    <canvas ng-show="ctrl.queryValues && ctrl.queryValues.length > 1" class="piechart" width="{{ctrl.width}}" height="{{ctrl.height}}"></canvas>
 </div>

@@ -8,3 +8,7 @@ tfs-query-chart .content
 {
     height: 100%;
 }
+
+tfs-query-chart canvas {
+    margin-top: 5px;
+}

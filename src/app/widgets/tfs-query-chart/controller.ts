@@ -2,6 +2,7 @@
 
     export interface ITfsQueryChartData extends Models.IWidgetData {
         project?: string;
+        team?: string;
         poolInterval?: number;
         queryCount?: number;
         queryIds?: string[];
@@ -29,11 +30,11 @@
 
             this.$scope.$watch(
                 () => this.$scope.$element.height(),
-                (height: number) => this.sizeFont(this.$scope.$element.width(), height)
+                (height: number) => this.resizeBy(this.$scope.$element.width(), height)
             );
             this.$scope.$watch(
                 () => this.$scope.$element.width(),
-                (width: number) => this.sizeFont(width, this.$scope.$element.height())
+                (width: number) => this.resizeBy(width, this.$scope.$element.height())
             );
             this.$scope.$watch(
                 () => this.data.poolInterval,
@@ -64,12 +65,22 @@
             this.update();
         }
 
-        private sizeFont(width: number, height: number) {
+        private resizeBy(width: number, height: number) {
             this.width = width;
-            this.height = height;
+            this.height = height - 40;
 
             this.fontSize = Math.round(height / 1.3);
             this.lineSize = Math.round((height) - 60);
+
+            var canvas = <HTMLCanvasElement>this.$scope.$element.find("canvas").get(0);
+            if (canvas)
+            {
+                canvas.width = this.width;
+                canvas.height = this.height;
+            }
+
+
+            this.drawGraph();
         }
 
         public config() {
@@ -119,6 +130,7 @@
                 if (query)
                     queries.push(res.run_query({
                         project: this.data.project,
+                        team: this.data.team,
                         queryId: query
                     }).$promise);
             }
@@ -127,28 +139,147 @@
 
             console.log("tfs query: " + this.data.title);
             this.$q.all(queries)
-                .then(res => this.drawGraph(res))
+                .then(res => {
+                    var resValues : number[] = [];
+                    for (var i in res)
+                        resValues.push(res[i].workItems.length);
+                    
+                    this.queryValues = resValues;
+                    this.drawGraph();
+                })
                 .catch((reason) => {
                     this.queryValues = null;
                     console.error(reason);
                 });
-            this.$timeout(() => this.sizeFont(this.$scope.$element.width(), this.$scope.$element.height()), 500);
+            this.$timeout(() => this.resizeBy(this.$scope.$element.width(), this.$scope.$element.height()), 500);
         }
 
-
-        private drawGraph(results: Resources.Tfs.IRunQueryResult[]) {
+        private doughnutHoleSize = 0.5;
+        private drawGraph() {
             var data: number[] = [];
             var labels: string[] = [];
             var colors: string[] = [];
 
-            for (var i = 0; i < results.length; i++) {
-                data.push(results[i].workItems.length);
-                labels.push(results[i].workItems.length.toString());
-                colors.push(this.data.queryColors[i]);
+            console.log("chart draw start: " + this.data.title);
+
+
+            var bgColor = this.getStyleRuleValue("background-color", "." + this.data.color);
+            for (var i in this.queryValues) {
+                data.push(this.queryValues[i]);
+                labels.push(this.queryValues[i].toString());
+                var color = this.getStyleRuleValue("background-color", "." + this.data.queryColors[i]);
+                colors.push(color);
             }
 
             //todo: draw segments at canvas.
+
+            var canvas = <HTMLCanvasElement>this.$scope.$element.find("canvas").get(0);
+            if (!canvas)
+                return;
+            var ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            var total_value = 0;
+            var color_index = 0;
+            for (var i in data) {
+                total_value += data[i];
+            }
+
+            var start_angle = 0;
+            for (var i in data) {
+                var val = data[i];
+                var slice_angle = 2 * Math.PI * val / total_value;
+
+                this.drawPieSlice(
+                    ctx,
+                    canvas.width / 2,
+                    canvas.height / 2,
+                    Math.min(canvas.width / 2, canvas.height / 2),
+                    start_angle,
+                    start_angle + slice_angle,
+                    colors[i]
+                );
+
+                start_angle += slice_angle;
+                color_index++;
+            }
+
+            //drawing a white circle over the chart
+            //to create the doughnut chart
+            if (this.doughnutHoleSize) {
+                this.drawPieSlice(
+                    ctx,
+                    canvas.width / 2,
+                    canvas.height / 2,
+                    this.doughnutHoleSize * Math.min(canvas.width / 2, canvas.height / 2),
+                    0,
+                    2 * Math.PI,
+                    bgColor
+                );
+            }
+
+            start_angle = 0;
+            for (i in data) {
+                var val = data[i];
+                slice_angle = 2 * Math.PI * val / total_value;
+                var pieRadius = Math.min(canvas.width / 2, canvas.height / 2);
+                var labelX = canvas.width / 2 + (pieRadius / 2) * Math.cos(start_angle + slice_angle / 2);
+                var labelY = canvas.height / 2 + (pieRadius / 2) * Math.sin(start_angle + slice_angle / 2);
+
+                if (this.doughnutHoleSize) {
+                    var offset = (pieRadius * this.doughnutHoleSize) / 2;
+                    labelX = canvas.width / 2 + (offset + pieRadius / 2) * Math.cos(start_angle + slice_angle / 2);
+                    labelY = canvas.height / 2 + (offset + pieRadius / 2) * Math.sin(start_angle + slice_angle / 2);
+                }
+
+                var labelText = Math.round(100 * val / total_value);
+                if (labelText > 4) {
+                    ctx.fillStyle = "white";
+                    ctx.font = "bold 20px Arial";
+                    ctx.fillText(labelText + "%", labelX, labelY);
+                    start_angle += slice_angle;
+                }
+            }
+            console.log("chart draw complete: " + this.data.title);
+        }
+
+        /*
+        private drawLine(ctx:CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number) {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+        }
+
+        private drawArc(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, startAngle: number, endAngle: number) {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.stroke();
+        }
+        */
+        private drawPieSlice(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, startAngle: number, endAngle: number, color: string) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        private getStyleRuleValue(style: string, selector: string, sheet?: StyleSheet):any {
+            var sheets = typeof sheet !== 'undefined' ? [sheet] : document.styleSheets;
+            for (var i = 0, l = sheets.length; i < l; i++) {
+                var currentSheet = <CSSStyleSheet>sheets[i];
+                var rules = currentSheet.cssRules || currentSheet.rules;
+                if (!rules) { continue; }
+                for (var j = 0, k = rules.length; j < k; j++) {
+                    var rule = <CSSPageRule>rules[j];
+                    if (rule.selectorText && rule.selectorText.split(',').indexOf(selector) !== -1) {
+                        return rule.style[<any>style];
+                    }
+                }
+            }
+            return null;
         }
     }
-
 }
