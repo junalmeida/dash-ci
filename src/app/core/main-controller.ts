@@ -161,12 +161,13 @@ namespace DashCI.Core {
             this.currentPage = this.options.pages[0]; //preparing to support multiple pages
         }
 
+        public isGoogleCast = this.CheckGoogleCast();
         public castStatus = 'cast';
         public canCast = false;
         private castSender: GoogleCastSender = null;
         private castReceiver: GoogleCastReceiver = null;
         private initCastApi() {
-            if (!this.isGoogleCast()) {
+            if (!this.isGoogleCast) {
                 this.castSender = new GoogleCastSender();
                 this.$scope.$watch(() => this.castSender.connected, (connected) => {
                     this.castStatus = connected ? 'cast_connected' : 'cast';
@@ -196,7 +197,7 @@ namespace DashCI.Core {
             }
         }
 
-        private isGoogleCast() {
+        private CheckGoogleCast() {
             return (
                 navigator.userAgent.match(/CrKey/i) &&
                 navigator.userAgent.match(/TV/i)

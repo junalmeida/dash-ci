@@ -3395,6 +3395,7 @@ var DashCI;
                             widgets: []
                         }]
                 };
+                this.isGoogleCast = this.CheckGoogleCast();
                 this.castStatus = 'cast';
                 this.canCast = false;
                 this.castSender = null;
@@ -3495,7 +3496,7 @@ var DashCI;
             };
             MainController.prototype.initCastApi = function () {
                 var _this = this;
-                if (!this.isGoogleCast()) {
+                if (!this.isGoogleCast) {
                     this.castSender = new DashCI.GoogleCastSender();
                     this.$scope.$watch(function () { return _this.castSender.connected; }, function (connected) {
                         _this.castStatus = connected ? 'cast_connected' : 'cast';
@@ -3522,7 +3523,7 @@ var DashCI;
                     this.castSender.stopApp();
                 }
             };
-            MainController.prototype.isGoogleCast = function () {
+            MainController.prototype.CheckGoogleCast = function () {
                 return (navigator.userAgent.match(/CrKey/i) &&
                     navigator.userAgent.match(/TV/i));
             };
