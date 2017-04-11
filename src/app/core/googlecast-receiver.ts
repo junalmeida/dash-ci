@@ -4,7 +4,7 @@ namespace DashCI {
         public static Cast = <any>null;
         private manager: any;
         private messageBus: any;
-        private namespace = 'urn:x-cast:almasistemas.dash-ci';
+        private namespace = 'urn:x-cast:almasistemas.dashci';
 
         private script = '//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js';
         public constructor() {
@@ -35,6 +35,10 @@ namespace DashCI {
 
             this.manager.onSenderDisconnected = (event : any) => {
                 console.log('Received Sender Disconnected event: ' + event.senderId);
+                if (this.manager.getSenders().length == 0 &&
+                    event.reason == GoogleCastReceiver.Cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
+                    window.close();
+                }
             };
 
             this.messageBus =
