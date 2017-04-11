@@ -3180,7 +3180,7 @@ var DashCI;
     var GoogleCastReceiver = (function () {
         function GoogleCastReceiver() {
             var _this = this;
-            this.namespace = 'urn:x-cast:almasistemas.dash-ci';
+            this.namespace = 'urn:x-cast:almasistemas.dashci';
             this.script = '//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js';
             var el = document.createElement('script');
             document.body.appendChild(el);
@@ -3205,6 +3205,10 @@ var DashCI;
             };
             this.manager.onSenderDisconnected = function (event) {
                 console.log('Received Sender Disconnected event: ' + event.senderId);
+                if (_this.manager.getSenders().length == 0 &&
+                    event.reason == GoogleCastReceiver.Cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
+                    window.close();
+                }
             };
             this.messageBus =
                 this.manager.getCastMessageBus(this.namespace, GoogleCastReceiver.Cast.receiver.CastMessageBus.MessageType.JSON);
@@ -3234,7 +3238,7 @@ var DashCI;
             var _this = this;
             this.script = '//www.gstatic.com/cv/js/sender/v1/cast_sender.js';
             this.applicationID = 'E57E663D';
-            this.namespace = 'urn:x-cast:almasistemas.dash-ci';
+            this.namespace = 'urn:x-cast:almasistemas.dashci';
             this.session = null;
             this.invalidOs = true;
             var el = document.createElement('script');
@@ -3252,7 +3256,7 @@ var DashCI;
             var _this = this;
             GoogleCastSender.Cast = window.chrome.cast;
             var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
-            var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest, this.sessionListener, this.receiverListener);
+            var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest, function (e) { return _this.sessionListener(e); }, function (e) { return _this.receiverListener(e); });
             GoogleCastSender.Cast.initialize(apiConfig, function () { return _this.onInitSuccess(); }, function (m) { return _this.onError(m); });
         };
         /**
@@ -3302,6 +3306,7 @@ var DashCI;
             console.debug(message);
             if (!isAlive) {
                 this.session = null;
+                this.connected = false;
             }
         };
         /**
@@ -3328,7 +3333,8 @@ var DashCI;
          */
         GoogleCastSender.prototype.stopApp = function () {
             var _this = this;
-            this.session.stop(function () { return _this.onStopAppSuccess(); }, function (message) { return _this.onError(message); });
+            if (this.session)
+                this.session.stop(function () { return _this.onStopAppSuccess(); }, function (message) { return _this.onError(message); });
         };
         /**
          * send a message to the receiver using the custom namespace
@@ -3338,13 +3344,12 @@ var DashCI;
         GoogleCastSender.prototype.sendMessage = function (message) {
             var _this = this;
             if (this.session != null) {
-                this.session.sendMessage(this.namespace, message, this.onSuccess.bind(this, 'Message sent: ' + message), this.onError);
+                this.session.sendMessage(this.namespace, message, function () { return _this.onSuccess(message); }, function (m) { return _this.onError(m); });
             }
             else {
                 GoogleCastSender.Cast.requestSession(function (e) {
                     _this.session = e;
-                    _this.session.sendMessage(_this.namespace, message, _this.onSuccess.bind(_this, 'Message sent: ' +
-                        message), function (m) { return _this.onError(m); });
+                    _this.session.sendMessage(_this.namespace, message, function () { return _this.onSuccess(message); }, function (m) { return _this.onError(m); });
                 }, function (m) { return _this.onError(m); });
             }
         };

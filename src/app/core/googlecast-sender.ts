@@ -2,7 +2,7 @@
     export class GoogleCastSender {
         private script = '//www.gstatic.com/cv/js/sender/v1/cast_sender.js';
         private applicationID = 'E57E663D';
-        private namespace = 'urn:x-cast:almasistemas.dash-ci';
+        private namespace = 'urn:x-cast:almasistemas.dashci';
         private session = <any>null;
         public static Cast = <any>null;
         public connected: boolean;
@@ -28,8 +28,8 @@
             GoogleCastSender.Cast = (<any>window).chrome.cast;
             var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
             var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest,
-                this.sessionListener,
-                this.receiverListener);
+                (e: any) => this.sessionListener(e),
+                (e: any) => this.receiverListener(e));
             GoogleCastSender.Cast.initialize(apiConfig, () => this.onInitSuccess(), (m: string) => this.onError(m));
         }
         /**
@@ -78,6 +78,7 @@
             console.debug(message);
             if (!isAlive) {
                 this.session = null;
+                this.connected = false;
             }
         }
         /**
@@ -103,7 +104,8 @@
          * stop app/session
          */
         public stopApp() {
-            this.session.stop(() => this.onStopAppSuccess(), (message: string) => this.onError(message));
+            if (this.session)
+                this.session.stop(() => this.onStopAppSuccess(), (message: string) => this.onError(message));
         }
         /**
          * send a message to the receiver using the custom namespace
@@ -112,14 +114,16 @@
          */
         public sendMessage(message: any) {
             if (this.session != null) {
-                this.session.sendMessage(this.namespace, message, this.onSuccess.bind(this, 'Message sent: ' + message),
-                    this.onError);
+                this.session.sendMessage(this.namespace, message,
+                    () => this.onSuccess(message),
+                    (m: string) => this.onError(m));
             }
             else {
                 GoogleCastSender.Cast.requestSession((e: any) => {
                     this.session = e;
-                    this.session.sendMessage(this.namespace, message, this.onSuccess.bind(this, 'Message sent: ' +
-                        message), (m: string) => this.onError(m));
+                    this.session.sendMessage(this.namespace, message,
+                        () => this.onSuccess(message),
+                        (m: string) => this.onError(m));
                 }, (m: string) => this.onError(m));
             }
         }
