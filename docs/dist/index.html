@@ -21,7 +21,7 @@
     <script type="text/javascript" src="app.js"></script>
 </head>
 <body ng-controller="MainController as main" ng-cloak>
-    <md-nav-bar md-selected-nav-item="main.selectedPageId" nav-bar-aria-label="navigation links" ng-init="main.selectedPageId = main.options.pages[0].id">
+    <md-nav-bar ng-if="!main.isGoogleCast" md-selected-nav-item="main.selectedPageId" nav-bar-aria-label="navigation links" ng-init="main.selectedPageId = main.options.pages[0].id">
         <md-nav-item ng-repeat="page in main.options.pages" md-nav-click="main.Go(page)" name="{{page.id}}" value="{{page.id}}">{{page.name}}</md-nav-item>
         <section class="config">
             <span flex> </span>
@@ -62,6 +62,7 @@
             </div>
         </wg-widget>
     </wg-grid>
-    <div ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}}</div>
+    <div ng-if="!main.isGoogleCast" ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}}</div>
+    <div ng-if="main.isGoogleCast" class="grid-dimensions">Google Cast Mode</div>
 </body>
 </html>
