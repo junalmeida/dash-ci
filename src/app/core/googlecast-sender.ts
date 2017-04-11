@@ -121,6 +121,7 @@
             else {
                 GoogleCastSender.Cast.requestSession((e: any) => {
                     this.session = e;
+                    this.sessionListener(e);
                     this.session.sendMessage(this.namespace, message,
                         () => this.onSuccess(message),
                         (m: string) => this.onError(m));
