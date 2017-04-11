@@ -79,10 +79,13 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="%40dev-types\angular-css\index.d.ts" />
+    <TypeScriptCompile Include="%40dev-types\cast\index.d.ts" />
     <TypeScriptCompile Include="%40dev-types\moment\index.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\core\add-widget-controller.ts" />
     <TypeScriptCompile Include="app\core\global-config-controller.ts" />
+    <TypeScriptCompile Include="app\core\googlecast-receiver.ts" />
+    <TypeScriptCompile Include="app\core\googlecast-sender.ts" />
     <TypeScriptCompile Include="app\models\widgets.ts" />
     <TypeScriptCompile Include="app\resources\github\models.ts" />
     <TypeScriptCompile Include="app\resources\github\resources.ts" />
@@ -136,6 +139,7 @@
   <ItemGroup>
     <None Include="Properties\PublishProfiles\github-pages.pubxml" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

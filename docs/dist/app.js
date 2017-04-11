@@ -3174,6 +3174,185 @@ var DashCI;
         Core.GlobalConfigController = GlobalConfigController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var GoogleCastReceiver = (function () {
+        function GoogleCastReceiver() {
+            var _this = this;
+            this.namespace = 'urn:x-cast:almasistemas.dash-ci';
+            this.script = '//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js';
+            var el = document.createElement('script');
+            document.body.appendChild(el);
+            el.onload = function () {
+                setTimeout(function () { return _this.initializeCastApi(); }, 1000);
+            };
+            el.type = "text/javascript";
+            el.src = this.script;
+        }
+        GoogleCastReceiver.prototype.initializeCastApi = function () {
+            var _this = this;
+            GoogleCastReceiver.Cast = window.cast;
+            GoogleCastReceiver.Cast.receiver.logger.setLevelValue(0);
+            this.manager = GoogleCastReceiver.Cast.receiver.CastReceiverManager.getInstance();
+            console.log('Starting Receiver Manager');
+            this.manager.onReady = function (event) {
+                console.log('Received Ready event: ' + JSON.stringify(event.data));
+                _this.manager.setApplicationState('chromecast-dashboard is ready...');
+            };
+            this.manager.onSenderConnected = function (event) {
+                console.log('Received Sender Connected event: ' + event.senderId);
+            };
+            this.manager.onSenderDisconnected = function (event) {
+                console.log('Received Sender Disconnected event: ' + event.senderId);
+            };
+            this.messageBus =
+                this.manager.getCastMessageBus(this.namespace, GoogleCastReceiver.Cast.receiver.CastMessageBus.MessageType.JSON);
+            this.messageBus.onMessage = function (event) { return _this.receiveMessage(event); };
+            // Initialize the CastReceiverManager with an application status message.
+            this.manager.start({ statusText: 'Application is starting' });
+            console.log('Receiver Manager started');
+        };
+        GoogleCastReceiver.prototype.receiveMessage = function (event) {
+            console.log('Message [' + event.senderId + ']: ' + event.data);
+            if (event.data && this.receiveOptions)
+                this.receiveOptions(event.data);
+        };
+        return GoogleCastReceiver;
+    }());
+    GoogleCastReceiver.Cast = null;
+    DashCI.GoogleCastReceiver = GoogleCastReceiver;
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var GoogleCastSender = (function () {
+        function GoogleCastSender() {
+            /**
+            * Call initialization for Cast
+            */
+            var _this = this;
+            this.script = '//www.gstatic.com/cv/js/sender/v1/cast_sender.js';
+            this.applicationID = 'E57E663D';
+            this.namespace = 'urn:x-cast:almasistemas.dash-ci';
+            this.session = null;
+            this.invalidOs = true;
+            var el = document.createElement('script');
+            document.body.appendChild(el);
+            el.onload = function () {
+                setTimeout(function () { return _this.initializeCastApi(); }, 1000);
+            };
+            el.type = "text/javascript";
+            el.src = this.script;
+        }
+        /**
+         * initialization
+         */
+        GoogleCastSender.prototype.initializeCastApi = function () {
+            var _this = this;
+            GoogleCastSender.Cast = window.chrome.cast;
+            var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
+            var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest, this.sessionListener, this.receiverListener);
+            GoogleCastSender.Cast.initialize(apiConfig, function () { return _this.onInitSuccess(); }, function (m) { return _this.onError(m); });
+        };
+        /**
+         * initialization success callback
+         */
+        GoogleCastSender.prototype.onInitSuccess = function () {
+            console.info('Cast onInitSuccess');
+            this.invalidOs = false;
+        };
+        /**
+         * initialization error callback
+         */
+        GoogleCastSender.prototype.onError = function (message) {
+            console.error('Cast onError: ' + JSON.stringify(message));
+            this.connected = false;
+        };
+        /**
+         * generic success callback
+         */
+        GoogleCastSender.prototype.onSuccess = function (message) {
+            console.info('Cast onSuccess: ' + message);
+            this.connected = true;
+        };
+        /**
+         * callback on success for stopping app
+         */
+        GoogleCastSender.prototype.onStopAppSuccess = function () {
+            console.info('Cast onStopAppSuccess');
+            this.connected = false;
+        };
+        /**
+         * session listener during initialization
+         */
+        GoogleCastSender.prototype.sessionListener = function (e) {
+            var _this = this;
+            console.info('Cast New session ID:' + e.sessionId);
+            this.session = e;
+            this.session.addUpdateListener(function (isAlive) { return _this.sessionUpdateListener(isAlive); });
+            this.session.addMessageListener(this.namespace, function (namespace, message) { return _this.receiverMessage(namespace, message); });
+        };
+        /**
+         * listener for session updates
+         */
+        GoogleCastSender.prototype.sessionUpdateListener = function (isAlive) {
+            var message = isAlive ? 'Session Updated' : 'Session Removed';
+            message += ': ' + this.session.sessionId;
+            console.debug(message);
+            if (!isAlive) {
+                this.session = null;
+            }
+        };
+        /**
+         * utility private to log messages from the receiver
+         * @param {string} namespace The namespace of the message
+         * @param {string} message A message string
+         */
+        GoogleCastSender.prototype.receiverMessage = function (namespace, message) {
+            console.debug('receiverMessage: ' + namespace + ', ' + message);
+        };
+        /**
+         * receiver listener during initialization
+         */
+        GoogleCastSender.prototype.receiverListener = function (e) {
+            if (e === 'available') {
+                console.info('receiver found');
+            }
+            else {
+                console.info('receiver list empty');
+            }
+        };
+        /**
+         * stop app/session
+         */
+        GoogleCastSender.prototype.stopApp = function () {
+            var _this = this;
+            this.session.stop(function () { return _this.onStopAppSuccess(); }, function (message) { return _this.onError(message); });
+        };
+        /**
+         * send a message to the receiver using the custom namespace
+         * receiver CastMessageBus message handler will be invoked
+         * @param {string} message A message string
+         */
+        GoogleCastSender.prototype.sendMessage = function (message) {
+            var _this = this;
+            if (this.session != null) {
+                this.session.sendMessage(this.namespace, message, this.onSuccess.bind(this, 'Message sent: ' + message), this.onError);
+            }
+            else {
+                GoogleCastSender.Cast.requestSession(function (e) {
+                    _this.session = e;
+                    _this.session.sendMessage(_this.namespace, message, _this.onSuccess.bind(_this, 'Message sent: ' +
+                        message), function (m) { return _this.onError(m); });
+                }, function (m) { return _this.onError(m); });
+            }
+        };
+        return GoogleCastSender;
+    }());
+    GoogleCastSender.Cast = null;
+    DashCI.GoogleCastSender = GoogleCastSender;
+})(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
 "use strict";
 var DashCI;
@@ -3203,6 +3382,23 @@ var DashCI;
                         _this.gridHeight = grid.clientHeight;
                     }, 500);
                 };
+                this.defOptions = {
+                    columns: 30,
+                    rows: 20,
+                    tfs: null,
+                    gitlab: null,
+                    github: [],
+                    circleci: [],
+                    pages: [{
+                            id: "1",
+                            name: "Dash-CI",
+                            widgets: []
+                        }]
+                };
+                this.castStatus = 'cast';
+                this.canCast = false;
+                this.castSender = null;
+                this.castReceiver = null;
                 this.loadData();
                 window.onresize = this.updateGridSize;
                 this.$scope.$on('wg-grid-full', function () {
@@ -3221,6 +3417,7 @@ var DashCI;
                 });
                 this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
                 this.updateGridSize();
+                this.initCastApi();
             }
             MainController.prototype.changePage = function () {
                 var _this = this;
@@ -3288,25 +3485,46 @@ var DashCI;
                 window.localStorage['dash-ci-options'] = angular.toJson(this.options);
             };
             MainController.prototype.loadData = function () {
-                var defOptions = {
-                    columns: 30,
-                    rows: 20,
-                    tfs: null,
-                    gitlab: null,
-                    github: [],
-                    circleci: [],
-                    pages: [{
-                            id: "1",
-                            name: "Dash-CI",
-                            widgets: []
-                        }]
-                };
+                var defOptions = angular.copy(this.defOptions);
                 var savedOpts = (angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
                 angular.extend(this.options, defOptions, savedOpts);
                 angular.forEach(savedOpts.pages, function (item) {
                     item.name = item.name || "Dash-CI";
                 });
                 this.currentPage = this.options.pages[0]; //preparing to support multiple pages
+            };
+            MainController.prototype.initCastApi = function () {
+                var _this = this;
+                if (!this.isGoogleCast()) {
+                    this.castSender = new DashCI.GoogleCastSender();
+                    this.$scope.$watch(function () { return _this.castSender.connected; }, function (connected) {
+                        _this.castStatus = connected ? 'cast_connected' : 'cast';
+                    });
+                    this.$scope.$watch(function () { return _this.castSender.invalidOs; }, function (invalidOs) {
+                        _this.canCast = !invalidOs;
+                    });
+                }
+                else {
+                    this.castReceiver = new DashCI.GoogleCastReceiver();
+                    this.castReceiver.receiveOptions = function (options) {
+                        var defOptions = angular.copy(_this.defOptions);
+                        angular.extend(_this.options, defOptions, options);
+                    };
+                }
+            };
+            MainController.prototype.toggleCast = function () {
+                if (this.castStatus == 'cast') {
+                    //connect
+                    this.castSender.sendMessage(this.options);
+                }
+                else {
+                    //disconnect
+                    this.castSender.stopApp();
+                }
+            };
+            MainController.prototype.isGoogleCast = function () {
+                return (navigator.userAgent.match(/CrKey/i) &&
+                    navigator.userAgent.match(/TV/i));
             };
             return MainController;
         }());
