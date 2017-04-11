@@ -3349,6 +3349,7 @@ var DashCI;
             else {
                 GoogleCastSender.Cast.requestSession(function (e) {
                     _this.session = e;
+                    _this.sessionListener(e);
                     _this.session.sendMessage(_this.namespace, message, function () { return _this.onSuccess(message); }, function (m) { return _this.onError(m); });
                 }, function (m) { return _this.onError(m); });
             }
