@@ -34,6 +34,8 @@ namespace DashCI.Core {
             this.$scope.$watch(() => this.selectedPageId, () => this.changePage());
             this.updateGridSize();
 
+
+            this.initCastApi();
         }
 
 
@@ -133,26 +135,73 @@ namespace DashCI.Core {
             window.localStorage['dash-ci-options'] = angular.toJson(this.options);
         }
 
+
+        private defOptions: Models.IOptions = {
+            columns: 30,
+            rows: 20,
+            tfs: null,
+            gitlab: null,
+            github: [],
+            circleci: [],
+            pages: [{
+                id: "1",
+                name: "Dash-CI",
+                widgets: []
+            }]
+        };
+
         private loadData() {
-            var defOptions:Models.IOptions = {
-                columns: 30,
-                rows: 20,
-                tfs: null,
-                gitlab: null,
-                github: [],
-                circleci: [],
-                pages: [{
-                    id: "1",
-                    name: "Dash-CI",
-                    widgets: []
-                }]
-            }
+
+            var defOptions = angular.copy(this.defOptions);
             var savedOpts = <Models.IOptions>(angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
             angular.extend(this.options, defOptions, savedOpts);
             angular.forEach(savedOpts.pages, (item) => {
                 item.name = item.name || "Dash-CI";
             });
             this.currentPage = this.options.pages[0]; //preparing to support multiple pages
+        }
+
+        public isGoogleCast = this.CheckGoogleCast();
+        public castStatus = 'cast';
+        public canCast = false;
+        private castSender: GoogleCastSender = null;
+        private castReceiver: GoogleCastReceiver = null;
+        private initCastApi() {
+            if (!this.isGoogleCast) {
+                this.castSender = new GoogleCastSender();
+                this.$scope.$watch(() => this.castSender.connected, (connected) => {
+                    this.castStatus = connected ? 'cast_connected' : 'cast';
+                });
+                this.$scope.$watch(() => this.castSender.invalidOs, (invalidOs) => {
+                    this.canCast = !invalidOs;
+                });
+            }
+            else {
+                this.castReceiver = new GoogleCastReceiver();
+                this.castReceiver.receiveOptions = (options: DashCI.Models.IOptions) => {
+                    var defOptions = angular.copy(this.defOptions);
+                    angular.extend(this.options, defOptions, options);
+                };
+            }
+        }
+
+        public toggleCast() {
+            if (this.castStatus == 'cast') {
+                //connect
+                this.castSender.sendMessage(this.options);
+            }
+            else 
+            {
+                //disconnect
+                this.castSender.stopApp();
+            }
+        }
+
+        private CheckGoogleCast() {
+            return (
+                navigator.userAgent.match(/CrKey/i) &&
+                navigator.userAgent.match(/TV/i)
+            );
         }
     }
     DashCI.app.controller("MainController", MainController);

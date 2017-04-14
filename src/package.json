@@ -22,6 +22,5 @@
     "@types/angular-material": "~1.1.45",
     "@types/angular-resource": "1.5.8",
     "http-server": "~0.9.0"
-
   }
 }

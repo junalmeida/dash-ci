@@ -83,6 +83,7 @@ var DashCI;
             WidgetType[WidgetType["tfsBuildGraph"] = 8] = "tfsBuildGraph";
             WidgetType[WidgetType["githubIssues"] = 9] = "githubIssues";
             WidgetType[WidgetType["tfsRelease"] = 10] = "tfsRelease";
+            WidgetType[WidgetType["tfsQueryChart"] = 11] = "tfsQueryChart";
         })(WidgetType = Models.WidgetType || (Models.WidgetType = {}));
         var WidgetCategory;
         (function (WidgetCategory) {
@@ -178,6 +179,13 @@ var DashCI;
                 directive: "tfs-query-count",
                 title: "TFS - Query Count",
                 desc: "The count of a saved query against a project.",
+                category: WidgetCategory.tfs
+            },
+            {
+                type: WidgetType.tfsQueryChart,
+                directive: "tfs-query-chart",
+                title: "TFS - Query Chart",
+                desc: "Shows the count of saved querys count at a chart.",
                 category: WidgetCategory.tfs
             },
         ]);
@@ -761,6 +769,365 @@ var DashCI;
             }());
             DashCI.app.directive("tfsQueryCount", TfsQueryCountDirective.create());
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsQueryChart;
+        (function (TfsQueryChart) {
+            var TfsQueryChartConfigController = (function () {
+                function TfsQueryChartConfigController($scope, $mdDialog, $q, tfsResources, colors, intervals, vm) {
+                    this.$scope = $scope;
+                    this.$mdDialog = $mdDialog;
+                    this.$q = $q;
+                    this.tfsResources = tfsResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.init();
+                }
+                TfsQueryChartConfigController.prototype.init = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    res.project_list().$promise
+                        .then(function (result) {
+                        _this.projects = result.value;
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.projects = [];
+                    });
+                    this.$scope.$watch(function () { return _this.vm.project; }, function () {
+                        _this.getTeams();
+                        _this.getQueries();
+                    });
+                    this.$scope.$watch(function () { return _this.vm.queryCount; }, function () { return _this.setQueryList(); });
+                };
+                TfsQueryChartConfigController.prototype.getQueries = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res || !this.vm.project)
+                        return;
+                    var q1 = res.query_list({ project: this.vm.project, folder: "Shared Queries" }).$promise;
+                    var q2 = res.query_list({ project: this.vm.project, folder: "My Queries" }).$promise;
+                    this.$q.all([q1, q2])
+                        .then(function (result) {
+                        _this.queries = [];
+                        angular.forEach(result[0].children || result[0].value, function (item) { return _this.queries.push(item); });
+                        angular.forEach(result[1].children || result[1].value, function (item) { return _this.queries.push(item); });
+                    }).catch(function (reason) {
+                        console.error(reason);
+                        _this.queries = [];
+                    });
+                };
+                TfsQueryChartConfigController.prototype.getTeams = function () {
+                    var _this = this;
+                    var res = this.tfsResources();
+                    if (!res || !this.vm.project)
+                        return;
+                    res.team_list({ project: this.vm.project })
+                        .$promise
+                        .then(function (result) {
+                        _this.teams = [];
+                        angular.forEach(result.value, function (item) { return _this.teams.push(item); });
+                    })
+                        .catch(function (reason) {
+                        console.error(reason);
+                        _this.teams = [];
+                    });
+                    ;
+                };
+                TfsQueryChartConfigController.prototype.setQueryList = function () {
+                    if (this.vm.queryIds.length < this.vm.queryCount) {
+                        for (var i = 0; i < this.vm.queryCount; i++) {
+                            this.vm.queryIds.push("");
+                            this.vm.queryColors.push("");
+                        }
+                    }
+                    else if (this.vm.queryIds.length > this.vm.queryCount) {
+                        while (this.vm.queryIds.length > this.vm.queryCount) {
+                            this.vm.queryIds.pop();
+                            this.vm.queryColors.pop();
+                        }
+                    }
+                };
+                TfsQueryChartConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return TfsQueryChartConfigController;
+            }());
+            TfsQueryChartConfigController.$inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config"];
+            TfsQueryChart.TfsQueryChartConfigController = TfsQueryChartConfigController;
+        })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsQueryChart;
+        (function (TfsQueryChart) {
+            var TfsQueryChartController = (function () {
+                function TfsQueryChartController($scope, $q, $timeout, $interval, $mdDialog, tfsResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.tfsResources = tfsResources;
+                    this.total = null;
+                    this.width = 50;
+                    this.height = 50;
+                    this.fontSize = 12;
+                    this.lineSize = 12;
+                    this.doughnutHoleSize = 0.5;
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.tfsQueryChart;
+                    this.data.footer = false;
+                    this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.resizeBy(_this.$scope.$element.width(), height); });
+                    this.$scope.$watch(function () { return _this.$scope.$element.width(); }, function (width) { return _this.resizeBy(width, _this.$scope.$element.height()); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                TfsQueryChartController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                TfsQueryChartController.prototype.init = function () {
+                    this.data.title = this.data.title || "Chart";
+                    this.data.color = this.data.color || "grey";
+                    //default values
+                    this.data.queryCount = this.data.queryCount || 2;
+                    this.data.queryIds = this.data.queryIds || ["", ""];
+                    this.data.queryColors = this.data.queryColors || ["", ""];
+                    this.data.poolInterval = this.data.poolInterval || 20000;
+                    this.updateInterval();
+                    this.update();
+                };
+                TfsQueryChartController.prototype.resizeBy = function (width, height) {
+                    var _this = this;
+                    this.width = width;
+                    this.height = height - 40;
+                    this.fontSize = Math.round(height / 1.3);
+                    this.lineSize = Math.round((height) - 60);
+                    var canvas = this.$scope.$element.find("canvas").get(0);
+                    if (canvas) {
+                        canvas.width = this.width;
+                        canvas.height = this.height;
+                    }
+                    this.$timeout(function () { return _this.drawGraph(); }, 50);
+                };
+                TfsQueryChartController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: TfsQueryChart.TfsQueryChartConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/tfs-query-chart/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                TfsQueryChartController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                };
+                TfsQueryChartController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.project || !this.data.queryIds || this.data.queryIds.length == 0)
+                        return;
+                    var res = this.tfsResources();
+                    if (!res)
+                        return;
+                    var queries = [];
+                    for (var q in this.data.queryIds) {
+                        var query = this.data.queryIds[q];
+                        if (query)
+                            queries.push(res.run_query({
+                                project: this.data.project,
+                                team: this.data.team,
+                                queryId: query
+                            }).$promise);
+                    }
+                    if (queries.length == 0)
+                        return;
+                    console.log("tfs query: " + this.data.title);
+                    this.$q.all(queries)
+                        .then(function (res) {
+                        var resValues = [];
+                        _this.total = 0;
+                        for (var i in res) {
+                            resValues.push(res[i].workItems.length);
+                            _this.total += res[i].workItems.length;
+                        }
+                        _this.queryValues = resValues;
+                        _this.drawGraph();
+                    })
+                        .catch(function (reason) {
+                        _this.queryValues = null;
+                        console.error(reason);
+                    });
+                    this.$timeout(function () { return _this.resizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
+                };
+                TfsQueryChartController.prototype.drawGraph = function () {
+                    var data = [];
+                    var labels = [];
+                    var colors = [];
+                    console.log("chart draw start: " + this.data.title);
+                    var bgColor = this.data.color == 'transparent' || this.data.color == 'semi-transparent' ? "black" :
+                        this.getStyleRuleValue("background-color", "." + this.data.color);
+                    for (var i in this.queryValues) {
+                        data.push(this.queryValues[i]);
+                        labels.push(this.queryValues[i].toString());
+                        var color = this.getStyleRuleValue("background-color", "." + this.data.queryColors[i]);
+                        colors.push(color);
+                    }
+                    //todo: draw segments at canvas.
+                    var canvas = this.$scope.$element.find("canvas").get(0);
+                    if (!canvas)
+                        return;
+                    var ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    var total_value = this.total;
+                    var color_index = 0;
+                    var start_angle = 0;
+                    for (var i in data) {
+                        var val = data[i];
+                        var slice_angle = 2 * Math.PI * val / total_value;
+                        this.drawPieSlice(ctx, canvas.width / 2, canvas.height / 2, Math.min(canvas.width / 2, canvas.height / 2), start_angle, start_angle + slice_angle, colors[i]);
+                        start_angle += slice_angle;
+                        color_index++;
+                    }
+                    //drawing a white circle over the chart
+                    //to create the doughnut chart
+                    if (this.doughnutHoleSize) {
+                        this.drawPieSlice(ctx, canvas.width / 2, canvas.height / 2, this.doughnutHoleSize * Math.min(canvas.width / 2, canvas.height / 2), 0, 2 * Math.PI, bgColor);
+                    }
+                    start_angle = 0;
+                    for (i in data) {
+                        var val = data[i];
+                        slice_angle = 2 * Math.PI * val / total_value;
+                        var pieRadius = Math.min(canvas.width / 2, canvas.height / 2);
+                        var labelX = canvas.width / 2 + (pieRadius / 2) * Math.cos(start_angle + slice_angle / 2);
+                        var labelY = canvas.height / 2 + (pieRadius / 2) * Math.sin(start_angle + slice_angle / 2);
+                        if (this.doughnutHoleSize) {
+                            var offset = (pieRadius * this.doughnutHoleSize) / 2;
+                            labelX = canvas.width / 2 + (offset + pieRadius / 2) * Math.cos(start_angle + slice_angle / 2);
+                            labelY = canvas.height / 2 + (offset + pieRadius / 2) * Math.sin(start_angle + slice_angle / 2);
+                        }
+                        var labelText = Math.round(100 * val / total_value);
+                        if (labelText > 4) {
+                            ctx.fillStyle = "white";
+                            ctx.font = "bold 20px Arial";
+                            ctx.fillText(labelText + "%", labelX, labelY);
+                            start_angle += slice_angle;
+                        }
+                    }
+                    console.log("chart draw complete: " + this.data.title);
+                };
+                /*
+                private drawLine(ctx:CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number) {
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+        
+                private drawArc(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, startAngle: number, endAngle: number) {
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    ctx.stroke();
+                }
+                */
+                TfsQueryChartController.prototype.drawPieSlice = function (ctx, centerX, centerY, radius, startAngle, endAngle, color) {
+                    if (color)
+                        ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    ctx.closePath();
+                    //if (!color) {
+                    //    ctx.clip();
+                    //    ctx.clearRect(centerX - radius - 1, centerY - radius - 1,
+                    //        radius * 2 + 2, radius * 2 + 2);
+                    //}
+                    ctx.fill();
+                };
+                TfsQueryChartController.prototype.getStyleRuleValue = function (style, selector, sheet) {
+                    var sheets = typeof sheet !== 'undefined' ? [sheet] : document.styleSheets;
+                    for (var i = 0, l = sheets.length; i < l; i++) {
+                        var currentSheet = sheets[i];
+                        var rules = currentSheet.cssRules || currentSheet.rules;
+                        if (!rules) {
+                            continue;
+                        }
+                        for (var j = 0, k = rules.length; j < k; j++) {
+                            var rule = rules[j];
+                            if (rule.selectorText && rule.selectorText.split(',').indexOf(selector) !== -1) {
+                                return rule.style[style];
+                            }
+                        }
+                    }
+                    return null;
+                };
+                return TfsQueryChartController;
+            }());
+            TfsQueryChartController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
+            TfsQueryChart.TfsQueryChartController = TfsQueryChartController;
+        })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var TfsQueryChart;
+        (function (TfsQueryChart) {
+            var TfsQueryChartDirective = (function () {
+                function TfsQueryChartDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/tfs-query-chart/tfs-query-chart.html";
+                    this.replace = false;
+                    this.controller = TfsQueryChart.TfsQueryChartController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/tfs-query-chart/tfs-query-chart.css",
+                        persist: true
+                    };
+                }
+                TfsQueryChartDirective.create = function () {
+                    var directive = function () { return new TfsQueryChartDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return TfsQueryChartDirective;
+            }());
+            DashCI.app.directive("tfsQueryChart", TfsQueryChartDirective.create());
+        })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 "use strict";
@@ -2316,6 +2683,14 @@ var DashCI;
                             cache: true,
                             withCredentials: withCredentials
                         },
+                        team_list: {
+                            method: 'GET',
+                            isArray: false,
+                            url: globalOptions.tfs.host + "/_apis/projects/:project/teams?api-version=2.2",
+                            headers: headers,
+                            cache: true,
+                            withCredentials: withCredentials
+                        },
                         query_list: {
                             method: 'GET',
                             isArray: false,
@@ -2327,7 +2702,7 @@ var DashCI;
                         run_query: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.tfs.host + "/:project/_apis/wit/wiql/:queryId?api-version=2.2",
+                            url: globalOptions.tfs.host + "/:project/:team/_apis/wit/wiql/:queryId?api-version=2.2",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials
@@ -2799,6 +3174,191 @@ var DashCI;
         Core.GlobalConfigController = GlobalConfigController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var GoogleCastReceiver = (function () {
+        function GoogleCastReceiver() {
+            var _this = this;
+            this.namespace = 'urn:x-cast:almasistemas.dashci';
+            this.script = '//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js';
+            var el = document.createElement('script');
+            document.body.appendChild(el);
+            el.onload = function () {
+                setTimeout(function () { return _this.initializeCastApi(); }, 1000);
+            };
+            el.type = "text/javascript";
+            el.src = this.script;
+        }
+        GoogleCastReceiver.prototype.initializeCastApi = function () {
+            var _this = this;
+            GoogleCastReceiver.Cast = window.cast;
+            GoogleCastReceiver.Cast.receiver.logger.setLevelValue(0);
+            this.manager = GoogleCastReceiver.Cast.receiver.CastReceiverManager.getInstance();
+            console.log('Starting Receiver Manager');
+            this.manager.onReady = function (event) {
+                console.log('Received Ready event: ' + JSON.stringify(event.data));
+                _this.manager.setApplicationState('chromecast-dashboard is ready...');
+            };
+            this.manager.onSenderConnected = function (event) {
+                console.log('Received Sender Connected event: ' + event.senderId);
+            };
+            this.manager.onSenderDisconnected = function (event) {
+                console.log('Received Sender Disconnected event: ' + event.senderId);
+                if (_this.manager.getSenders().length == 0 &&
+                    event.reason == GoogleCastReceiver.Cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
+                    window.close();
+                }
+            };
+            this.messageBus =
+                this.manager.getCastMessageBus(this.namespace, GoogleCastReceiver.Cast.receiver.CastMessageBus.MessageType.JSON);
+            this.messageBus.onMessage = function (event) { return _this.receiveMessage(event); };
+            // Initialize the CastReceiverManager with an application status message.
+            this.manager.start({ statusText: 'Application is starting' });
+            console.log('Receiver Manager started');
+        };
+        GoogleCastReceiver.prototype.receiveMessage = function (event) {
+            console.log('Message [' + event.senderId + ']: ' + event.data);
+            if (event.data && this.receiveOptions)
+                this.receiveOptions(event.data);
+        };
+        return GoogleCastReceiver;
+    }());
+    GoogleCastReceiver.Cast = null;
+    DashCI.GoogleCastReceiver = GoogleCastReceiver;
+})(DashCI || (DashCI = {}));
+"use strict";
+var DashCI;
+(function (DashCI) {
+    var GoogleCastSender = (function () {
+        function GoogleCastSender() {
+            /**
+            * Call initialization for Cast
+            */
+            var _this = this;
+            this.script = '//www.gstatic.com/cv/js/sender/v1/cast_sender.js';
+            this.applicationID = 'E57E663D';
+            this.namespace = 'urn:x-cast:almasistemas.dashci';
+            this.session = null;
+            this.invalidOs = true;
+            var el = document.createElement('script');
+            document.body.appendChild(el);
+            el.onload = function () {
+                setTimeout(function () { return _this.initializeCastApi(); }, 1000);
+            };
+            el.type = "text/javascript";
+            el.src = this.script;
+        }
+        /**
+         * initialization
+         */
+        GoogleCastSender.prototype.initializeCastApi = function () {
+            var _this = this;
+            GoogleCastSender.Cast = window.chrome.cast;
+            var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
+            var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest, function (e) { return _this.sessionListener(e); }, function (e) { return _this.receiverListener(e); });
+            GoogleCastSender.Cast.initialize(apiConfig, function () { return _this.onInitSuccess(); }, function (m) { return _this.onError(m); });
+        };
+        /**
+         * initialization success callback
+         */
+        GoogleCastSender.prototype.onInitSuccess = function () {
+            console.info('Cast onInitSuccess');
+            this.invalidOs = false;
+        };
+        /**
+         * initialization error callback
+         */
+        GoogleCastSender.prototype.onError = function (message) {
+            console.error('Cast onError: ' + JSON.stringify(message));
+            this.connected = false;
+        };
+        /**
+         * generic success callback
+         */
+        GoogleCastSender.prototype.onSuccess = function (message) {
+            console.info('Cast onSuccess: ' + message);
+            this.connected = true;
+        };
+        /**
+         * callback on success for stopping app
+         */
+        GoogleCastSender.prototype.onStopAppSuccess = function () {
+            console.info('Cast onStopAppSuccess');
+            this.connected = false;
+        };
+        /**
+         * session listener during initialization
+         */
+        GoogleCastSender.prototype.sessionListener = function (e) {
+            var _this = this;
+            console.info('Cast New session ID:' + e.sessionId);
+            this.session = e;
+            this.session.addUpdateListener(function (isAlive) { return _this.sessionUpdateListener(isAlive); });
+            this.session.addMessageListener(this.namespace, function (namespace, message) { return _this.receiverMessage(namespace, message); });
+        };
+        /**
+         * listener for session updates
+         */
+        GoogleCastSender.prototype.sessionUpdateListener = function (isAlive) {
+            var message = isAlive ? 'Session Updated' : 'Session Removed';
+            message += ': ' + this.session.sessionId;
+            console.debug(message);
+            if (!isAlive) {
+                this.session = null;
+                this.connected = false;
+            }
+        };
+        /**
+         * utility private to log messages from the receiver
+         * @param {string} namespace The namespace of the message
+         * @param {string} message A message string
+         */
+        GoogleCastSender.prototype.receiverMessage = function (namespace, message) {
+            console.debug('receiverMessage: ' + namespace + ', ' + message);
+        };
+        /**
+         * receiver listener during initialization
+         */
+        GoogleCastSender.prototype.receiverListener = function (e) {
+            if (e === 'available') {
+                console.info('receiver found');
+            }
+            else {
+                console.info('receiver list empty');
+            }
+        };
+        /**
+         * stop app/session
+         */
+        GoogleCastSender.prototype.stopApp = function () {
+            var _this = this;
+            if (this.session)
+                this.session.stop(function () { return _this.onStopAppSuccess(); }, function (message) { return _this.onError(message); });
+        };
+        /**
+         * send a message to the receiver using the custom namespace
+         * receiver CastMessageBus message handler will be invoked
+         * @param {string} message A message string
+         */
+        GoogleCastSender.prototype.sendMessage = function (message) {
+            var _this = this;
+            if (this.session != null) {
+                this.session.sendMessage(this.namespace, message, function () { return _this.onSuccess(message); }, function (m) { return _this.onError(m); });
+            }
+            else {
+                GoogleCastSender.Cast.requestSession(function (e) {
+                    _this.session = e;
+                    _this.sessionListener(e);
+                    _this.session.sendMessage(_this.namespace, message, function () { return _this.onSuccess(message); }, function (m) { return _this.onError(m); });
+                }, function (m) { return _this.onError(m); });
+            }
+        };
+        return GoogleCastSender;
+    }());
+    GoogleCastSender.Cast = null;
+    DashCI.GoogleCastSender = GoogleCastSender;
+})(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
 "use strict";
 var DashCI;
@@ -2828,6 +3388,24 @@ var DashCI;
                         _this.gridHeight = grid.clientHeight;
                     }, 500);
                 };
+                this.defOptions = {
+                    columns: 30,
+                    rows: 20,
+                    tfs: null,
+                    gitlab: null,
+                    github: [],
+                    circleci: [],
+                    pages: [{
+                            id: "1",
+                            name: "Dash-CI",
+                            widgets: []
+                        }]
+                };
+                this.isGoogleCast = this.CheckGoogleCast();
+                this.castStatus = 'cast';
+                this.canCast = false;
+                this.castSender = null;
+                this.castReceiver = null;
                 this.loadData();
                 window.onresize = this.updateGridSize;
                 this.$scope.$on('wg-grid-full', function () {
@@ -2846,6 +3424,7 @@ var DashCI;
                 });
                 this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
                 this.updateGridSize();
+                this.initCastApi();
             }
             MainController.prototype.changePage = function () {
                 var _this = this;
@@ -2913,25 +3492,46 @@ var DashCI;
                 window.localStorage['dash-ci-options'] = angular.toJson(this.options);
             };
             MainController.prototype.loadData = function () {
-                var defOptions = {
-                    columns: 30,
-                    rows: 20,
-                    tfs: null,
-                    gitlab: null,
-                    github: [],
-                    circleci: [],
-                    pages: [{
-                            id: "1",
-                            name: "Dash-CI",
-                            widgets: []
-                        }]
-                };
+                var defOptions = angular.copy(this.defOptions);
                 var savedOpts = (angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
                 angular.extend(this.options, defOptions, savedOpts);
                 angular.forEach(savedOpts.pages, function (item) {
                     item.name = item.name || "Dash-CI";
                 });
                 this.currentPage = this.options.pages[0]; //preparing to support multiple pages
+            };
+            MainController.prototype.initCastApi = function () {
+                var _this = this;
+                if (!this.isGoogleCast) {
+                    this.castSender = new DashCI.GoogleCastSender();
+                    this.$scope.$watch(function () { return _this.castSender.connected; }, function (connected) {
+                        _this.castStatus = connected ? 'cast_connected' : 'cast';
+                    });
+                    this.$scope.$watch(function () { return _this.castSender.invalidOs; }, function (invalidOs) {
+                        _this.canCast = !invalidOs;
+                    });
+                }
+                else {
+                    this.castReceiver = new DashCI.GoogleCastReceiver();
+                    this.castReceiver.receiveOptions = function (options) {
+                        var defOptions = angular.copy(_this.defOptions);
+                        angular.extend(_this.options, defOptions, options);
+                    };
+                }
+            };
+            MainController.prototype.toggleCast = function () {
+                if (this.castStatus == 'cast') {
+                    //connect
+                    this.castSender.sendMessage(this.options);
+                }
+                else {
+                    //disconnect
+                    this.castSender.stopApp();
+                }
+            };
+            MainController.prototype.CheckGoogleCast = function () {
+                return (navigator.userAgent.match(/CrKey/i) &&
+                    navigator.userAgent.match(/TV/i));
             };
             return MainController;
         }());

@@ -2,8 +2,9 @@
 
     export interface ITfsResource extends ng.resource.IResourceClass<ITfsObject> {
         project_list(): IProjectResult
+        team_list(param: { project: string }): ITeamResult
         query_list(param: { project: string, folder: string }): IQueryResult
-        run_query(param: { project: string; queryId: string }): IRunQueryResult;
+        run_query(param: { project: string; team?: string, queryId: string }): IRunQueryResult;
         latest_build(param: { project: string; build: number }): IBuildResult;
         recent_builds(param: { project: string; build: number, count: number }): IBuildResult;
         build_definition_list(param: { project: string; }): IBuildDefinitionResult;
@@ -44,6 +45,14 @@
                         cache: true,
                         withCredentials: withCredentials
                     },
+                    team_list: <ng.resource.IActionDescriptor>{
+                        method: 'GET',
+                        isArray: false,
+                        url: globalOptions.tfs.host + "/_apis/projects/:project/teams?api-version=2.2",
+                        headers: headers,
+                        cache: true,
+                        withCredentials: withCredentials
+                    },
 
                     query_list: <ng.resource.IActionDescriptor>{
                         method: 'GET',
@@ -57,7 +66,7 @@
                     run_query: <ng.resource.IActionDescriptor>{
                         method: 'GET',
                         isArray: false,
-                        url: globalOptions.tfs.host + "/:project/_apis/wit/wiql/:queryId?api-version=2.2",
+                        url: globalOptions.tfs.host + "/:project/:team/_apis/wit/wiql/:queryId?api-version=2.2",
                         headers: headers,
                         cache: false,
                         withCredentials: withCredentials

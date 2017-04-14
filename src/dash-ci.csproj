@@ -52,12 +52,17 @@
     <Content Include="app\widgets\tfs-build\config.html" />
     <Content Include="app\widgets\tfs-build\build.css" />
     <Content Include="app\widgets\tfs-build\build.html" />
+    <Content Include="app\widgets\tfs-query-chart\config.html" />
+    <Content Include="app\widgets\tfs-query-chart\tfs-query-chart.css" />
+    <Content Include="app\widgets\tfs-query-chart\tfs-query-chart.html" />
     <Content Include="app\widgets\tfs-query-count\config.html" />
     <Content Include="app\widgets\tfs-query-count\tfs-query-count.css" />
     <Content Include="app\widgets\tfs-query-count\tfs-query-count.html" />
     <Content Include="app\widgets\tfs-release\release.css" />
     <Content Include="app\widgets\tfs-release\release.html" />
     <Content Include="app\widgets\tfs-release\config.html" />
+    <Content Include="assets\material-desing-icons\iconfont\material-icons.css" />
+    <Content Include="assets\material-desing-icons\iconfont\MaterialIcons-Regular.svg" />
     <Content Include="index.html" />
   </ItemGroup>
   <ItemGroup>
@@ -76,10 +81,13 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="%40dev-types\angular-css\index.d.ts" />
+    <TypeScriptCompile Include="%40dev-types\cast\index.d.ts" />
     <TypeScriptCompile Include="%40dev-types\moment\index.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\core\add-widget-controller.ts" />
     <TypeScriptCompile Include="app\core\global-config-controller.ts" />
+    <TypeScriptCompile Include="app\core\googlecast-receiver.ts" />
+    <TypeScriptCompile Include="app\core\googlecast-sender.ts" />
     <TypeScriptCompile Include="app\models\widgets.ts" />
     <TypeScriptCompile Include="app\resources\github\models.ts" />
     <TypeScriptCompile Include="app\resources\github\resources.ts" />
@@ -104,6 +112,9 @@
     <TypeScriptCompile Include="app\widgets\tfs-build\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\directive.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-chart\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-chart\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-query-chart\tfs-query-chart.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-count\tfs-query-count.ts" />
@@ -128,8 +139,16 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\material-desing-icons\iconfont\codepoints" />
+    <Content Include="assets\material-desing-icons\iconfont\MaterialIcons-Regular.eot" />
+    <Content Include="assets\material-desing-icons\iconfont\MaterialIcons-Regular.ijmap" />
+    <Content Include="assets\material-desing-icons\iconfont\MaterialIcons-Regular.ttf" />
+    <Content Include="assets\material-desing-icons\iconfont\MaterialIcons-Regular.woff" />
+    <Content Include="assets\material-desing-icons\iconfont\MaterialIcons-Regular.woff2" />
+    <Content Include="assets\material-desing-icons\iconfont\README.md" />
     <None Include="Properties\PublishProfiles\github-pages.pubxml" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
