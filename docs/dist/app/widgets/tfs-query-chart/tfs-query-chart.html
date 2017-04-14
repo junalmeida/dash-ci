@@ -1,0 +1,8 @@
+﻿<md-button title="Configure" class="configure-widget md-icon-button md-mini" ng-show="editable" ng-click="ctrl.config()">
+    <md-icon>settings</md-icon>
+</md-button>
+<div ng-class="ctrl.colorClass" class="content">
+    <div class="header" ng-if="data.header">{{data.title}}</div>
+    <p class="center" style="font-size: {{ctrl.fontSize}}px; line-height: {{ctrl.lineSize}}px;" ng-if="!ctrl.queryValues || ctrl.total == 0">{{ ctrl.total == null ? '?' : ctrl.total}}</p>
+    <canvas ng-show="ctrl.total != 0 && ctrl.queryValues && ctrl.queryValues.length > 1" class="piechart" width="{{ctrl.width}}" height="{{ctrl.height}}"></canvas>
+</div>

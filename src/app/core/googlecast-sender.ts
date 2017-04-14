@@ -1,4 +1,4 @@
-﻿namespace DashCI {
+namespace DashCI {
     export class GoogleCastSender {
         private script = '//www.gstatic.com/cv/js/sender/v1/cast_sender.js';
         private applicationID = 'E57E663D';

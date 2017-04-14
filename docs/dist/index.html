@@ -2,9 +2,9 @@
 <html ng-app="dashboard" ng-strict-di>
 <head>
     <title>Dash-CI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet" type="text/css" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" type="text/css" />-->
     <link rel="stylesheet" href="node_modules/angular-widget-grid/angular-widget-grid.css" />
     <link rel="stylesheet" href="node_modules/angular-material/angular-material.min.css" />
@@ -21,11 +21,11 @@
     <script type="text/javascript" src="app.js"></script>
 </head>
 <body ng-controller="MainController as main" ng-cloak>
-    <md-nav-bar md-selected-nav-item="main.selectedPageId" nav-bar-aria-label="navigation links" ng-init="main.selectedPageId = main.options.pages[0].id">
+    <md-nav-bar ng-if="!main.isGoogleCast" md-selected-nav-item="main.selectedPageId" nav-bar-aria-label="navigation links" ng-init="main.selectedPageId = main.options.pages[0].id">
         <md-nav-item ng-repeat="page in main.options.pages" md-nav-click="main.Go(page)" name="{{page.id}}" value="{{page.id}}">{{page.name}}</md-nav-item>
         <section class="config">
             <span flex> </span>
-            <md-button ng-click="main.toggleEditable()" title="{{main.editable ? 'Concluir' : 'Editar'}}" class="md-icon-button" ng-class="{ mdPrimary: main.editable }" aria-label="Edit dashboard page">
+            <md-button ng-click="main.toggleEditable()" title="{{main.editable ? 'Done' : 'Customize'}}" class="md-icon-button" ng-class="{ mdPrimary: main.editable }" aria-label="Edit dashboard page">
                 <md-icon ng-if="!main.editable">mode_edit</md-icon>
                 <md-icon ng-if="main.editable">check_circle</md-icon>
             </md-button>
@@ -44,6 +44,12 @@
                        ng-click="main.globalConfigDialog()">
                 <md-icon>settings</md-icon>
             </md-button>
+
+            <md-button title="Cast" class="md-icon-button" ng-if="main.canCast"
+                       ng-click="main.toggleCast()">
+                <md-icon>{{main.castStatus}}</md-icon>
+            </md-button>
+
         </section>
     </md-nav-bar>
     <wg-grid columns="{{main.options.columns}}" rows="{{main.options.rows}}" options="main.gridOptions" class="grid" id="grid">
@@ -56,6 +62,7 @@
             </div>
         </wg-widget>
     </wg-grid>
-    <div ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}}</div>
+    <div ng-if="!main.isGoogleCast" ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}}</div>
+    <div ng-if="main.isGoogleCast" class="grid-dimensions">Google Cast Mode</div>
 </body>
 </html>

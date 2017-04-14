@@ -1,4 +1,3 @@
-﻿
 namespace DashCI {
     export class GoogleCastReceiver {
         public static Cast = <any>null;
