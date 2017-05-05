@@ -14,7 +14,8 @@
     "angular-css": "~1.0.8",
     "angular-resource": "~1.6.2",
     "jquery": "~3.1.1",
-    "moment": "~2.17.1"
+    "moment": "~2.17.1",
+    "multiplexjs": "~1.0.0"
   },
   "scripts": { "start": "http-server -a 127.0.0.1 -p 8080" },
   "devDependencies": {

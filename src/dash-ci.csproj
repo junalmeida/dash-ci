@@ -75,12 +75,15 @@
     <Content Include="node_modules\angular\angular.min.js" />
     <Content Include="node_modules\jquery\dist\jquery.min.js" />
     <Content Include="node_modules\moment\min\moment.min.js" />
+    <Content Include="node_modules\multiplexjs\build\multiplex.js" />
+    <Content Include="node_modules\multiplexjs\build\multiplex.min.js" />
     <Content Include="package.json" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="%40dev-types\angular-css\index.d.ts" />
     <TypeScriptCompile Include="%40dev-types\cast\index.d.ts" />
     <TypeScriptCompile Include="%40dev-types\moment\index.d.ts" />
+    <TypeScriptCompile Include="%40dev-types\multiplex\index.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\core\add-widget-controller.ts" />
     <TypeScriptCompile Include="app\core\global-config-controller.ts" />
