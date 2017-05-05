@@ -20,7 +20,7 @@ namespace DashCI.Widgets.TfsRelease {
                 return;
             res.project_list().$promise
                 .then((result: Resources.Tfs.IProjectResult) => {
-                    this.projects = result.value;
+                    this.projects = mx(result.value).orderBy(x=> x.name).toArray();
                 })
                 .catch((reason) => {
                     console.error(reason);
