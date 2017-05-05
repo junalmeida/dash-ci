@@ -20,7 +20,7 @@ namespace DashCI.Widgets.GitlabIssues {
 
             res.project_list().$promise
                 .then((result: Resources.Gitlab.IProject[]) => {
-                    this.projects = result;
+                    this.projects = mx(result).orderBy(x => x.name_with_namespace).toArray();
                 })
                 .catch((reason) => {
                     console.error(reason);

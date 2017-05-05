@@ -20,7 +20,7 @@ namespace DashCI.Widgets.TfsBuildGraph {
                 return;
             res.project_list().$promise
                 .then((result: Resources.Tfs.IProjectResult) => {
-                    this.projects = result.value;
+                    this.projects = mx(result.value).orderBy(x => x.name).toArray();
                 })
                 .catch((reason) => {
                     console.error(reason);
@@ -39,7 +39,7 @@ namespace DashCI.Widgets.TfsBuildGraph {
                 return;
             res.build_definition_list({ project: this.vm.project }).$promise
                 .then((result: Resources.Tfs.IBuildDefinitionResult) => {
-                    this.builds = result.value;
+                    this.builds = mx(result.value).orderBy(x => x.name).toArray();
                 })
                 .catch((reason) => {
                     console.error(reason);

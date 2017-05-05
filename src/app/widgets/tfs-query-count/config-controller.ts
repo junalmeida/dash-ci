@@ -20,7 +20,7 @@
                 return;
             res.project_list().$promise
                 .then((result: Resources.Tfs.IProjectResult) => {
-                    this.projects = result.value;
+                    this.projects = mx(result.value).orderBy(x => x.name).toArray();
                 })
                 .catch((reason) => {
                     console.error(reason);
@@ -44,9 +44,11 @@
             var q2 = res.query_list({ project: this.vm.project, folder: "My Queries" }).$promise;
             this.$q.all([q1, q2])
                 .then((result) => {
-                    this.queries = [];
-                    angular.forEach(result[0].children || result[0].value, (item) => this.queries.push(item));
-                    angular.forEach(result[1].children || result[1].value, (item) => this.queries.push(item));
+                    var q = <DashCI.Resources.Tfs.IQuery[]>[];
+                    angular.forEach(result[0].children || result[0].value, (item) => q.push(item));
+                    angular.forEach(result[1].children || result[1].value, (item) => q.push(item));
+
+                    this.queries = mx(q).orderBy(x => x.name).toArray();
                 }).catch((reason) => {
                     console.error(reason);
                     this.queries = [];

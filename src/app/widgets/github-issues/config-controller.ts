@@ -36,7 +36,7 @@ namespace DashCI.Widgets.GithubIssues {
                 return;
             res.repository_list().$promise
                 .then((result: Resources.Github.IRepository[]) => {
-                    this.repositories = result;
+                    this.repositories = mx(result).orderBy(x=> x.full_name).toArray();
                 })
                 .catch((reason) => {
                     console.error(reason);
