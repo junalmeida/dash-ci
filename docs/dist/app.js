@@ -254,7 +254,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result.value;
+                        _this.projects = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
