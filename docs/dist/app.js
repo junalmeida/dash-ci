@@ -269,7 +269,7 @@ var DashCI;
                         return;
                     res.release_definition_list({ project: this.vm.project }).$promise
                         .then(function (result) {
-                        _this.releases = result.value;
+                        _this.releases = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -586,7 +586,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result.value;
+                        _this.projects = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -603,9 +603,10 @@ var DashCI;
                     var q2 = res.query_list({ project: this.vm.project, folder: "My Queries" }).$promise;
                     this.$q.all([q1, q2])
                         .then(function (result) {
-                        _this.queries = [];
-                        angular.forEach(result[0].children || result[0].value, function (item) { return _this.queries.push(item); });
-                        angular.forEach(result[1].children || result[1].value, function (item) { return _this.queries.push(item); });
+                        var q = [];
+                        angular.forEach(result[0].children || result[0].value, function (item) { return q.push(item); });
+                        angular.forEach(result[1].children || result[1].value, function (item) { return q.push(item); });
+                        _this.queries = mx(q).orderBy(function (x) { return x.name; }).toArray();
                     }).catch(function (reason) {
                         console.error(reason);
                         _this.queries = [];
@@ -796,7 +797,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result.value;
+                        _this.projects = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -817,9 +818,10 @@ var DashCI;
                     var q2 = res.query_list({ project: this.vm.project, folder: "My Queries" }).$promise;
                     this.$q.all([q1, q2])
                         .then(function (result) {
-                        _this.queries = [];
-                        angular.forEach(result[0].children || result[0].value, function (item) { return _this.queries.push(item); });
-                        angular.forEach(result[1].children || result[1].value, function (item) { return _this.queries.push(item); });
+                        var q = [];
+                        angular.forEach(result[0].children || result[0].value, function (item) { return q.push(item); });
+                        angular.forEach(result[1].children || result[1].value, function (item) { return q.push(item); });
+                        _this.queries = mx(q).orderBy(function (x) { return x.name; }).toArray();
                     }).catch(function (reason) {
                         console.error(reason);
                         _this.queries = [];
@@ -833,8 +835,7 @@ var DashCI;
                     res.team_list({ project: this.vm.project })
                         .$promise
                         .then(function (result) {
-                        _this.teams = [];
-                        angular.forEach(result.value, function (item) { return _this.teams.push(item); });
+                        _this.teams = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -1185,7 +1186,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result.value;
+                        _this.projects = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -1200,7 +1201,7 @@ var DashCI;
                         return;
                     res.build_definition_list({ project: this.vm.project }).$promise
                         .then(function (result) {
-                        _this.builds = result.value;
+                        _this.builds = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -1370,7 +1371,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result.value;
+                        _this.projects = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -1385,7 +1386,7 @@ var DashCI;
                         return;
                     res.build_definition_list({ project: this.vm.project }).$promise
                         .then(function (result) {
-                        _this.builds = result.value;
+                        _this.builds = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -1746,7 +1747,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result;
+                        _this.projects = mx(result).orderBy(function (x) { return x.name_with_namespace; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -1942,7 +1943,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result;
+                        _this.projects = mx(result).orderBy(function (x) { return x.name_with_namespace; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -2172,7 +2173,7 @@ var DashCI;
                         return;
                     res.project_list().$promise
                         .then(function (result) {
-                        _this.projects = result;
+                        _this.projects = mx(result).orderBy(function (x) { return x.name_with_namespace; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
@@ -2381,7 +2382,7 @@ var DashCI;
                         return;
                     res.repository_list().$promise
                         .then(function (result) {
-                        _this.repositories = result;
+                        _this.repositories = mx(result).orderBy(function (x) { return x.full_name; }).toArray();
                     })
                         .catch(function (reason) {
                         console.error(reason);
