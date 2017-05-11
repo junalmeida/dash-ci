@@ -1,5 +1,14 @@
 ﻿namespace DashCI.Widgets.TfsBuildGraph
 {
+    export interface ITfsBuildGraphData extends Models.IWidgetData {
+        project?: string;
+        poolInterval?: number;
+        count?: number;
+        build?: number;
+        wildcardBuild?: boolean;
+        buildName?: string;
+    }
+
     export class TfsBuildGraphController implements ng.IController {
         public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
 
@@ -96,50 +105,73 @@
 
 
         private update() {
-            if (!this.data.project || !this.data.build)
+            if (!this.data.project || (!this.data.wildcardBuild && !this.data.build) || (this.data.wildcardBuild && !this.data.buildName))
                 return;
             var res = this.tfsResources();
             if (!res)
                 return;
 
             console.log("start request: " + this.data.id + "; " + this.data.title);
-            res.recent_builds({
-                project: this.data.project,
-                build: this.data.build,
-                count: 40 
-            }).$promise.then((result) => {
-                console.log("end request: " + this.data.id + "; " + this.data.title);
-                var builds = result.value.reverse();
-                var maxDuration = 1; 
-                angular.forEach(builds, (item) => {
-                    if (item.finishTime) {
-                        var finishTime = moment(item.finishTime);
-                        var startTime = moment(item.startTime);
-                            
-                        
-                        item.duration = finishTime.diff(startTime, 'seconds');
-                        if (maxDuration < item.duration)
-                            maxDuration = item.duration;
-                    }
-                });
 
-                var width = (100 / builds.length);
-                angular.forEach(builds, (item, i) => {
-                    var height = Math.round((100 * item.duration) / maxDuration);
-                    if (height < 1) height = 1;
-                    item.css = {
-                        height: height.toString() + "%",
-                        width: width.toFixed(2) + "%",
-                        left: (width * i).toFixed(2) + "%"
-                    };
-                });
+            var doQueryBuild = (builds: number|string) => {
 
-                this.builds = builds;
-                this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
-            }).catch((reason) => {
-                this.builds = [];
-                console.error(reason);
-            });
+                res.recent_builds({
+                    project: this.data.project,
+                    build: builds,
+                    count: 40
+                }).$promise.then((result) => {
+                    console.log("end request: " + this.data.id + "; " + this.data.title);
+                    var builds = result.value.reverse();
+                    var maxDuration = 1;
+                    angular.forEach(builds, (item) => {
+                        if (item.finishTime) {
+                            var finishTime = moment(item.finishTime);
+                            var startTime = moment(item.startTime);
+
+
+                            item.duration = finishTime.diff(startTime, 'seconds');
+                            if (maxDuration < item.duration)
+                                maxDuration = item.duration;
+                        }
+                    });
+
+                    var width = (100 / builds.length);
+                    angular.forEach(builds, (item, i) => {
+                        var height = Math.round((100 * item.duration) / maxDuration);
+                        if (height < 3) height = 3;
+                        item.css = {
+                            height: height.toString() + "%",
+                            width: width.toFixed(2) + "%",
+                            left: (width * i).toFixed(2) + "%"
+                        };
+                    });
+
+                    this.builds = builds;
+                    this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
+                }).catch((reason: any) => {
+                    this.builds = [];
+                    console.error(reason);
+                });
+            };
+
+
+
+            if (this.data.wildcardBuild) {
+                res.build_definition_list({
+                    project: this.data.project,
+                    name: this.data.buildName
+                }).$promise.then((build: Resources.Tfs.IBuildDefinitionResult) => {
+
+                    var buildIds = mx(build.value).select(x => x.id).toArray().join(",");
+                    doQueryBuild(buildIds);
+
+                }).catch((reason:any) => {
+                    this.builds = [];
+                    console.error(reason);
+                });
+            }
+            else
+                doQueryBuild(this.data.build);
         }
 
     }

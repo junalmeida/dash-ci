@@ -43,7 +43,16 @@
                     </md-input-container>
                 </div>
                 <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="80">
+                    <md-input-container flex="30">
+                        <md-checkbox ng-model="ctrl.vm.wildcardBuild" aria-label="Wildcard Build">
+                            Wildcard Build?
+                        </md-checkbox>
+                    </md-input-container>
+                    <md-input-container flex="70" ng-if="ctrl.vm.wildcardBuild">
+                        <label>Build:</label>
+                        <input ng-model="ctrl.vm.buildName" placeholder="XYZ-*" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="70" ng-if="!ctrl.vm.wildcardBuild">
                         <label>Build:</label>
                         <md-select ng-model="ctrl.vm.build" placeholder="Select a build definition">
                             <md-option ng-value="opt.id" ng-repeat="opt in ctrl.builds">{{ opt.name }}</md-option>

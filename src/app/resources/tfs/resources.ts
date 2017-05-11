@@ -6,7 +6,7 @@
         query_list(param: { project: string, folder: string }): IQueryResult
         run_query(param: { project: string; team?: string, queryId: string }): IRunQueryResult;
         latest_build(param: { project: string; build: number|string }): IBuildResult;
-        recent_builds(param: { project: string; build: number, count: number }): IBuildResult;
+        recent_builds(param: { project: string; build: number|string, count: number }): IBuildResult;
         build_definition_list(param: { project: string; name: string }): IBuildDefinitionResult;
 
         release_definition_list(param: { project: string; }): IReleaseDefinitionListResult;

@@ -127,7 +127,7 @@
         public hideAvatar: boolean;
 
         private update() {
-            if (!this.data.project || !this.data.build)
+            if (!this.data.project || (!this.data.wildcardBuild && !this.data.build) || (this.data.wildcardBuild && !this.data.buildName))
                 return;
             var res = this.tfsResources();
             if (!res)

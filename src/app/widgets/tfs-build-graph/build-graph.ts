@@ -26,12 +26,5 @@
     }
 
 
-    export interface ITfsBuildGraphData extends Models.IWidgetData {
-        project?: string;
-        poolInterval?: number;
-        count?: number;
-        build?: number;
-    }
-
     DashCI.app.directive("tfsBuildGraph", TfsBuildGraphDirective.create());
 }
