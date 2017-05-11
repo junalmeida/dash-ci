@@ -3,6 +3,8 @@
         project?: string;
         poolInterval?: number;
         build?: number;
+        wildcardBuild?: boolean;
+        buildName?: string;
     }
 
 
@@ -133,61 +135,90 @@
 
 
             console.log("start request: " + this.data.id + "; " + this.data.title);
-            res.latest_build({
-                project: this.data.project,
-                build: this.data.build
-            }).$promise.then((build: Resources.Tfs.IBuildResult) => {
-                console.log("end request: " + this.data.id + "; " + this.data.title);
-                var new_build: Resources.Tfs.IBuild = null;
 
-                if (build.value.length >= 1)
-                    new_build = build.value[0];
 
-                this.latest = new_build;
-                this.latest.sourceBranch = this.latest.sourceBranch.replace("refs/heads/", ""); //is it right?
-                
-                if (this.latest && this.latest.status) {
-                    switch (this.latest.status) {
-                        case "notStarted":
-                        case "postponed":
-                        case "none":
-                            this.icon = "pause_circle_filled"; break;
-                        case "inProgress":
-                            this.icon = "play_circle_filled"; break;
-                        case "cancelling":
-                        case "stopped":
-                            this.icon = "remove_circle"; break;
-                        case "completed":
-                            switch (this.latest.result) {
-                                case "partiallySucceeded":
-                                case "succeeded":
-                                    this.icon = "check"; break;
-                                case "failed":
-                                    this.icon = "cancel"; break;
-                                case "canceled":
-                                    this.icon = "remove_circle"; break;
-                                case "default":
-                                    this.icon = "help"; break;
-                            }
-                            break;
-                        case "default":
-                            this.icon = "help"; break;
+
+            var doQueryBuild = (builds: number|string) => {
+
+
+                res.latest_build({
+                    project: this.data.project,
+                    build: builds
+                }).$promise.then((build: Resources.Tfs.IBuildResult) => {
+                    console.log("end request: " + this.data.id + "; " + this.data.title);
+                    var new_build: Resources.Tfs.IBuild = null;
+
+                    if (build.value.length >= 1)
+                        new_build = build.value[0];
+
+                    this.latest = new_build;
+                    if (this.latest) {
+                        var branchName = this.latest.sourceBranch.split("/"); //is it right?
+                        this.latest.sourceBranch = mx(branchName).last();
                     }
 
-                }
-                else
-                    this.icon = "help";
+                    if (this.latest && this.latest.status) {
+                        switch (this.latest.status) {
+                            case "notStarted":
+                            case "postponed":
+                            case "none":
+                                this.icon = "pause_circle_filled"; break;
+                            case "inProgress":
+                                this.icon = "play_circle_filled"; break;
+                            case "cancelling":
+                            case "stopped":
+                                this.icon = "remove_circle"; break;
+                            case "completed":
+                                switch (this.latest.result) {
+                                    case "partiallySucceeded":
+                                    case "succeeded":
+                                        this.icon = "check"; break;
+                                    case "failed":
+                                        this.icon = "cancel"; break;
+                                    case "canceled":
+                                        this.icon = "remove_circle"; break;
+                                    case "default":
+                                        this.icon = "help"; break;
+                                }
+                                break;
+                            case "default":
+                                this.icon = "help"; break;
+                        }
 
-                //var p = this.$scope.$element.find("p");
+                    }
+                    else
+                        this.icon = "help";
 
-                //p.addClass('changed');
-                //this.$timeout(() => p.removeClass('changed'), 1000);
-                this.resizeWidget();
-            }).catch((reason) => {
-                this.latest = null;
-                console.error(reason);
-                this.resizeWidget();
-            });
+                    //var p = this.$scope.$element.find("p");
+
+                    //p.addClass('changed');
+                    //this.$timeout(() => p.removeClass('changed'), 1000);
+                    this.resizeWidget();
+                }).catch((reason) => {
+                    this.latest = null;
+                    console.error(reason);
+                    this.resizeWidget();
+                });
+            };
+
+
+            if (this.data.wildcardBuild) {
+                res.build_definition_list({
+                    project: this.data.project,
+                    name: this.data.buildName
+                }).$promise.then((build: Resources.Tfs.IBuildDefinitionResult) => {
+
+                    var buildIds = mx(build.value).select(x => x.id).toArray().join(",");
+                    doQueryBuild(buildIds);
+
+                }).catch((reason) => {
+                    this.latest = null;
+                    console.error(reason);
+                    this.resizeWidget();
+                });
+            }
+            else
+                doQueryBuild(this.data.build);
         }
 
 

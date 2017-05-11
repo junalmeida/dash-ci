@@ -37,11 +37,11 @@ namespace DashCI.Widgets.TfsBuild {
             var res = this.tfsResources();
             if (!res || !this.vm.project)
                 return;
-            res.build_definition_list({ project: this.vm.project }).$promise
+            res.build_definition_list({ project: this.vm.project, name: "*" }).$promise
                 .then((result: Resources.Tfs.IBuildDefinitionResult) => {
                     this.builds = mx(result.value).orderBy(x => x.name).toArray();
                 })
-                .catch((reason) => {
+                .catch((reason:any) => {
                     console.error(reason);
                     this.builds = [];
                 });
