@@ -1,38 +1,50 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Windows.Forms;
 using TfsOnPremiseNtlm.Properties;
+using Swf = System.Windows.Forms;
 
 namespace TfsOnPremiseNtlm
 {
-    public class MyApplicationContext : ApplicationContext
+    public class MyApplicationContext : Swf.ApplicationContext
     {
-        private NotifyIcon trayIcon;
+        private Swf.NotifyIcon trayIconSwf;
 
         public MyApplicationContext()
         {
             // Initialize Tray Icon
-            trayIcon = new NotifyIcon()
+            TraySwf();
+        }
+
+
+        private void TraySwf()
+        {
+            trayIconSwf = new Swf.NotifyIcon()
             {
                 Icon = Resources.PerfCenterCpl,
                 Text = Program.Title,
-                ContextMenu = new ContextMenu(new MenuItem[] {
-                    new MenuItem("Open", Open) { DefaultItem = true },
-                    new MenuItem("Exit", Exit)
+                ContextMenu = new Swf.ContextMenu(new Swf.MenuItem[] {
+                    new Swf.MenuItem("Open", Open) { DefaultItem = true },
+                    new Swf.MenuItem("Exit", Exit)
                 }),
                 Visible = true
             };
-            trayIcon.DoubleClick += Open;
+            trayIconSwf.DoubleClick += Open;
+            trayIconSwf.Visible = false;
+            Swf.Application.DoEvents();
+            trayIconSwf.Visible = true;
         }
 
         void Exit(object sender, EventArgs e)
         {
             // Hide tray icon, otherwise it will remain shown until user mouses over it
-            trayIcon.Visible = false;
+            if (trayIconSwf != null)
+                trayIconSwf.Visible = false;
+
             if (Program.server != null)
                 Program.server.Dispose();
-            Application.Exit();
+            Swf.Application.Exit();
         }
+
         void Open(object sender, EventArgs e)
         {
             Process.Start(new ProcessStartInfo()
