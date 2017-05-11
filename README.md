@@ -15,6 +15,7 @@ To run online, goto http://junalmeida.github.io/dash-ci/dist
 
 To run from source, download, extract and run `npm install` and `npm start`.
 
+You can also use the prepared package at https://github.com/junalmeida/dash-ci/releases
 
 Dash-Ci does not need a back-end. It uses browser local storage to save settings and service API's, but you need a server to serve static files since CORS does not allow XHR requests to local files.
 
@@ -29,6 +30,9 @@ Run online and click at the edit button to add or configure global options.
 
 If this is your first usage, you need to set gitlab and/or tfs host and private access key. 
 
+If using TFS 2015 (that uses only NTLM), use the tfs-onpremises-ntlm executable. Use the tray icon to open the client. To run on linux, set ntlm credentials at config and run the executable as root.
+
+
 ### Widgets 
 
 1. **Label:**  A simple label to create semantic areas at your dashboard.
@@ -37,13 +41,14 @@ If this is your first usage, you need to set gitlab and/or tfs host and private 
 3. **TFS - Build:** Shows status of latest build definition run from a tfs project.
 4. **TFS - Build Graph:** Shows status with a graph of N build runs in a row from a tfs project.
 5. **TFS - Query Count:** Runs a saved query from tfs and show the items count. Useful to show open bugs, issues, etc.
-6. **TFS - Releases:** Shows status of latest release definition run from a tfs project.
+6. **TFS - Query Chart:** Runs a saved query from tfs and show the items count. Useful to show open bugs, issues, etc.
+7. **TFS - Releases:** Shows status of latest release definition run from a tfs project.
 
-7. **Gitlab - Pipeline:** Shows status of latest pipeline run from a gitlab project.
-8. **Gitlab - Pipeline Graph:** Shows status with a graph of N pipeline runs in a row from a gitlab project.
-9. **Gitlab - Issue Query:** Counts issues at gitlab by group or project, filtering by label and state.
+8. **Gitlab - Pipeline:** Shows status of latest pipeline run from a gitlab project.
+9. **Gitlab - Pipeline Graph:** Shows status with a graph of N pipeline runs in a row from a gitlab project.
+10. **Gitlab - Issue Query:** Counts issues at gitlab by group or project, filtering by label and state.
 
-10. **Github - Issue Query:** Counts issues at github by group or project, filtering by label and state.
+11. **Github - Issue Query:** Counts issues at github by group or project, filtering by label and state.
 
 ### Feedback
 

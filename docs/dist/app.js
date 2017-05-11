@@ -1199,7 +1199,7 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res || !this.vm.project)
                         return;
-                    res.build_definition_list({ project: this.vm.project }).$promise
+                    res.build_definition_list({ project: this.vm.project, name: "*" }).$promise
                         .then(function (result) {
                         _this.builds = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
@@ -1299,46 +1299,62 @@ var DashCI;
                 };
                 TfsBuildGraphController.prototype.update = function () {
                     var _this = this;
-                    if (!this.data.project || !this.data.build)
+                    if (!this.data.project || (!this.data.wildcardBuild && !this.data.build) || (this.data.wildcardBuild && !this.data.buildName))
                         return;
                     var res = this.tfsResources();
                     if (!res)
                         return;
                     console.log("start request: " + this.data.id + "; " + this.data.title);
-                    res.recent_builds({
-                        project: this.data.project,
-                        build: this.data.build,
-                        count: 40
-                    }).$promise.then(function (result) {
-                        console.log("end request: " + _this.data.id + "; " + _this.data.title);
-                        var builds = result.value.reverse();
-                        var maxDuration = 1;
-                        angular.forEach(builds, function (item) {
-                            if (item.finishTime) {
-                                var finishTime = moment(item.finishTime);
-                                var startTime = moment(item.startTime);
-                                item.duration = finishTime.diff(startTime, 'seconds');
-                                if (maxDuration < item.duration)
-                                    maxDuration = item.duration;
-                            }
+                    var doQueryBuild = function (builds) {
+                        res.recent_builds({
+                            project: _this.data.project,
+                            build: builds,
+                            count: 40
+                        }).$promise.then(function (result) {
+                            console.log("end request: " + _this.data.id + "; " + _this.data.title);
+                            var builds = result.value.reverse();
+                            var maxDuration = 1;
+                            angular.forEach(builds, function (item) {
+                                if (item.finishTime) {
+                                    var finishTime = moment(item.finishTime);
+                                    var startTime = moment(item.startTime);
+                                    item.duration = finishTime.diff(startTime, 'seconds');
+                                    if (maxDuration < item.duration)
+                                        maxDuration = item.duration;
+                                }
+                            });
+                            var width = (100 / builds.length);
+                            angular.forEach(builds, function (item, i) {
+                                var height = Math.round((100 * item.duration) / maxDuration);
+                                if (height < 3)
+                                    height = 3;
+                                item.css = {
+                                    height: height.toString() + "%",
+                                    width: width.toFixed(2) + "%",
+                                    left: (width * i).toFixed(2) + "%"
+                                };
+                            });
+                            _this.builds = builds;
+                            _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        }).catch(function (reason) {
+                            _this.builds = [];
+                            console.error(reason);
                         });
-                        var width = (100 / builds.length);
-                        angular.forEach(builds, function (item, i) {
-                            var height = Math.round((100 * item.duration) / maxDuration);
-                            if (height < 1)
-                                height = 1;
-                            item.css = {
-                                height: height.toString() + "%",
-                                width: width.toFixed(2) + "%",
-                                left: (width * i).toFixed(2) + "%"
-                            };
+                    };
+                    if (this.data.wildcardBuild) {
+                        res.build_definition_list({
+                            project: this.data.project,
+                            name: this.data.buildName
+                        }).$promise.then(function (build) {
+                            var buildIds = mx(build.value).select(function (x) { return x.id; }).toArray().join(",");
+                            doQueryBuild(buildIds);
+                        }).catch(function (reason) {
+                            _this.builds = [];
+                            console.error(reason);
                         });
-                        _this.builds = builds;
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
-                    }).catch(function (reason) {
-                        _this.builds = [];
-                        console.error(reason);
-                    });
+                    }
+                    else
+                        doQueryBuild(this.data.build);
                 };
                 return TfsBuildGraphController;
             }());
@@ -1384,7 +1400,7 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res || !this.vm.project)
                         return;
-                    res.build_definition_list({ project: this.vm.project }).$promise
+                    res.build_definition_list({ project: this.vm.project, name: "*" }).$promise
                         .then(function (result) {
                         _this.builds = mx(result.value).orderBy(function (x) { return x.name; }).toArray();
                     })
@@ -1499,69 +1515,89 @@ var DashCI;
                 };
                 TfsBuildController.prototype.update = function () {
                     var _this = this;
-                    if (!this.data.project || !this.data.build)
+                    if (!this.data.project || (!this.data.wildcardBuild && !this.data.build) || (this.data.wildcardBuild && !this.data.buildName))
                         return;
                     var res = this.tfsResources();
                     if (!res)
                         return;
                     console.log("start request: " + this.data.id + "; " + this.data.title);
-                    res.latest_build({
-                        project: this.data.project,
-                        build: this.data.build
-                    }).$promise.then(function (build) {
-                        console.log("end request: " + _this.data.id + "; " + _this.data.title);
-                        var new_build = null;
-                        if (build.value.length >= 1)
-                            new_build = build.value[0];
-                        _this.latest = new_build;
-                        _this.latest.sourceBranch = _this.latest.sourceBranch.replace("refs/heads/", ""); //is it right?
-                        if (_this.latest && _this.latest.status) {
-                            switch (_this.latest.status) {
-                                case "notStarted":
-                                case "postponed":
-                                case "none":
-                                    _this.icon = "pause_circle_filled";
-                                    break;
-                                case "inProgress":
-                                    _this.icon = "play_circle_filled";
-                                    break;
-                                case "cancelling":
-                                case "stopped":
-                                    _this.icon = "remove_circle";
-                                    break;
-                                case "completed":
-                                    switch (_this.latest.result) {
-                                        case "partiallySucceeded":
-                                        case "succeeded":
-                                            _this.icon = "check";
-                                            break;
-                                        case "failed":
-                                            _this.icon = "cancel";
-                                            break;
-                                        case "canceled":
-                                            _this.icon = "remove_circle";
-                                            break;
-                                        case "default":
-                                            _this.icon = "help";
-                                            break;
-                                    }
-                                    break;
-                                case "default":
-                                    _this.icon = "help";
-                                    break;
+                    var doQueryBuild = function (builds) {
+                        res.latest_build({
+                            project: _this.data.project,
+                            build: builds
+                        }).$promise.then(function (build) {
+                            console.log("end request: " + _this.data.id + "; " + _this.data.title);
+                            var new_build = null;
+                            if (build.value.length >= 1)
+                                new_build = build.value[0];
+                            _this.latest = new_build;
+                            if (_this.latest) {
+                                var branchName = _this.latest.sourceBranch.split("/"); //is it right?
+                                _this.latest.sourceBranch = mx(branchName).last();
                             }
-                        }
-                        else
-                            _this.icon = "help";
-                        //var p = this.$scope.$element.find("p");
-                        //p.addClass('changed');
-                        //this.$timeout(() => p.removeClass('changed'), 1000);
-                        _this.resizeWidget();
-                    }).catch(function (reason) {
-                        _this.latest = null;
-                        console.error(reason);
-                        _this.resizeWidget();
-                    });
+                            if (_this.latest && _this.latest.status) {
+                                switch (_this.latest.status) {
+                                    case "notStarted":
+                                    case "postponed":
+                                    case "none":
+                                        _this.icon = "pause_circle_filled";
+                                        break;
+                                    case "inProgress":
+                                        _this.icon = "play_circle_filled";
+                                        break;
+                                    case "cancelling":
+                                    case "stopped":
+                                        _this.icon = "remove_circle";
+                                        break;
+                                    case "completed":
+                                        switch (_this.latest.result) {
+                                            case "partiallySucceeded":
+                                            case "succeeded":
+                                                _this.icon = "check";
+                                                break;
+                                            case "failed":
+                                                _this.icon = "cancel";
+                                                break;
+                                            case "canceled":
+                                                _this.icon = "remove_circle";
+                                                break;
+                                            case "default":
+                                                _this.icon = "help";
+                                                break;
+                                        }
+                                        break;
+                                    case "default":
+                                        _this.icon = "help";
+                                        break;
+                                }
+                            }
+                            else
+                                _this.icon = "help";
+                            //var p = this.$scope.$element.find("p");
+                            //p.addClass('changed');
+                            //this.$timeout(() => p.removeClass('changed'), 1000);
+                            _this.resizeWidget();
+                        }).catch(function (reason) {
+                            _this.latest = null;
+                            console.error(reason);
+                            _this.resizeWidget();
+                        });
+                    };
+                    if (this.data.wildcardBuild) {
+                        res.build_definition_list({
+                            project: this.data.project,
+                            name: this.data.buildName
+                        }).$promise.then(function (build) {
+                            var buildIds = mx(build.value).select(function (x) { return x.id; }).toArray().join(",");
+                            doQueryBuild(buildIds);
+                        }).catch(function (reason) {
+                            _this.latest = null;
+                            console.error(reason);
+                            _this.resizeWidget();
+                        });
+                    }
+                    else
+                        doQueryBuild(this.data.build);
                 };
                 TfsBuildController.prototype.resizeWidget = function () {
                     var _this = this;
@@ -2727,7 +2763,7 @@ var DashCI;
                         build_definition_list: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2",
+                            url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2&name=:name",
                             headers: headers,
                             cache: false,
                             withCredentials: withCredentials

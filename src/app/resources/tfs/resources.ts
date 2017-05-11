@@ -5,9 +5,9 @@
         team_list(param: { project: string }): ITeamResult
         query_list(param: { project: string, folder: string }): IQueryResult
         run_query(param: { project: string; team?: string, queryId: string }): IRunQueryResult;
-        latest_build(param: { project: string; build: number }): IBuildResult;
-        recent_builds(param: { project: string; build: number, count: number }): IBuildResult;
-        build_definition_list(param: { project: string; }): IBuildDefinitionResult;
+        latest_build(param: { project: string; build: number|string }): IBuildResult;
+        recent_builds(param: { project: string; build: number|string, count: number }): IBuildResult;
+        build_definition_list(param: { project: string; name: string }): IBuildDefinitionResult;
 
         release_definition_list(param: { project: string; }): IReleaseDefinitionListResult;
         latest_release_environments(param: { project: string; release: number }): IReleaseEnvironmentResult;
@@ -93,7 +93,7 @@
                     build_definition_list: <ng.resource.IActionDescriptor>{
                         method: 'GET',
                         isArray: false,
-                        url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2",
+                        url: globalOptions.tfs.host + "/:project/_apis/build/definitions?api-version=2.2&name=:name",
                         headers: headers,
                         cache: false,
                         withCredentials: withCredentials
