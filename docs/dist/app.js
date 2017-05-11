@@ -1275,7 +1275,7 @@ var DashCI;
                     this.$mdDialog.show({
                         controller: TfsBuildGraph.TfsBuildGraphConfigController,
                         controllerAs: "ctrl",
-                        templateUrl: 'app/widgets/Tfs-Build-graph/config.html',
+                        templateUrl: 'app/widgets/tfs-build-graph/config.html',
                         parent: angular.element(document.body),
                         //targetEvent: ev,
                         clickOutsideToClose: true,

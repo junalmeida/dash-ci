@@ -1,12 +1,12 @@
-﻿using Microsoft.Owin.FileSystems;
-using Microsoft.Owin.Hosting;
-using Microsoft.Owin.StaticFiles;
-using Owin;
-using System;
+﻿using System;
 using System.Configuration;
 using System.Net;
 using System.Web.Http;
 using System.Windows.Forms;
+using Microsoft.Owin.FileSystems;
+using Microsoft.Owin.Hosting;
+using Microsoft.Owin.StaticFiles;
+using Owin;
 
 namespace TfsOnPremiseNtlm
 {
@@ -54,7 +54,19 @@ namespace TfsOnPremiseNtlm
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot start the web server. Check static-files config parameter." + Environment.NewLine + ex.Message, Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
+                var msg = ex.Message;
+                var innerMsg = ex.InnerException != null ? ex.InnerException.Message : null;
+
+                msg = $@"Cannot start the web server. Check static-files config parameter.
+
+{msg}
+{innerMsg}";
+
+                if (IsRunningOnMono())
+                {
+                    Console.Error.WriteLine(ex.ToString());
+                }
+                MessageBox.Show(msg, Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
                 server = null;
             }
         }
@@ -82,5 +94,11 @@ namespace TfsOnPremiseNtlm
             EnableDirectoryBrowsing = false,
             FileSystem = new PhysicalFileSystem(ConfigurationManager.AppSettings["static-files"])
         };
+
+
+        public static bool IsRunningOnMono()
+        {
+            return Type.GetType("Mono.Runtime", false) != null;
+        }
     }
 }

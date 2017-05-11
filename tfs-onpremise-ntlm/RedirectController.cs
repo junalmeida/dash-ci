@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -17,11 +19,28 @@ namespace TfsOnPremiseNtlm
             url = url.Replace("http/", "http://");
             url = url.Replace("https/", "https://");
 
-            using (var client = new HttpClient(new HttpClientHandler()
+            var handler = new HttpClientHandler();
+
+            var username = ConfigurationManager.AppSettings["username"];
+            var password = ConfigurationManager.AppSettings["password"];
+            var domain = ConfigurationManager.AppSettings["domain"];
+            handler.UseDefaultCredentials = string.IsNullOrWhiteSpace(username);
+            if (!handler.UseDefaultCredentials)
             {
-                UseDefaultCredentials = true
-            }))
+
+                var credential = new NetworkCredential(username, password, domain);
+                var myCache = new CredentialCache();
+                myCache.Add(new Uri(url), "NTLM", credential);
+
+                // Create an HttpClientHandler to add some settings
+                handler.AllowAutoRedirect = true;
+                handler.Credentials = myCache;
+            }
+
+
+            using (var client = new HttpClient(handler))
             {
+                
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/json"));
