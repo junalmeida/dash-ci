@@ -143,6 +143,7 @@ namespace DashCI.Core {
             gitlab: null,
             github: [],
             circleci: [],
+            custom: [],
             pages: [{
                 id: "1",
                 name: "Dash-CI",

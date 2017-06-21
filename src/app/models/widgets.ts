@@ -12,14 +12,16 @@ namespace DashCI.Models {
         tfsBuildGraph = 8,
         githubIssues = 9,
         tfsRelease = 10,
-        tfsQueryChart = 11
+        tfsQueryChart = 11,
+        customCount = 12
     }
     export enum WidgetCategory {
         generic = 1,
         gitlab = 2,
         tfs = 3,
         github = 4,
-        circleci = 5
+        circleci = 5,
+        custom = 6
     }
 
     DashCI.app.constant("widgetcategories", <IEnumDescription<WidgetCategory>[]>[
@@ -38,6 +40,10 @@ namespace DashCI.Models {
         {
             value: WidgetCategory.github,
             desc: "Github Widgets"
+        },
+        {
+            value: WidgetCategory.custom,
+            desc: "Custom APIs"
         },
     ]);
 
@@ -118,6 +124,13 @@ namespace DashCI.Models {
             title: "TFS - Query Chart",
             desc: "Shows the count of saved querys count at a chart.",
             category: WidgetCategory.tfs
+        },
+        {
+            type: WidgetType.customCount,
+            directive: "custom-count",
+            title: "Custom API Count",
+            desc: "Shows the count of the result of a custom REST API.",
+            category: WidgetCategory.custom
         },
     ]);
 }

@@ -66,7 +66,6 @@ var DashCI;
     DashCI.EnumEx = EnumEx;
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Core;
@@ -90,7 +89,6 @@ var DashCI;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Core;
@@ -183,7 +181,6 @@ var DashCI;
         Core.GlobalConfigController = GlobalConfigController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var GoogleCastReceiver = (function () {
@@ -236,7 +233,6 @@ var DashCI;
     GoogleCastReceiver.Cast = null;
     DashCI.GoogleCastReceiver = GoogleCastReceiver;
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var GoogleCastSender = (function () {
@@ -369,7 +365,6 @@ var DashCI;
     DashCI.GoogleCastSender = GoogleCastSender;
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Core;
@@ -404,6 +399,7 @@ var DashCI;
                     gitlab: null,
                     github: [],
                     circleci: [],
+                    custom: [],
                     pages: [{
                             id: "1",
                             name: "Dash-CI",
@@ -549,7 +545,6 @@ var DashCI;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Models;
@@ -646,7 +641,6 @@ var DashCI;
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 /// <reference path="../app.ts" />
 var DashCI;
 (function (DashCI) {
@@ -656,7 +650,6 @@ var DashCI;
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Models;
@@ -674,6 +667,7 @@ var DashCI;
             WidgetType[WidgetType["githubIssues"] = 9] = "githubIssues";
             WidgetType[WidgetType["tfsRelease"] = 10] = "tfsRelease";
             WidgetType[WidgetType["tfsQueryChart"] = 11] = "tfsQueryChart";
+            WidgetType[WidgetType["customCount"] = 12] = "customCount";
         })(WidgetType = Models.WidgetType || (Models.WidgetType = {}));
         var WidgetCategory;
         (function (WidgetCategory) {
@@ -682,6 +676,7 @@ var DashCI;
             WidgetCategory[WidgetCategory["tfs"] = 3] = "tfs";
             WidgetCategory[WidgetCategory["github"] = 4] = "github";
             WidgetCategory[WidgetCategory["circleci"] = 5] = "circleci";
+            WidgetCategory[WidgetCategory["custom"] = 6] = "custom";
         })(WidgetCategory = Models.WidgetCategory || (Models.WidgetCategory = {}));
         DashCI.app.constant("widgetcategories", [
             {
@@ -699,6 +694,10 @@ var DashCI;
             {
                 value: WidgetCategory.github,
                 desc: "Github Widgets"
+            },
+            {
+                value: WidgetCategory.custom,
+                desc: "Custom APIs"
             },
         ]);
         DashCI.app.constant("widgets", [
@@ -778,11 +777,88 @@ var DashCI;
                 desc: "Shows the count of saved querys count at a chart.",
                 category: WidgetCategory.tfs
             },
+            {
+                type: WidgetType.customCount,
+                directive: "custom-count",
+                title: "Custom API Count",
+                desc: "Shows the count of the result of a custom REST API.",
+                category: WidgetCategory.custom
+            },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
-"use strict";
+var DashCI;
+(function (DashCI) {
+    var Resources;
+    (function (Resources) {
+        var Custom;
+        (function (Custom) {
+            DashCI.app.factory('customResources', ['$resource', 'globalOptions',
+                function ($resource, globalOptions) { return function (label) {
+                    if (!globalOptions || !globalOptions.custom || globalOptions.custom.length == 0)
+                        return null;
+                    var accounts = globalOptions.custom.filter(function (item) { return item.label == label; });
+                    if (!accounts || accounts.length != 1)
+                        return null;
+                    var headers = {
+                        "Authorization": null,
+                    };
+                    if (accounts[0].basicAuth)
+                        headers.Authorization = "Basic " + accounts[0].basicAuth; // btoa(accounts[0].username + ":" + accounts[0].privateToken);
+                    else
+                        delete headers.Authorization;
+                    var countParser = function (data, getHeaders, status) {
+                        if (status == 200) {
+                            data = angular.fromJson(data);
+                            var headers = getHeaders();
+                            var parameter = accounts[0].jsonCountToken;
+                            var parsedCount = parseInt(headers[parameter]);
+                            if (isNaN(parsedCount))
+                                parsedCount = parseInt(data[parameter]);
+                            if (isNaN(parsedCount)) {
+                                for (var node in data) {
+                                    parsedCount = parseInt(data[node][parameter]);
+                                    if (!isNaN(parsedCount))
+                                        break;
+                                }
+                            }
+                            if (isNaN(parsedCount)) {
+                                parsedCount = 0;
+                                //cannot access X-Total today, let's parse
+                                var links = headers.link.split('>');
+                                angular.forEach(links, function (item) {
+                                    var matches = item.match(/&page=(\d*)/);
+                                    if (matches && matches.length > 1) {
+                                        var page = Number(matches[1]);
+                                        if (page > parsedCount)
+                                            parsedCount = page;
+                                    }
+                                });
+                            }
+                            var ret = {
+                                count: parsedCount
+                            };
+                            return ret;
+                        }
+                        else
+                            return data;
+                    };
+                    var host = accounts[0].baseUrl;
+                    // Return the resource, include your custom actions
+                    return $resource(host, {}, {
+                        execute_count: {
+                            method: 'GET',
+                            isArray: false,
+                            url: host + ":route",
+                            headers: headers,
+                            cache: false,
+                            transformResponse: countParser
+                        },
+                    });
+                }; }]);
+        })(Custom = Resources.Custom || (Resources.Custom = {}));
+    })(Resources = DashCI.Resources || (DashCI.Resources = {}));
+})(DashCI || (DashCI = {}));
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -859,8 +935,6 @@ var DashCI;
         })(Github = Resources.Github || (Resources.Github = {}));
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -962,8 +1036,6 @@ var DashCI;
         })(Gitlab = Resources.Gitlab || (Resources.Gitlab = {}));
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -1083,7 +1155,6 @@ var DashCI;
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../models/widgets.ts" />
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1121,7 +1192,6 @@ var DashCI;
         DashCI.app.directive("widgetLoader", LoaderDirective.create());
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1152,7 +1222,6 @@ var DashCI;
         })(Clock = Widgets.Clock || (Widgets.Clock = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1220,7 +1289,190 @@ var DashCI;
         })(Clock = Widgets.Clock || (Widgets.Clock = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var CustomCount;
+        (function (CustomCount) {
+            var CustomCountConfigController = (function () {
+                function CustomCountConfigController($mdDialog, globalOptions, customResources, colors, intervals, vm) {
+                    this.$mdDialog = $mdDialog;
+                    this.globalOptions = globalOptions;
+                    this.customResources = customResources;
+                    this.colors = colors;
+                    this.intervals = intervals;
+                    this.vm = vm;
+                    this.init();
+                }
+                CustomCountConfigController.prototype.init = function () {
+                    var _this = this;
+                    this.labels = [];
+                    angular.forEach(this.globalOptions.custom, function (item) { return _this.labels.push(item.label); });
+                };
+                CustomCountConfigController.prototype.getAccountBaseUrl = function (label) {
+                    if (!this.globalOptions.custom)
+                        return null;
+                    var accounts = this.globalOptions.custom.filter(function (item) { return item.label == label; });
+                    if (!accounts || accounts.length == 0)
+                        return null;
+                    return accounts[0].baseUrl;
+                };
+                //public cancel() {
+                //    this.$mdDialog.cancel();
+                //}
+                CustomCountConfigController.prototype.ok = function () {
+                    this.$mdDialog.hide(true);
+                };
+                return CustomCountConfigController;
+            }());
+            CustomCountConfigController.$inject = ["$mdDialog", "globalOptions", "customResources", "colors", "intervals", "config"];
+            CustomCount.CustomCountConfigController = CustomCountConfigController;
+        })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var CustomCount;
+        (function (CustomCount) {
+            var CustomCountController = (function () {
+                function CustomCountController($scope, $q, $timeout, $interval, $mdDialog, customResources) {
+                    var _this = this;
+                    this.$scope = $scope;
+                    this.$q = $q;
+                    this.$timeout = $timeout;
+                    this.$interval = $interval;
+                    this.$mdDialog = $mdDialog;
+                    this.customResources = customResources;
+                    this.count = null;
+                    this.data = this.$scope.data;
+                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                    this.data.type = DashCI.Models.WidgetType.customCount;
+                    this.data.footer = false;
+                    this.data.header = true;
+                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
+                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
+                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
+                    this.init();
+                }
+                CustomCountController.prototype.finalize = function () {
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                };
+                CustomCountController.prototype.init = function () {
+                    this.data.title = this.data.title || "Count";
+                    this.data.color = this.data.color || "grey";
+                    //default values
+                    this.data.poolInterval = this.data.poolInterval || 10000;
+                    this.updateInterval();
+                    this.update();
+                };
+                CustomCountController.prototype.sizeFont = function (height) {
+                    var p = this.$scope.$element.find("p");
+                    var fontSize = Math.round(height / 1.3) + "px";
+                    var lineSize = Math.round((height) - 60) + "px";
+                    p.css('font-size', fontSize);
+                    p.css('line-height', lineSize);
+                };
+                CustomCountController.prototype.config = function () {
+                    var _this = this;
+                    this.$mdDialog.show({
+                        controller: CustomCount.CustomCountConfigController,
+                        controllerAs: "ctrl",
+                        templateUrl: 'app/widgets/custom-count/config.html',
+                        parent: angular.element(document.body),
+                        //targetEvent: ev,
+                        clickOutsideToClose: true,
+                        fullscreen: false,
+                        resolve: {
+                            config: function () {
+                                var deferred = _this.$q.defer();
+                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
+                                return deferred.promise;
+                            }
+                        }
+                    });
+                    //.then((ok) => this.createWidget(type));
+                };
+                CustomCountController.prototype.updateInterval = function () {
+                    var _this = this;
+                    if (this.handle)
+                        this.$interval.cancel(this.handle);
+                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.update();
+                };
+                CustomCountController.prototype.update = function () {
+                    var _this = this;
+                    if (!this.data.label && !this.data.route)
+                        return;
+                    var res = this.customResources(this.data.label);
+                    if (!res)
+                        return;
+                    res.execute_count({
+                        route: this.data.route
+                    }).$promise.then(function (newCount) {
+                        //var newCount = Math.round(Math.random() * 100);
+                        if (newCount.count != _this.count) {
+                            _this.count = newCount.count;
+                            var p = _this.$scope.$element.find("p");
+                            p.addClass('changed');
+                            _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
+                        }
+                        if (_this.data.lowerThan && !isNaN(_this.data.lowerThan.value) && _this.data.lowerThan.color) {
+                            if (_this.count < _this.data.lowerThan.value)
+                                _this.colorClass = _this.data.lowerThan.color;
+                        }
+                        if (_this.data.greaterThan && !isNaN(_this.data.greaterThan.value) && _this.data.greaterThan.color) {
+                            if (_this.count > _this.data.greaterThan.value)
+                                _this.colorClass = _this.data.greaterThan.color;
+                        }
+                    })
+                        .catch(function (reason) {
+                        _this.count = null;
+                        console.error(reason);
+                    });
+                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                };
+                return CustomCountController;
+            }());
+            CustomCountController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "customResources"];
+            CustomCount.CustomCountController = CustomCountController;
+        })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var CustomCount;
+        (function (CustomCount) {
+            var CustomCountDirective = (function () {
+                function CustomCountDirective() {
+                    this.restrict = "E";
+                    this.templateUrl = "app/widgets/custom-count/custom-count.html";
+                    this.replace = false;
+                    this.controller = CustomCount.CustomCountController;
+                    this.controllerAs = "ctrl";
+                    /* Binding css to directives */
+                    this.css = {
+                        href: "app/widgets/custom-count/custom-count.css",
+                        persist: true
+                    };
+                }
+                CustomCountDirective.create = function () {
+                    var directive = function () { return new CustomCountDirective(); };
+                    directive.$inject = [];
+                    return directive;
+                };
+                return CustomCountDirective;
+            }());
+            DashCI.app.directive("customCount", CustomCountDirective.create());
+        })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1272,7 +1524,6 @@ var DashCI;
         })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1390,7 +1641,6 @@ var DashCI;
         })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1421,7 +1671,6 @@ var DashCI;
         })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1472,7 +1721,6 @@ var DashCI;
         })(GitlabIssues = Widgets.GitlabIssues || (Widgets.GitlabIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1589,7 +1837,6 @@ var DashCI;
         })(GitlabIssues = Widgets.GitlabIssues || (Widgets.GitlabIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1620,7 +1867,6 @@ var DashCI;
         })(GitlabIssues = Widgets.GitlabIssues || (Widgets.GitlabIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1663,7 +1909,6 @@ var DashCI;
         })(GitlabPipeline = Widgets.GitlabPipeline || (Widgets.GitlabPipeline = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1819,7 +2064,6 @@ var DashCI;
         })(GitlabPipeline = Widgets.GitlabPipeline || (Widgets.GitlabPipeline = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1850,7 +2094,6 @@ var DashCI;
         })(GitlabPipeline = Widgets.GitlabPipeline || (Widgets.GitlabPipeline = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1893,7 +2136,6 @@ var DashCI;
         })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2015,7 +2257,6 @@ var DashCI;
         })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2046,7 +2287,6 @@ var DashCI;
         })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2073,7 +2313,6 @@ var DashCI;
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2134,7 +2373,6 @@ var DashCI;
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2165,7 +2403,6 @@ var DashCI;
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2224,7 +2461,6 @@ var DashCI;
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2412,7 +2648,6 @@ var DashCI;
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2443,7 +2678,6 @@ var DashCI;
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2474,7 +2708,6 @@ var DashCI;
         })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2533,7 +2766,6 @@ var DashCI;
         })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2675,7 +2907,6 @@ var DashCI;
         })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2770,7 +3001,6 @@ var DashCI;
         })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3003,7 +3233,6 @@ var DashCI;
         })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3034,7 +3263,6 @@ var DashCI;
         })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3095,7 +3323,6 @@ var DashCI;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3214,7 +3441,6 @@ var DashCI;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3245,7 +3471,6 @@ var DashCI;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3304,7 +3529,6 @@ var DashCI;
         })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3545,7 +3769,6 @@ var DashCI;
         })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
-"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3574,215 +3797,6 @@ var DashCI;
             }());
             DashCI.app.directive("tfsRelease", TfsReleaseDirective.create());
         })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
-    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
-})(DashCI || (DashCI = {}));
-"use strict";
-var DashCI;
-(function (DashCI) {
-    var Widgets;
-    (function (Widgets) {
-        var CustomCount;
-        (function (CustomCount) {
-            var CustomCountConfigController = (function () {
-                function CustomCountConfigController($scope, $mdDialog, $q, customResources, colors, intervals, vm) {
-                    this.$scope = $scope;
-                    this.$mdDialog = $mdDialog;
-                    this.$q = $q;
-                    this.customResources = customResources;
-                    this.colors = colors;
-                    this.intervals = intervals;
-                    this.vm = vm;
-                    this.init();
-                }
-                CustomCountConfigController.prototype.init = function () {
-                    var res = this.customResources();
-                    if (!res)
-                        return;
-                    //res.project_list().$promise
-                    //    .then((result: Resources.Custom.IProjectResult) => {
-                    //        this.projects = mx(result.value).orderBy(x => x.name).toArray();
-                    //    })
-                    //    .catch((reason) => {
-                    //        console.error(reason);
-                    //        this.projects = [];
-                    //    });
-                    //this.$scope.$watch(() => this.vm.project, () => this.getQueries());
-                };
-                CustomCountConfigController.prototype.getQueries = function () {
-                    var res = this.customResources();
-                    if (!res || !this.vm.project)
-                        return;
-                    //var q1 = res.query_list({ project: this.vm.project, folder: "Shared Queries" }).$promise;
-                    //var q2 = res.query_list({ project: this.vm.project, folder: "My Queries" }).$promise;
-                    //this.$q.all([q1, q2])
-                    //    .then((result) => {
-                    //        var q = <DashCI.Resources.Custom.IQuery[]>[];
-                    //        angular.forEach(result[0].children || result[0].value, (item) => q.push(item));
-                    //        angular.forEach(result[1].children || result[1].value, (item) => q.push(item));
-                    //        this.queries = mx(q).orderBy(x => x.name).toArray();
-                    //    }).catch((reason) => {
-                    //        console.error(reason);
-                    //        this.queries = [];
-                    //    });
-                };
-                CustomCountConfigController.prototype.ok = function () {
-                    this.$mdDialog.hide(true);
-                };
-                return CustomCountConfigController;
-            }());
-            CustomCountConfigController.$inject = ["$scope", "$mdDialog", "$q", "customResources", "colors", "intervals", "config"];
-            CustomCount.CustomCountConfigController = CustomCountConfigController;
-        })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
-    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
-})(DashCI || (DashCI = {}));
-"use strict";
-var DashCI;
-(function (DashCI) {
-    var Widgets;
-    (function (Widgets) {
-        var CustomCount;
-        (function (CustomCount) {
-            var CustomCountController = (function () {
-                function CustomCountController($scope, $q, $timeout, $interval, $mdDialog, customResources) {
-                    var _this = this;
-                    this.$scope = $scope;
-                    this.$q = $q;
-                    this.$timeout = $timeout;
-                    this.$interval = $interval;
-                    this.$mdDialog = $mdDialog;
-                    this.customResources = customResources;
-                    this.data = this.$scope.data;
-                    this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-                    this.data.type = DashCI.Models.WidgetType.CustomCount;
-                    this.data.footer = false;
-                    this.data.header = true;
-                    this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
-                    this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
-                    this.$scope.$on("$destroy", function () { return _this.finalize(); });
-                    this.init();
-                }
-                CustomCountController.prototype.finalize = function () {
-                    if (this.handle)
-                        this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
-                };
-                CustomCountController.prototype.init = function () {
-                    this.data.title = this.data.title || "Query";
-                    this.data.color = this.data.color || "grey";
-                    //default values
-                    this.data.queryId = this.data.queryId || "";
-                    this.data.poolInterval = this.data.poolInterval || 20000;
-                    this.updateInterval();
-                    this.update();
-                };
-                CustomCountController.prototype.sizeFont = function (altura) {
-                    var p = this.$scope.$element.find("p");
-                    var fontSize = Math.round(altura / 1.3) + "px";
-                    var lineSize = Math.round((altura) - 60) + "px";
-                    p.css('font-size', fontSize);
-                    p.css('line-height', lineSize);
-                    var img = this.$scope.$element.find(".avatar");
-                    var size = Math.round(altura - 32);
-                    img.width(size);
-                    img.height(size);
-                };
-                CustomCountController.prototype.config = function () {
-                    var _this = this;
-                    this.$mdDialog.show({
-                        controller: CustomCount.CustomCountConfigController,
-                        controllerAs: "ctrl",
-                        templateUrl: 'app/widgets/custom-count/config.html',
-                        parent: angular.element(document.body),
-                        //targetEvent: ev,
-                        clickOutsideToClose: true,
-                        fullscreen: false,
-                        resolve: {
-                            config: function () {
-                                var deferred = _this.$q.defer();
-                                _this.$timeout(function () { return deferred.resolve(_this.data); }, 1);
-                                return deferred.promise;
-                            }
-                        }
-                    });
-                    //.then((ok) => this.createWidget(type));
-                };
-                CustomCountController.prototype.updateInterval = function () {
-                    var _this = this;
-                    if (this.handle)
-                        this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
-                };
-                CustomCountController.prototype.update = function () {
-                    var _this = this;
-                    if (!this.data.project || !this.data.queryId)
-                        return;
-                    var res = this.customResources();
-                    if (!res)
-                        return;
-                    console.log("custom query: " + this.data.title);
-                    //res.run_query({
-                    //    project: this.data.project,
-                    //    queryId: this.data.queryId
-                    //}).$promise.then((result: Resources.Custom.IRunQueryResult) => {
-                    //    var newCount = result.workItems.length;
-                    //    if (newCount != this.queryCount) {
-                    //        this.queryCount = newCount;
-                    //        var p = this.$scope.$element.find("p");
-                    //        p.addClass('changed');
-                    //        this.$timeout(() => p.removeClass('changed'), 1000);
-                    //    }
-                    //    if (this.data.lowerThan && !isNaN(this.data.lowerThan.value) && this.data.lowerThan.color) {
-                    //        if (this.queryCount < this.data.lowerThan.value)
-                    //            this.colorClass = this.data.lowerThan.color;
-                    //    }
-                    //    if (this.data.greaterThan && !isNaN(this.data.greaterThan.value) && this.data.greaterThan.color) {
-                    //        if (this.queryCount > this.data.greaterThan.value)
-                    //            this.colorClass = this.data.greaterThan.color;
-                    //    }
-                    //    console.log("end custom query: " + this.data.title);
-                    //})
-                    //.catch((reason) => {
-                    //    this.queryCount = null;
-                    //    console.error(reason);
-                    //});
-                    this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
-                };
-                return CustomCountController;
-            }());
-            CustomCountController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "customResources"];
-            CustomCount.CustomCountController = CustomCountController;
-        })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
-    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
-})(DashCI || (DashCI = {}));
-"use strict";
-var DashCI;
-(function (DashCI) {
-    var Widgets;
-    (function (Widgets) {
-        var CustomCount;
-        (function (CustomCount) {
-            var CustomCountDirective = (function () {
-                function CustomCountDirective() {
-                    this.restrict = "E";
-                    this.templateUrl = "app/widgets/custom-count/custom-count.html";
-                    this.replace = false;
-                    this.controller = CustomCount.CustomCountController;
-                    this.controllerAs = "ctrl";
-                    /* Binding css to directives */
-                    this.css = {
-                        href: "app/widgets/custom-count/custom-count.css",
-                        persist: true
-                    };
-                }
-                CustomCountDirective.create = function () {
-                    var directive = function () { return new CustomCountDirective(); };
-                    directive.$inject = [];
-                    return directive;
-                };
-                return CustomCountDirective;
-            }());
-            DashCI.app.directive("customCount", CustomCountDirective.create());
-        })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 //# sourceMappingURL=app.js.map
