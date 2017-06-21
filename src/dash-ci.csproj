@@ -31,6 +31,9 @@
     <Content Include="app\core\global-config.html" />
     <Content Include="app\widgets\clock\clock.css" />
     <Content Include="app\widgets\clock\clock.html" />
+    <Content Include="app\widgets\custom-count\config.html" />
+    <Content Include="app\widgets\custom-count\custom-count.css" />
+    <Content Include="app\widgets\custom-count\custom-count.html" />
     <Content Include="app\widgets\github-issues\config.html" />
     <Content Include="app\widgets\github-issues\issues.css" />
     <Content Include="app\widgets\github-issues\issues.html" />
@@ -95,6 +98,9 @@
     <TypeScriptCompile Include="app\resources\tfs\models.ts" />
     <TypeScriptCompile Include="app\resources\tfs\resources.ts" />
     <TypeScriptCompile Include="app\widgets\clock\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\custom-count\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\custom-count\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\custom-count\custom-count.ts" />
     <TypeScriptCompile Include="app\widgets\github-issues\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\github-issues\controller.ts" />
     <TypeScriptCompile Include="app\widgets\github-issues\issues.ts" />
@@ -140,7 +146,9 @@
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\github-pages.pubxml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="app\resources\custom\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

@@ -1,0 +1,89 @@
+﻿<md-dialog aria-label="Adicionar Widget">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Configure Custom Count Widget</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="ctrl.ok()">
+                    <md-icon aria-label="Close">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content layout-gt-sm="row" layout-padding style="width: 700px">
+            <div layout="row" layout-align="center" flex ng-if="!ctrl.projects">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+            <div ng-if="ctrl.projects" layout="column" layout-fill>
+
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="80">
+                        <label>Title:</label>
+                        <input ng-model="ctrl.vm.title" placeholder="Widget title" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Color:</label>
+                        <md-select ng-model="ctrl.vm.color" placeholder="Select the background">
+                            <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="80">
+                        <label>Project:</label>
+                        <md-select ng-model="ctrl.vm.project" placeholder="Select a project">
+                            <md-option ng-value="opt.id" ng-repeat="opt in ctrl.projects">{{ opt.name }}</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Interval:</label>
+                        <md-select ng-model="ctrl.vm.poolInterval" placeholder="Select the pool interval">
+                            <md-option ng-value="opt.value" ng-repeat="opt in ctrl.intervals">{{ opt.desc }}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="80">
+                        <label>Saved Query:</label>
+                        <md-select ng-model="ctrl.vm.queryId" placeholder="Select a saved query">
+                            <md-optgroup label="{{grp.name}}" ng-repeat="grp in ctrl.queries">
+                                <md-option ng-value="opt.id" ng-repeat="opt in grp.children | filter:({ isFolder: '!true' })">{{ opt.name }}</md-option>
+                            </md-optgroup>
+                        </md-select>
+                    </md-input-container>
+
+                </div>
+
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="20">
+                        <label>Lower than:</label>
+                        <input ng-model="ctrl.vm.lowerThan.value" placeholder="" type="number" />
+                    </md-input-container>
+                    <md-input-container flex="30">
+                        <label>Color:</label>
+                        <md-select ng-model="ctrl.vm.lowerThan.color" placeholder="Select the background">
+                            <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container flex="20">
+                        <label>Greater than:</label>
+                        <input ng-model="ctrl.vm.greaterThan.value" placeholder="" type="number" />
+                    </md-input-container>
+                    <md-input-container flex="30">
+                        <label>Color:</label>
+                        <md-select ng-model="ctrl.vm.greaterThan.color" placeholder="Select the background">
+                            <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <span flex></span>
+            <!--<md-button ng-click="ctrl.cancel()">
+                Cancel
+            </md-button>-->
+        </md-dialog-actions>
+    </form>
+</md-dialog>
