@@ -60,6 +60,26 @@
                         <div class="hint"><a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">How to generate a token?</a></div>
                     </md-input-container>
                 </div>
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="30">
+                        <label>Custom API Label:</label>
+                        <input ng-model="ctrl.vm.custom[0].label" placeholder="Any text to identify" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="40">
+                        <label>Basic API Url:</label>
+                        <input ng-model="ctrl.vm.custom[0].baseUrl" placeholder="https://yourdomain.com/api/v1" type="text" />
+                        <!--<div class="hint"><a href="#" target="_blank">How to generate a token?</a></div>-->
+                    </md-input-container>
+                    <md-input-container flex="30">
+                        <label>Basic Auth Key btoa(username:password):</label>
+                        <input ng-model="ctrl.vm.custom[0].basicAuth" placeholder="Your private key." type="password" />
+                        <!--<div class="hint"><a href="#" target="_blank">How to generate a token?</a></div>-->
+                    </md-input-container>
+                    <md-input-container flex="30">
+                        <label>Custom Json Token to get Count:</label>
+                        <input ng-model="ctrl.vm.custom[0].jsonCountToken" placeholder="Json token to get counts." type="text" />
+                    </md-input-container>
+                </div>
            </div>
         </md-dialog-content>
 

@@ -53,6 +53,13 @@ namespace DashCI.Models {
             privateToken: string
         }[],
 
+        custom: {
+            label: string;
+            baseUrl: string;
+            basicAuth: string;
+            jsonCountToken: string;
+        }[],
+
         circleci: {
             username: string;
             privateToken: string
