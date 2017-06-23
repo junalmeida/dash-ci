@@ -61,7 +61,6 @@
             this.data.queryId = this.data.queryId || "";
             this.data.poolInterval = this.data.poolInterval || 20000;
             this.updateInterval();
-            this.update();
         }
 
         private sizeFont(altura: number) {
@@ -102,7 +101,10 @@
         private updateInterval() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            this.handle = this.$interval(() => this.update(), this.data.poolInterval);
+            this.handle = this.$timeout(() => {
+                this.handle = this.$interval(() => this.update(), this.data.poolInterval);
+            }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
+            this.update();
         }
         private update() {
             if (!this.data.project || !this.data.queryId)

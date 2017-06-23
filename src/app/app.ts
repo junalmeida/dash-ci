@@ -51,6 +51,10 @@
         return regEx.test(source);
     }
 
+    export function randomNess():number {
+        return (Math.floor(Math.random() * 6) + 1) * 1000;
+    }
+
     export class EnumEx {
         static getNamesAndValues<T extends number>(e: any) {
             return EnumEx.getNames(e).map(n => ({ name: n, value: e[n] as T }));

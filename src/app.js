@@ -46,6 +46,10 @@ var DashCI;
         return regEx.test(source);
     }
     DashCI.wildcardMatch = wildcardMatch;
+    function randomNess() {
+        return (Math.floor(Math.random() * 6) + 1) * 1000;
+    }
+    DashCI.randomNess = randomNess;
     var EnumEx = (function () {
         function EnumEx() {
         }
@@ -1403,7 +1407,6 @@ var DashCI;
                     //default values
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 CustomCountController.prototype.sizeFont = function (height) {
                     var p = this.$scope.$element.find("p");
@@ -1436,7 +1439,9 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
                     this.update();
                 };
                 CustomCountController.prototype.update = function () {
@@ -1601,7 +1606,6 @@ var DashCI;
                     this.data.status = this.data.status || "open";
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 GithubIssuesController.prototype.sizeFont = function (height) {
                     var p = this.$scope.$element.find("p");
@@ -1634,7 +1638,9 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
                     this.update();
                 };
                 GithubIssuesController.prototype.update = function () {
@@ -1800,7 +1806,6 @@ var DashCI;
                     this.data.status = this.data.status || "opened";
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 GitlabIssuesController.prototype.sizeFont = function (height) {
                     var p = this.$scope.$element.find("p");
@@ -1833,7 +1838,9 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
                     this.update();
                 };
                 GitlabIssuesController.prototype.update = function () {
@@ -1992,7 +1999,6 @@ var DashCI;
                     this.data.refs = this.data.refs || "master";
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 GitlabPipelineController.prototype.sizeBy = function (width, height) {
                     this.hideDetails = (width < height * 1.7);
@@ -2041,7 +2047,9 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
                     this.update();
                 };
                 GitlabPipelineController.prototype.update = function () {
@@ -2221,7 +2229,6 @@ var DashCI;
                     this.data.ref = this.data.ref || "master";
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 GitlabPipelineGraphController.prototype.sizeFont = function (height) {
                     var header_size = this.$scope.$element.find(".header").height();
@@ -2256,7 +2263,9 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
                     this.update();
                 };
                 GitlabPipelineGraphController.prototype.update = function () {
@@ -2553,7 +2562,6 @@ var DashCI;
                     //default values
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 TfsBuildController.prototype.sizeBy = function (width, height) {
                     this.hideDetails = (width < height * 1.7);
@@ -2602,7 +2610,10 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
+                    this.update();
                 };
                 TfsBuildController.prototype.update = function () {
                     var _this = this;
@@ -2862,7 +2873,6 @@ var DashCI;
                     //default values
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 TfsBuildGraphController.prototype.sizeFont = function (height) {
                     var header_size = this.$scope.$element.find(".header").height();
@@ -2897,7 +2907,9 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
                     this.update();
                 };
                 TfsBuildGraphController.prototype.update = function () {
@@ -3108,7 +3120,6 @@ var DashCI;
                     this.data.queryColors = this.data.queryColors || ["", ""];
                     this.data.poolInterval = this.data.poolInterval || 20000;
                     this.updateInterval();
-                    this.update();
                 };
                 TfsQueryChartController.prototype.resizeBy = function (width, height) {
                     var _this = this;
@@ -3147,7 +3158,10 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
+                    this.update();
                 };
                 TfsQueryChartController.prototype.update = function () {
                     var _this = this;
@@ -3424,7 +3438,6 @@ var DashCI;
                     this.data.queryId = this.data.queryId || "";
                     this.data.poolInterval = this.data.poolInterval || 20000;
                     this.updateInterval();
-                    this.update();
                 };
                 TfsQueryCountController.prototype.sizeFont = function (altura) {
                     var p = this.$scope.$element.find("p");
@@ -3461,7 +3474,10 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
+                    this.update();
                 };
                 TfsQueryCountController.prototype.update = function () {
                     var _this = this;
@@ -3639,7 +3655,6 @@ var DashCI;
                     //default values
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
-                    this.update();
                 };
                 TfsReleaseController.prototype.sizeFont = function (height) {
                     var header_size = this.$scope.$element.find(".header").height();
@@ -3676,7 +3691,10 @@ var DashCI;
                     var _this = this;
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    this.handle = this.$interval(function () { return _this.update(); }, this.data.poolInterval);
+                    this.handle = this.$timeout(function () {
+                        _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
+                    }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
+                    this.update();
                 };
                 TfsReleaseController.prototype.update = function () {
                     var _this = this;

@@ -61,7 +61,6 @@
             this.data.poolInterval = this.data.poolInterval || 10000;
 
             this.updateInterval();
-            this.update();
         }
 
         private sizeBy(width: number, height: number) {
@@ -118,7 +117,10 @@
         private updateInterval() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            this.handle = this.$interval(() => this.update(), this.data.poolInterval);
+            this.handle = this.$timeout(() => {
+                this.handle = this.$interval(() => this.update(), this.data.poolInterval);
+            }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
+            this.update();
         }
 
         public icon = "help";
