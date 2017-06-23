@@ -52,6 +52,7 @@
         private init() {
             this.data.title = this.data.title || "Build Graph";
             this.data.color = this.data.color || "blue";
+            this.data.count = this.data.count || 20;
 
             //default values
             this.data.poolInterval = this.data.poolInterval || 10000;
@@ -118,7 +119,7 @@
                 res.recent_builds({
                     project: this.data.project,
                     build: builds,
-                    count: 40
+                    count: this.data.count
                 }).$promise.then((result) => {
                     console.log("end request: " + this.data.id + "; " + this.data.title);
                     var builds = result.value.reverse();

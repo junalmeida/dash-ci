@@ -2,13 +2,14 @@
 namespace DashCI.Widgets.TfsBuildGraph {
 
     export class TfsBuildGraphConfigController implements ng.IController {
-        public static $inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
+        public static $inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "buildCounts", "config"];
         constructor(
             private $scope: ng.IScope,
             private $mdDialog: ng.material.IDialogService,
             public tfsResources: () => Resources.Tfs.ITfsResource,
             public colors: Models.ICodeDescription[],
             public intervals: Models.IValueDescription[],
+            public buildCounts: Models.IValueDescription[],
             public vm: ITfsBuildGraphData
         ) { 
             this.init();

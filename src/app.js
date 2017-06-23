@@ -66,6 +66,7 @@ var DashCI;
     DashCI.EnumEx = EnumEx;
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Core;
@@ -89,6 +90,7 @@ var DashCI;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Core;
@@ -181,6 +183,7 @@ var DashCI;
         Core.GlobalConfigController = GlobalConfigController;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var GoogleCastReceiver = (function () {
@@ -233,6 +236,7 @@ var DashCI;
     GoogleCastReceiver.Cast = null;
     DashCI.GoogleCastReceiver = GoogleCastReceiver;
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var GoogleCastSender = (function () {
@@ -365,6 +369,7 @@ var DashCI;
     DashCI.GoogleCastSender = GoogleCastSender;
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Core;
@@ -545,6 +550,7 @@ var DashCI;
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Models;
@@ -625,6 +631,20 @@ var DashCI;
                 desc: "2 min"
             },
         ]);
+        DashCI.app.constant("buildCounts", [
+            {
+                value: 20,
+                desc: "20 builds"
+            },
+            {
+                value: 30,
+                desc: "30 builds"
+            },
+            {
+                value: 40,
+                desc: "40 builds"
+            }
+        ]);
         DashCI.app.constant("aligns", [
             {
                 code: "center",
@@ -641,6 +661,7 @@ var DashCI;
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 /// <reference path="../app.ts" />
 var DashCI;
 (function (DashCI) {
@@ -650,6 +671,7 @@ var DashCI;
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Models;
@@ -787,6 +809,8 @@ var DashCI;
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -859,6 +883,8 @@ var DashCI;
         })(Custom = Resources.Custom || (Resources.Custom = {}));
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -935,6 +961,8 @@ var DashCI;
         })(Github = Resources.Github || (Resources.Github = {}));
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -1036,6 +1064,8 @@ var DashCI;
         })(Gitlab = Resources.Gitlab || (Resources.Gitlab = {}));
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -1155,6 +1185,7 @@ var DashCI;
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../models/widgets.ts" />
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1192,6 +1223,7 @@ var DashCI;
         DashCI.app.directive("widgetLoader", LoaderDirective.create());
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1222,6 +1254,7 @@ var DashCI;
         })(Clock = Widgets.Clock || (Widgets.Clock = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1289,6 +1322,7 @@ var DashCI;
         })(Clock = Widgets.Clock || (Widgets.Clock = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1331,6 +1365,7 @@ var DashCI;
         })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1443,6 +1478,7 @@ var DashCI;
         })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1473,6 +1509,7 @@ var DashCI;
         })(CustomCount = Widgets.CustomCount || (Widgets.CustomCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1524,6 +1561,7 @@ var DashCI;
         })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1641,6 +1679,7 @@ var DashCI;
         })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1671,6 +1710,7 @@ var DashCI;
         })(GithubIssues = Widgets.GithubIssues || (Widgets.GithubIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1721,6 +1761,7 @@ var DashCI;
         })(GitlabIssues = Widgets.GitlabIssues || (Widgets.GitlabIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1837,6 +1878,7 @@ var DashCI;
         })(GitlabIssues = Widgets.GitlabIssues || (Widgets.GitlabIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1867,6 +1909,7 @@ var DashCI;
         })(GitlabIssues = Widgets.GitlabIssues || (Widgets.GitlabIssues = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -1909,6 +1952,7 @@ var DashCI;
         })(GitlabPipeline = Widgets.GitlabPipeline || (Widgets.GitlabPipeline = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2064,6 +2108,7 @@ var DashCI;
         })(GitlabPipeline = Widgets.GitlabPipeline || (Widgets.GitlabPipeline = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2094,6 +2139,7 @@ var DashCI;
         })(GitlabPipeline = Widgets.GitlabPipeline || (Widgets.GitlabPipeline = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2136,6 +2182,7 @@ var DashCI;
         })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2257,6 +2304,7 @@ var DashCI;
         })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2287,6 +2335,7 @@ var DashCI;
         })(GitlabPipelineGraph = Widgets.GitlabPipelineGraph || (Widgets.GitlabPipelineGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2313,6 +2362,7 @@ var DashCI;
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2373,6 +2423,7 @@ var DashCI;
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2403,6 +2454,7 @@ var DashCI;
         })(Label = Widgets.Label || (Widgets.Label = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2461,6 +2513,7 @@ var DashCI;
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2648,6 +2701,7 @@ var DashCI;
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2678,6 +2732,7 @@ var DashCI;
         })(TfsBuild = Widgets.TfsBuild || (Widgets.TfsBuild = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2708,6 +2763,7 @@ var DashCI;
         })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2715,12 +2771,13 @@ var DashCI;
         var TfsBuildGraph;
         (function (TfsBuildGraph) {
             var TfsBuildGraphConfigController = (function () {
-                function TfsBuildGraphConfigController($scope, $mdDialog, tfsResources, colors, intervals, vm) {
+                function TfsBuildGraphConfigController($scope, $mdDialog, tfsResources, colors, intervals, buildCounts, vm) {
                     this.$scope = $scope;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
                     this.colors = colors;
                     this.intervals = intervals;
+                    this.buildCounts = buildCounts;
                     this.vm = vm;
                     this.init();
                 }
@@ -2761,11 +2818,12 @@ var DashCI;
                 };
                 return TfsBuildGraphConfigController;
             }());
-            TfsBuildGraphConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "config"];
+            TfsBuildGraphConfigController.$inject = ["$scope", "$mdDialog", "tfsResources", "colors", "intervals", "buildCounts", "config"];
             TfsBuildGraph.TfsBuildGraphConfigController = TfsBuildGraphConfigController;
         })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -2800,6 +2858,7 @@ var DashCI;
                 TfsBuildGraphController.prototype.init = function () {
                     this.data.title = this.data.title || "Build Graph";
                     this.data.color = this.data.color || "blue";
+                    this.data.count = this.data.count || 20;
                     //default values
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
@@ -2853,7 +2912,7 @@ var DashCI;
                         res.recent_builds({
                             project: _this.data.project,
                             build: builds,
-                            count: 40
+                            count: _this.data.count
                         }).$promise.then(function (result) {
                             console.log("end request: " + _this.data.id + "; " + _this.data.title);
                             var builds = result.value.reverse();
@@ -2907,6 +2966,7 @@ var DashCI;
         })(TfsBuildGraph = Widgets.TfsBuildGraph || (Widgets.TfsBuildGraph = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3001,6 +3061,7 @@ var DashCI;
         })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3233,6 +3294,7 @@ var DashCI;
         })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3263,6 +3325,7 @@ var DashCI;
         })(TfsQueryChart = Widgets.TfsQueryChart || (Widgets.TfsQueryChart = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3323,6 +3386,7 @@ var DashCI;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3441,6 +3505,7 @@ var DashCI;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3471,6 +3536,7 @@ var DashCI;
         })(TfsQueryCount = Widgets.TfsQueryCount || (Widgets.TfsQueryCount = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3529,6 +3595,7 @@ var DashCI;
         })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;
@@ -3769,6 +3836,7 @@ var DashCI;
         })(TfsRelease = Widgets.TfsRelease || (Widgets.TfsRelease = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+"use strict";
 var DashCI;
 (function (DashCI) {
     var Widgets;

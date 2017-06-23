@@ -80,7 +80,20 @@ namespace DashCI.Models {
             desc: "2 min"
         },
     ]);
-
+    DashCI.app.constant("buildCounts", <IValueDescription[]>[
+        {
+            value: 20,
+            desc: "20 builds"
+        },
+        {
+            value: 30,
+            desc: "30 builds"
+        },
+        {
+            value: 40,
+            desc: "40 builds"
+        }
+    ]);
     DashCI.app.constant("aligns", <ICodeDescription[]>[
         {
             code: "center",
