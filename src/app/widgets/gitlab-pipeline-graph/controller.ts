@@ -37,7 +37,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
         private init() {
@@ -104,7 +104,7 @@
             if (!res)
                 return;
 
-            console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+            DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             res.recent_pipelines({
                 project: this.data.project,
                 ref: this.data.ref,
@@ -130,7 +130,7 @@
 
                 this.pipelines = pipelines;
                 this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
-                console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                DashCI.DEBUG && console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             }).catch((reason) => {
                 this.pipelines = null;
                 console.error(reason);

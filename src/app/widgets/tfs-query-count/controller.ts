@@ -50,7 +50,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
         private init() {
@@ -113,7 +113,7 @@
             if (!res)
                 return;
 
-            console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+            DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             res.run_query({
                 project: this.data.project,
                 queryId: this.data.queryId
@@ -137,7 +137,7 @@
                         this.colorClass = this.data.greaterThan.color;
                 }
 
-                console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                DashCI.DEBUG && console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             })
             .catch((reason) => {
                 this.queryCount = null;

@@ -50,7 +50,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
 
@@ -110,7 +110,7 @@
             if (!res)
                 return;
 
-            console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
+            DashCI.DEBUG && console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
             res.execute_count({
                 route: this.data.route
             }).$promise.then((newCount: Resources.Custom.ICount) => {
@@ -133,7 +133,7 @@
                         this.colorClass = this.data.greaterThan.color;
                 }
 
-                console.log("end custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
+                DashCI.DEBUG && console.log("end custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
             })
             .catch((reason) => {
                 this.count = null;

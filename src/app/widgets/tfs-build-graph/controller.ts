@@ -46,7 +46,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
         private init() {
@@ -113,7 +113,7 @@
             if (!res)
                 return;
 
-            console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+            DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
 
             var doQueryBuild = (builds: number|string) => {
 
@@ -149,7 +149,7 @@
 
                     this.builds = builds;
                     this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
-                    console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                 }).catch((reason: any) => {
                     this.builds = [];
                     console.error(reason);

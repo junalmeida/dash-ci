@@ -55,6 +55,8 @@
         return (Math.floor(Math.random() * 10) + 1) * 1000;
     }
 
+    export var DEBUG = false;
+
     export class EnumEx {
         static getNamesAndValues<T extends number>(e: any) {
             return EnumEx.getNames(e).map(n => ({ name: n, value: e[n] as T }));

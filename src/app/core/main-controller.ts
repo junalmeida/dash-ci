@@ -23,7 +23,7 @@ namespace DashCI.Core {
             });
 
             this.$scope.$on('wg-update-position', (event: ng.IAngularEvent, widgetInfo: any) => {
-                console.log('A widget has changed its position!', widgetInfo);
+                DashCI.DEBUG && console.log('A widget has changed its position!', widgetInfo);
             });
 
             this.$scope.$on("dashci-refresh", () => {

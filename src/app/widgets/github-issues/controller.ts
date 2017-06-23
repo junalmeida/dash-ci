@@ -52,7 +52,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
 
@@ -114,7 +114,7 @@
             if (!res)
                 return;
 
-            console.log("start github request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+            DashCI.DEBUG && console.log("start github request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             res.issue_count({
                 owner: this.data.repository.split('/')[0],
                 repository: this.data.repository.split('/')[1],
@@ -140,7 +140,7 @@
                         this.colorClass = this.data.greaterThan.color;
                 }
 
-                console.log("end github request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                DashCI.DEBUG && console.log("end github request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             })
             .catch((reason) => {
                 this.issueCount = null;

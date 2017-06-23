@@ -50,6 +50,7 @@ var DashCI;
         return (Math.floor(Math.random() * 10) + 1) * 1000;
     }
     DashCI.randomNess = randomNess;
+    DashCI.DEBUG = false;
     var EnumEx = (function () {
         function EnumEx() {
         }
@@ -208,16 +209,16 @@ var DashCI;
             GoogleCastReceiver.Cast = window.cast;
             GoogleCastReceiver.Cast.receiver.logger.setLevelValue(0);
             this.manager = GoogleCastReceiver.Cast.receiver.CastReceiverManager.getInstance();
-            console.log('Starting Receiver Manager');
+            DashCI.DEBUG && console.log('Starting Receiver Manager');
             this.manager.onReady = function (event) {
-                console.log('Received Ready event: ' + JSON.stringify(event.data));
+                DashCI.DEBUG && console.log('Received Ready event: ' + JSON.stringify(event.data));
                 _this.manager.setApplicationState('chromecast-dashboard is ready...');
             };
             this.manager.onSenderConnected = function (event) {
-                console.log('Received Sender Connected event: ' + event.senderId);
+                DashCI.DEBUG && console.log('Received Sender Connected event: ' + event.senderId);
             };
             this.manager.onSenderDisconnected = function (event) {
-                console.log('Received Sender Disconnected event: ' + event.senderId);
+                DashCI.DEBUG && console.log('Received Sender Disconnected event: ' + event.senderId);
                 if (_this.manager.getSenders().length == 0 &&
                     event.reason == GoogleCastReceiver.Cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
                     window.close();
@@ -228,10 +229,10 @@ var DashCI;
             this.messageBus.onMessage = function (event) { return _this.receiveMessage(event); };
             // Initialize the CastReceiverManager with an application status message.
             this.manager.start({ statusText: 'Application is starting' });
-            console.log('Receiver Manager started');
+            DashCI.DEBUG && console.log('Receiver Manager started');
         };
         GoogleCastReceiver.prototype.receiveMessage = function (event) {
-            console.log('Message [' + event.senderId + ']: ' + event.data);
+            DashCI.DEBUG && console.log('Message [' + event.senderId + ']: ' + event.data);
             if (event.data && this.receiveOptions)
                 this.receiveOptions(event.data);
         };
@@ -429,7 +430,7 @@ var DashCI;
                     _this.additionPossible = true;
                 });
                 this.$scope.$on('wg-update-position', function (event, widgetInfo) {
-                    console.log('A widget has changed its position!', widgetInfo);
+                    DashCI.DEBUG && console.log('A widget has changed its position!', widgetInfo);
                 });
                 this.$scope.$on("dashci-refresh", function () {
                     _this.currentPage = null;
@@ -1288,7 +1289,7 @@ var DashCI;
                 ClockController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 ClockController.prototype.fontSize = function (height) {
                     var fontSizeTime = Math.round(height / 3.8) + "px";
@@ -1399,7 +1400,7 @@ var DashCI;
                 CustomCountController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 CustomCountController.prototype.init = function () {
                     this.data.title = this.data.title || "Count";
@@ -1451,7 +1452,7 @@ var DashCI;
                     var res = this.customResources(this.data.label);
                     if (!res)
                         return;
-                    console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
+                    DashCI.DEBUG && console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
                     res.execute_count({
                         route: this.data.route
                     }).$promise.then(function (newCount) {
@@ -1470,7 +1471,7 @@ var DashCI;
                             if (_this.count > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
-                        console.log("end custom request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + _this.data.label);
+                        DashCI.DEBUG && console.log("end custom request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + _this.data.label);
                     })
                         .catch(function (reason) {
                         _this.count = null;
@@ -1598,7 +1599,7 @@ var DashCI;
                 GithubIssuesController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GithubIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
@@ -1652,7 +1653,7 @@ var DashCI;
                     var res = this.githubResources(this.data.username);
                     if (!res)
                         return;
-                    console.log("start github request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start github request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.issue_count({
                         owner: this.data.repository.split('/')[0],
                         repository: this.data.repository.split('/')[1],
@@ -1674,7 +1675,7 @@ var DashCI;
                             if (_this.issueCount > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
-                        console.log("end github request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        DashCI.DEBUG && console.log("end github request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.issueCount = null;
@@ -1800,7 +1801,7 @@ var DashCI;
                 GitlabIssuesController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabIssuesController.prototype.init = function () {
                     this.data.title = this.data.title || "Issues";
@@ -1854,7 +1855,7 @@ var DashCI;
                     var res = this.gitlabResources();
                     if (!res)
                         return;
-                    console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.issue_count({
                         scope: this.data.query_type,
                         scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
@@ -1876,7 +1877,7 @@ var DashCI;
                             if (_this.issueCount > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
-                        console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.issueCount = null;
@@ -1996,7 +1997,7 @@ var DashCI;
                 GitlabPipelineController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabPipelineController.prototype.init = function () {
                     this.data.title = this.data.title || "Pipeline";
@@ -2065,7 +2066,7 @@ var DashCI;
                     var res = this.gitlabResources();
                     if (!res)
                         return;
-                    console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.latest_pipeline({
                         project: this.data.project,
                         ref: this.data.refs
@@ -2104,7 +2105,7 @@ var DashCI;
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
                         _this.resizeWidget();
-                        console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
@@ -2226,7 +2227,7 @@ var DashCI;
                 GitlabPipelineGraphController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabPipelineGraphController.prototype.init = function () {
                     this.data.title = this.data.title || "Pipeline Graph";
@@ -2281,7 +2282,7 @@ var DashCI;
                     var res = this.gitlabResources();
                     if (!res)
                         return;
-                    console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.recent_pipelines({
                         project: this.data.project,
                         ref: this.data.ref,
@@ -2306,7 +2307,7 @@ var DashCI;
                         });
                         _this.pipelines = pipelines;
                         _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
-                        console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     }).catch(function (reason) {
                         _this.pipelines = null;
                         console.error(reason);
@@ -2560,7 +2561,7 @@ var DashCI;
                 TfsBuildController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsBuildController.prototype.init = function () {
                     this.data.title = this.data.title || "Build";
@@ -2628,7 +2629,7 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
-                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     var doQueryBuild = function (builds) {
                         res.latest_build({
                             project: _this.data.project,
@@ -2684,7 +2685,7 @@ var DashCI;
                             //p.addClass('changed');
                             //this.$timeout(() => p.removeClass('changed'), 1000);
                             _this.resizeWidget();
-                            console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                            DashCI.DEBUG && console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         }).catch(function (reason) {
                             _this.latest = null;
                             console.error(reason);
@@ -2870,7 +2871,7 @@ var DashCI;
                 TfsBuildGraphController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsBuildGraphController.prototype.init = function () {
                     this.data.title = this.data.title || "Build Graph";
@@ -2925,7 +2926,7 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
-                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     var doQueryBuild = function (builds) {
                         res.recent_builds({
                             project: _this.data.project,
@@ -2956,7 +2957,7 @@ var DashCI;
                             });
                             _this.builds = builds;
                             _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
-                            console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                            DashCI.DEBUG && console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         }).catch(function (reason) {
                             _this.builds = [];
                             console.error(reason);
@@ -3115,7 +3116,7 @@ var DashCI;
                 TfsQueryChartController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsQueryChartController.prototype.init = function () {
                     this.data.title = this.data.title || "Chart";
@@ -3188,7 +3189,7 @@ var DashCI;
                     }
                     if (queries.length == 0)
                         return;
-                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     this.$q.all(queries)
                         .then(function (res) {
                         var resValues = [];
@@ -3199,7 +3200,7 @@ var DashCI;
                         }
                         _this.queryValues = resValues;
                         _this.drawGraph();
-                        console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        DashCI.DEBUG && console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.queryValues = null;
@@ -3211,7 +3212,7 @@ var DashCI;
                     var data = [];
                     var labels = [];
                     var colors = [];
-                    console.log("chart draw start: " + this.data.title);
+                    DashCI.DEBUG && console.log("chart draw start: " + this.data.title);
                     var bgColor = this.data.color == 'transparent' || this.data.color == 'semi-transparent' ? "black" :
                         this.getStyleRuleValue("background-color", "." + this.data.color);
                     for (var i in this.queryValues) {
@@ -3261,7 +3262,7 @@ var DashCI;
                             start_angle += slice_angle;
                         }
                     }
-                    console.log("chart draw complete: " + this.data.title);
+                    DashCI.DEBUG && console.log("chart draw complete: " + this.data.title);
                 };
                 /*
                 private drawLine(ctx:CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number) {
@@ -3436,7 +3437,7 @@ var DashCI;
                 TfsQueryCountController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsQueryCountController.prototype.init = function () {
                     this.data.title = this.data.title || "Query";
@@ -3493,7 +3494,7 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
-                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.run_query({
                         project: this.data.project,
                         queryId: this.data.queryId
@@ -3513,7 +3514,7 @@ var DashCI;
                             if (_this.queryCount > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
-                        console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        DashCI.DEBUG && console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.queryCount = null;
@@ -3654,7 +3655,7 @@ var DashCI;
                 TfsReleaseController.prototype.finalize = function () {
                     if (this.handle)
                         this.$interval.cancel(this.handle);
-                    console.log("dispose: " + this.data.id + "-" + this.data.title);
+                    DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsReleaseController.prototype.init = function () {
                     this.data.title = this.data.title || "Release";
@@ -3724,7 +3725,7 @@ var DashCI;
                         });
                     }
                     if (this.releaseDefinition) {
-                        console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         res.latest_release_environments({ project: this.data.project, release: this.data.release })
                             .$promise.then(function (result) {
                             _this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
@@ -3768,7 +3769,7 @@ var DashCI;
                                 _this.environment_rows = null;
                             }
                             _this.sizeFont(_this.$scope.$element.height());
-                            console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                            DashCI.DEBUG && console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         })
                             .catch(function (error) {
                             _this.latest = null;

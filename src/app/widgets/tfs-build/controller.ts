@@ -49,7 +49,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
 
@@ -136,7 +136,7 @@
                 return;
 
 
-            console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+            DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
 
             var doQueryBuild = (builds: number|string) => {
 
@@ -193,7 +193,7 @@
                     //p.addClass('changed');
                     //this.$timeout(() => p.removeClass('changed'), 1000);
                     this.resizeWidget();
-                    console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                 }).catch((reason) => {
                     this.latest = null;
                     console.error(reason);

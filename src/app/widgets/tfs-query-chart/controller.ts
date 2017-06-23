@@ -49,7 +49,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
         private init() {
@@ -139,7 +139,7 @@
             if (queries.length == 0)
                 return;
 
-            console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+            DashCI.DEBUG && console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             this.$q.all(queries)
                 .then(res => {
                     var resValues: number[] = [];
@@ -151,7 +151,7 @@
                     
                     this.queryValues = resValues;
                     this.drawGraph();
-                    console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    DashCI.DEBUG && console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                 })
                 .catch((reason) => {
                     this.queryValues = null;
@@ -166,7 +166,7 @@
             var labels: string[] = [];
             var colors: string[] = [];
 
-            console.log("chart draw start: " + this.data.title);
+            DashCI.DEBUG && console.log("chart draw start: " + this.data.title);
 
 
             var bgColor =
@@ -245,7 +245,7 @@
                     start_angle += slice_angle;
                 }
             }
-            console.log("chart draw complete: " + this.data.title);
+            DashCI.DEBUG && console.log("chart draw complete: " + this.data.title);
         }
 
         /*

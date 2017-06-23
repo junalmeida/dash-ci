@@ -133,7 +133,7 @@
         // * @param {string} message A message string
         // */
         //private appendMessage(message: string) {
-        //    console.log(message);
+        //    DashCI.DEBUG && console.log(message);
         //    var dw = document.getElementById('debugmessage');
         //    dw.innerHTML += '\n' + JSON.stringify(message);
         //}

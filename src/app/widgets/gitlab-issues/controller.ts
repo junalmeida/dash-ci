@@ -52,7 +52,7 @@
         private finalize() {
             if (this.handle)
                 this.$interval.cancel(this.handle);
-            console.log("dispose: " + this.data.id + "-" + this.data.title);
+            DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
 
@@ -114,7 +114,7 @@
             if (!res)
                 return;
 
-            console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+            DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             res.issue_count({
                 scope: this.data.query_type,
                 scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
@@ -140,7 +140,7 @@
                         this.colorClass = this.data.greaterThan.color;
                 }
 
-                console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                DashCI.DEBUG && console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             })
             .catch((reason) => {
                 this.issueCount = null;
