@@ -136,9 +136,7 @@
                 return;
 
 
-            console.log("start request: " + this.data.id + "; " + this.data.title);
-
-
+            console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
 
             var doQueryBuild = (builds: number|string) => {
 
@@ -147,7 +145,6 @@
                     project: this.data.project,
                     build: builds
                 }).$promise.then((build: Resources.Tfs.IBuildResult) => {
-                    console.log("end request: " + this.data.id + "; " + this.data.title);
                     var new_build: Resources.Tfs.IBuild = null;
 
                     if (build.value.length >= 1)
@@ -196,6 +193,7 @@
                     //p.addClass('changed');
                     //this.$timeout(() => p.removeClass('changed'), 1000);
                     this.resizeWidget();
+                    console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                 }).catch((reason) => {
                     this.latest = null;
                     console.error(reason);

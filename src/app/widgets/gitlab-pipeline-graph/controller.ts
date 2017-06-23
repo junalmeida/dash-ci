@@ -104,13 +104,12 @@
             if (!res)
                 return;
 
-            console.log("start request: " + this.data.id + "; " + this.data.title);
+            console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             res.recent_pipelines({
                 project: this.data.project,
                 ref: this.data.ref,
                 count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
             }).$promise.then((pipelines: Resources.Gitlab.IPipeline[]) => {
-                console.log("end request: " + this.data.id + "; " + this.data.title);
                 pipelines = pipelines.filter((item) => wildcardMatch(this.data.ref, item.ref)).slice(0, this.data.count).reverse();
                 var maxDuration = 1; 
                 angular.forEach(pipelines, (item) => {
@@ -131,6 +130,7 @@
 
                 this.pipelines = pipelines;
                 this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
+                console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             }).catch((reason) => {
                 this.pipelines = null;
                 console.error(reason);

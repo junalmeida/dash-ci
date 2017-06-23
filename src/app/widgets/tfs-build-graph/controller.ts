@@ -113,7 +113,7 @@
             if (!res)
                 return;
 
-            console.log("start request: " + this.data.id + "; " + this.data.title);
+            console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
 
             var doQueryBuild = (builds: number|string) => {
 
@@ -122,7 +122,6 @@
                     build: builds,
                     count: this.data.count
                 }).$promise.then((result) => {
-                    console.log("end request: " + this.data.id + "; " + this.data.title);
                     var builds = result.value.reverse();
                     var maxDuration = 1;
                     angular.forEach(builds, (item) => {
@@ -150,6 +149,7 @@
 
                     this.builds = builds;
                     this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
+                    console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                 }).catch((reason: any) => {
                     this.builds = [];
                     console.error(reason);

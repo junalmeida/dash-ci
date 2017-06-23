@@ -1451,6 +1451,7 @@ var DashCI;
                     var res = this.customResources(this.data.label);
                     if (!res)
                         return;
+                    console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
                     res.execute_count({
                         route: this.data.route
                     }).$promise.then(function (newCount) {
@@ -1469,6 +1470,7 @@ var DashCI;
                             if (_this.count > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
+                        console.log("end custom request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + _this.data.label);
                     })
                         .catch(function (reason) {
                         _this.count = null;
@@ -1650,6 +1652,7 @@ var DashCI;
                     var res = this.githubResources(this.data.username);
                     if (!res)
                         return;
+                    console.log("start github request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.issue_count({
                         owner: this.data.repository.split('/')[0],
                         repository: this.data.repository.split('/')[1],
@@ -1671,6 +1674,7 @@ var DashCI;
                             if (_this.issueCount > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
+                        console.log("end github request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.issueCount = null;
@@ -1850,6 +1854,7 @@ var DashCI;
                     var res = this.gitlabResources();
                     if (!res)
                         return;
+                    console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.issue_count({
                         scope: this.data.query_type,
                         scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
@@ -1871,6 +1876,7 @@ var DashCI;
                             if (_this.issueCount > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
+                        console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.issueCount = null;
@@ -2059,12 +2065,11 @@ var DashCI;
                     var res = this.gitlabResources();
                     if (!res)
                         return;
-                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.latest_pipeline({
                         project: this.data.project,
                         ref: this.data.refs
                     }).$promise.then(function (pipelines) {
-                        console.log("end request: " + _this.data.id + "; " + _this.data.title);
                         var new_pipeline = null;
                         var refList = _this.data.refs.split(",");
                         pipelines = pipelines.filter(function (i) { return refList.filter(function (r) { return DashCI.wildcardMatch(r, i.ref); }).length > 0; });
@@ -2099,6 +2104,7 @@ var DashCI;
                         //p.addClass('changed');
                         //this.$timeout(() => p.removeClass('changed'), 1000);
                         _this.resizeWidget();
+                        console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
@@ -2275,13 +2281,12 @@ var DashCI;
                     var res = this.gitlabResources();
                     if (!res)
                         return;
-                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.recent_pipelines({
                         project: this.data.project,
                         ref: this.data.ref,
                         count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
                     }).$promise.then(function (pipelines) {
-                        console.log("end request: " + _this.data.id + "; " + _this.data.title);
                         pipelines = pipelines.filter(function (item) { return DashCI.wildcardMatch(_this.data.ref, item.ref); }).slice(0, _this.data.count).reverse();
                         var maxDuration = 1;
                         angular.forEach(pipelines, function (item) {
@@ -2301,6 +2306,7 @@ var DashCI;
                         });
                         _this.pipelines = pipelines;
                         _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                        console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     }).catch(function (reason) {
                         _this.pipelines = null;
                         console.error(reason);
@@ -2622,13 +2628,12 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
-                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     var doQueryBuild = function (builds) {
                         res.latest_build({
                             project: _this.data.project,
                             build: builds
                         }).$promise.then(function (build) {
-                            console.log("end request: " + _this.data.id + "; " + _this.data.title);
                             var new_build = null;
                             if (build.value.length >= 1)
                                 new_build = build.value[0];
@@ -2679,6 +2684,7 @@ var DashCI;
                             //p.addClass('changed');
                             //this.$timeout(() => p.removeClass('changed'), 1000);
                             _this.resizeWidget();
+                            console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         }).catch(function (reason) {
                             _this.latest = null;
                             console.error(reason);
@@ -2919,14 +2925,13 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
-                    console.log("start request: " + this.data.id + "; " + this.data.title);
+                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     var doQueryBuild = function (builds) {
                         res.recent_builds({
                             project: _this.data.project,
                             build: builds,
                             count: _this.data.count
                         }).$promise.then(function (result) {
-                            console.log("end request: " + _this.data.id + "; " + _this.data.title);
                             var builds = result.value.reverse();
                             var maxDuration = 1;
                             angular.forEach(builds, function (item) {
@@ -2951,6 +2956,7 @@ var DashCI;
                             });
                             _this.builds = builds;
                             _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                            console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         }).catch(function (reason) {
                             _this.builds = [];
                             console.error(reason);
@@ -3182,7 +3188,7 @@ var DashCI;
                     }
                     if (queries.length == 0)
                         return;
-                    console.log("tfs query: " + this.data.title);
+                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     this.$q.all(queries)
                         .then(function (res) {
                         var resValues = [];
@@ -3193,6 +3199,7 @@ var DashCI;
                         }
                         _this.queryValues = resValues;
                         _this.drawGraph();
+                        console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.queryValues = null;
@@ -3486,7 +3493,7 @@ var DashCI;
                     var res = this.tfsResources();
                     if (!res)
                         return;
-                    console.log("tfs query: " + this.data.title);
+                    console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     res.run_query({
                         project: this.data.project,
                         queryId: this.data.queryId
@@ -3506,7 +3513,7 @@ var DashCI;
                             if (_this.queryCount > _this.data.greaterThan.value)
                                 _this.colorClass = _this.data.greaterThan.color;
                         }
-                        console.log("end tfs query: " + _this.data.title);
+                        console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                         .catch(function (reason) {
                         _this.queryCount = null;
@@ -3717,7 +3724,7 @@ var DashCI;
                         });
                     }
                     if (this.releaseDefinition) {
-                        console.log("start request: " + this.data.id + "; " + this.data.title);
+                        console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         res.latest_release_environments({ project: this.data.project, release: this.data.release })
                             .$promise.then(function (result) {
                             _this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
@@ -3761,6 +3768,7 @@ var DashCI;
                                 _this.environment_rows = null;
                             }
                             _this.sizeFont(_this.$scope.$element.height());
+                            console.log("end tfs request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                         })
                             .catch(function (error) {
                             _this.latest = null;

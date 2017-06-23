@@ -139,7 +139,7 @@
             if (queries.length == 0)
                 return;
 
-            console.log("tfs query: " + this.data.title);
+            console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             this.$q.all(queries)
                 .then(res => {
                     var resValues: number[] = [];
@@ -151,6 +151,7 @@
                     
                     this.queryValues = resValues;
                     this.drawGraph();
+                    console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                 })
                 .catch((reason) => {
                     this.queryValues = null;

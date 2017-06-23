@@ -141,7 +141,7 @@
             }
 
             if (this.releaseDefinition) {
-                console.log("start request: " + this.data.id + "; " + this.data.title);
+                console.log("start tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                 res.latest_release_environments({ project: this.data.project, release: this.data.release })
                     .$promise.then((result) => {
                         this.latest = result.releases.length > 0 ? result.releases[result.releases.length - 1] : null;
@@ -188,6 +188,7 @@
                             this.environment_rows = null;
                         }
                         this.sizeFont(this.$scope.$element.height());
+                        console.log("end tfs request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     })
                     .catch((error) => {
                         this.latest = null;

@@ -134,12 +134,11 @@
             if (!res)
                 return;
 
-            console.log("start request: " + this.data.id + "; " + this.data.title);
+            console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             res.latest_pipeline({
                 project: this.data.project,
                 ref: this.data.refs
             }).$promise.then((pipelines: Resources.Gitlab.IPipeline[]) => {
-                console.log("end request: " + this.data.id + "; " + this.data.title);
                 var new_pipeline: Resources.Gitlab.IPipeline = null;
                 var refList = this.data.refs.split(",");
                 pipelines = pipelines.filter((i: any) => refList.filter((r) => wildcardMatch(r, i.ref)).length > 0 );
@@ -172,6 +171,7 @@
                 //p.addClass('changed');
                 //this.$timeout(() => p.removeClass('changed'), 1000);
                 this.resizeWidget();
+                console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
             }).catch((reason) => {
                 this.latest = null;
                 console.error(reason);
