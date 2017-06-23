@@ -10,77 +10,110 @@
             </div>
         </md-toolbar>
 
-        <md-dialog-content layout-gt-sm="row" layout-padding style="width: 700px">
-            <div layout="column" layout-fill>
-                <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="20">
-                        <label>Pages:</label>
-                        <input ng-model="ctrl.pageCount" placeholder="0" type="number" required />
-                    </md-input-container>
-                    <md-input-container flex="20">
-                        <label>Grid Rows:</label>
-                        <input ng-model="ctrl.vm.rows" placeholder="0" type="number" required />
-                    </md-input-container>
-                    <md-input-container flex="20">
-                        <label>Grid Columns:</label>
-                        <input ng-model="ctrl.vm.columns" placeholder="0" type="number" required />
-                    </md-input-container>
-                </div>
-                <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="60">
-                        <label>Gitlab Host:</label>
-                        <input ng-model="ctrl.vm.gitlab.host" placeholder="https://gitlab.com" type="text" />
-                    </md-input-container>
-                    <md-input-container flex="40">
-                        <label>Gitlab Personal Private Key:</label>
-                        <input ng-model="ctrl.vm.gitlab.privateToken" placeholder="Private Key" type="password" />
-                        <div class="hint"><a href="https://docs.gitlab.com/ce/api/README.html#personal-access-tokens" target="_blank">How to generate a token?</a></div>
-                    </md-input-container>
-                </div>
-                <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="60">
-                        <label>Tfs Host and Collection:</label>
-                        <input ng-model="ctrl.vm.tfs.host" placeholder="https://username.visualstudio.com/DefaultCollection" type="text" />
-                        <div class="hint"><a href="#" onclick="javascript: return false;" title="Start tfs-on-premise-ntlm.exe, run this web client from the tray, and type here the following url: http://localhost/Temporary_Listen_Addresses/dash-ci/api/[http|https]/yourhost/tfs/DefaultCollection" target="_blank">How to use TFS 2015 on-premise?</a></div>
-                    </md-input-container>
-                    <md-input-container flex="40">
-                        <label>Tfs Personal Private Key:</label>
-                        <input ng-model="ctrl.vm.tfs.privateToken" placeholder="Your private key. Leave empty for default credentials (NTLM)" type="password" />
-                        <div class="hint"><a href="https://www.visualstudio.com/en-us/docs/integrate/get-started/auth/overview" target="_blank">How to generate a token?</a></div>
-                    </md-input-container>
-                </div>
-                <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="60">
-                        <label>GitHub Username:</label>
-                        <input ng-model="ctrl.vm.github[0].username" placeholder="username" type="text" />
-                    </md-input-container>
-                    <md-input-container flex="40">
-                        <label>GitHub Personal Private Key:</label>
-                        <input ng-model="ctrl.vm.github[0].privateToken" placeholder="Your private key." type="password" />
-                        <div class="hint"><a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">How to generate a token?</a></div>
-                    </md-input-container>
-                </div>
-                <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="30">
-                        <label>Custom API Label:</label>
-                        <input ng-model="ctrl.vm.custom[0].label" placeholder="Any text to identify" type="text" />
-                    </md-input-container>
-                    <md-input-container flex="40">
-                        <label>Basic API Url:</label>
-                        <input ng-model="ctrl.vm.custom[0].baseUrl" placeholder="https://yourdomain.com/api/v1" type="text" />
-                        <!--<div class="hint"><a href="#" target="_blank">How to generate a token?</a></div>-->
-                    </md-input-container>
-                    <md-input-container flex="30">
-                        <label>Basic Auth Key btoa(username:password):</label>
-                        <input ng-model="ctrl.vm.custom[0].basicAuth" placeholder="Your private key." type="password" />
-                        <!--<div class="hint"><a href="#" target="_blank">How to generate a token?</a></div>-->
-                    </md-input-container>
-                    <md-input-container flex="30">
-                        <label>Custom Json Token to get Count:</label>
-                        <input ng-model="ctrl.vm.custom[0].jsonCountToken" placeholder="Json token to get counts." type="text" />
-                    </md-input-container>
-                </div>
-           </div>
+        <md-dialog-content>
+
+            <md-tabs md-dynamic-height md-border-bottom style="width: 750px; min-height: 350px;">
+                <md-tab label="General">
+                    <md-content class="md-padding">
+                        <div layout="column" layout-fill>
+                            <div layout="row" layout-align="start" flex>
+                                <md-input-container flex="20">
+                                    <label>Pages:</label>
+                                    <input ng-model="ctrl.pageCount" placeholder="0" type="number" required />
+                                </md-input-container>
+                                <md-input-container flex="20">
+                                    <label>Grid Rows:</label>
+                                    <input ng-model="ctrl.vm.rows" placeholder="0" type="number" required />
+                                </md-input-container>
+                                <md-input-container flex="20">
+                                    <label>Grid Columns:</label>
+                                    <input ng-model="ctrl.vm.columns" placeholder="0" type="number" required />
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Gitlab">
+                    <md-content class="md-padding">
+                        <div layout="column" layout-fill>
+                            <div layout="row" layout-align="start" flex>
+                                <md-input-container flex="60">
+                                    <label>Gitlab Host:</label>
+                                    <input ng-model="ctrl.vm.gitlab.host" placeholder="https://gitlab.com" type="text" />
+                                </md-input-container>
+                                <md-input-container flex="40">
+                                    <label>Gitlab Personal Private Key:</label>
+                                    <input ng-model="ctrl.vm.gitlab.privateToken" placeholder="Private Key" type="password" />
+                                    <div class="hint"><a href="https://docs.gitlab.com/ce/api/README.html#personal-access-tokens" target="_blank">How to generate a token?</a></div>
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="TFS">
+                    <md-content class="md-padding">
+                        <div layout="column" layout-fill>
+                            <div layout="row" layout-align="start" flex>
+                                <md-input-container flex="60">
+                                    <label>Tfs Host and Collection:</label>
+                                    <input ng-model="ctrl.vm.tfs.host" placeholder="https://username.visualstudio.com/DefaultCollection" type="text" />
+                                    <div class="hint"><a href="#" onclick="javascript: return false;" title="Start tfs-on-premise-ntlm.exe, run this web client from the tray, and type here the following url: http://localhost/Temporary_Listen_Addresses/dash-ci/api/[http|https]/yourhost/tfs/DefaultCollection" target="_blank">How to use TFS 2015 on-premise?</a></div>
+                                </md-input-container>
+                                <md-input-container flex="40">
+                                    <label>Tfs Personal Private Key:</label>
+                                    <input ng-model="ctrl.vm.tfs.privateToken" placeholder="Your private key. Leave empty for default credentials (NTLM)" type="password" />
+                                    <div class="hint"><a href="https://www.visualstudio.com/en-us/docs/integrate/get-started/auth/overview" target="_blank">How to generate a token?</a></div>
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Github">
+                    <md-content class="md-padding">
+                        <div layout="column" layout-fill>
+                            <div layout="row" layout-align="start" flex>
+                                <md-input-container flex="60">
+                                    <label>GitHub Username:</label>
+                                    <input ng-model="ctrl.vm.github[0].username" placeholder="username" type="text" />
+                                </md-input-container>
+                                <md-input-container flex="40">
+                                    <label>GitHub Personal Private Key:</label>
+                                    <input ng-model="ctrl.vm.github[0].privateToken" placeholder="Your private key." type="password" />
+                                    <div class="hint"><a href="https://help.github.com/articles/creating-an-access-token-for-command-line-use/" target="_blank">How to generate a token?</a></div>
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Custom API">
+                    <md-content class="md-padding">
+                        <div layout="column" layout-fill>
+                            <div layout="row" layout-align="start" flex>
+                                <md-input-container flex="30">
+                                    <label>Custom API Label:</label>
+                                    <input ng-model="ctrl.vm.custom[0].label" placeholder="Any text to identify" type="text" />
+                                </md-input-container>
+                                <md-input-container flex="70">
+                                    <label>Basic API Url:</label>
+                                    <input ng-model="ctrl.vm.custom[0].baseUrl" placeholder="https://yourdomain.com/api/v1" type="text" />
+                                    <!--<div class="hint"><a href="#" target="_blank">How to generate a token?</a></div>-->
+                                </md-input-container>
+                            </div>
+                            <div layout="row" layout-align="start" flex>
+                                <md-input-container flex="60">
+                                    <label>Basic Auth Key btoa(username:password):</label>
+                                    <input ng-model="ctrl.vm.custom[0].basicAuth" placeholder="Your private key." type="password" />
+                                    <!--<div class="hint"><a href="#" target="_blank">How to generate a token?</a></div>-->
+                                </md-input-container>
+                                <md-input-container flex="40">
+                                    <label>Custom Json Token to get Count:</label>
+                                    <input ng-model="ctrl.vm.custom[0].jsonCountToken" placeholder="Json token to get counts." type="text" />
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
         </md-dialog-content>
 
         <md-dialog-actions layout="row">
