@@ -47,7 +47,7 @@ var DashCI;
     }
     DashCI.wildcardMatch = wildcardMatch;
     function randomNess() {
-        return (Math.floor(Math.random() * 6) + 1) * 1000;
+        return (Math.floor(Math.random() * 10) + 1) * 1000;
     }
     DashCI.randomNess = randomNess;
     var EnumEx = (function () {

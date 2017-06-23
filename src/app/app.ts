@@ -52,7 +52,7 @@
     }
 
     export function randomNess():number {
-        return (Math.floor(Math.random() * 6) + 1) * 1000;
+        return (Math.floor(Math.random() * 10) + 1) * 1000;
     }
 
     export class EnumEx {
