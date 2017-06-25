@@ -124,6 +124,7 @@
         }
 
         public icon = "help";
+        public warn = false;
         public latest: Resources.Tfs.IBuild;
         public hideDetails: boolean;
         public hideAvatar: boolean;
@@ -183,6 +184,7 @@
                             case "default":
                                 this.icon = "help"; break;
                         }
+                        this.warn = this.latest.result == "partiallySucceeded";
 
                     }
                     else

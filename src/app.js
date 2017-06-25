@@ -2546,6 +2546,7 @@ var DashCI;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
                     this.icon = "help";
+                    this.warn = false;
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                     this.data.type = DashCI.Models.WidgetType.tfsBuild;
@@ -2678,6 +2679,7 @@ var DashCI;
                                         _this.icon = "help";
                                         break;
                                 }
+                                _this.warn = _this.latest.result == "partiallySucceeded";
                             }
                             else
                                 _this.icon = "help";

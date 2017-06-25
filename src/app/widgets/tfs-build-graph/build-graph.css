@@ -35,6 +35,11 @@ tfs-build-graph .histogram .bar.failed
    background-color: maroon;
 }
 
+tfs-build-graph .histogram .bar.warn {
+    background-color: rgb(255, 106, 0);
+    /*text-shadow: 0px 0px 3px #FFFFFF;*/
+}
+
 tfs-build-graph .unknown 
 {
     width: 100%;
