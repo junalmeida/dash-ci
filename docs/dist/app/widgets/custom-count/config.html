@@ -2,7 +2,7 @@
     <form ng-cloak>
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <h2>Configure Tfs Build Graph Widget</h2>
+                <h2>Configure Custom APIs Count Widget</h2>
                 <span flex></span>
                 <md-button class="md-icon-button" ng-click="ctrl.ok()">
                     <md-icon aria-label="Close">close</md-icon>
@@ -11,10 +11,7 @@
         </md-toolbar>
 
         <md-dialog-content layout-gt-sm="row" layout-padding style="width: 700px">
-            <div layout="row" layout-align="center" flex ng-if="!ctrl.projects">
-                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-            </div>
-            <div ng-if="ctrl.projects" layout="column" layout-fill>
+            <div layout="column" layout-fill>
 
                 <div layout="row" layout-align="start" flex>
                     <md-input-container flex="80">
@@ -29,11 +26,15 @@
                     </md-input-container>
                 </div>
                 <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="60">
-                        <label>Project:</label>
-                        <md-select ng-model="ctrl.vm.project" placeholder="Select a project">
-                            <md-option ng-value="opt.id" ng-repeat="opt in ctrl.projects">{{ opt.name }}</md-option>
+                    <md-input-container flex="20">
+                        <label>Account:</label>
+                        <md-select ng-model="ctrl.vm.label" placeholder="Select an account">
+                            <md-option ng-value="opt" ng-repeat="opt in ctrl.labels">{{ opt }}</md-option>
                         </md-select>
+                    </md-input-container>
+                    <md-input-container flex="60">
+                        <label>Api Relative Route:</label>
+                        <input ng-model="ctrl.vm.route" placeholder="/example/to/api" type="text" />
                     </md-input-container>
                     <md-input-container flex="20">
                         <label>Interval:</label>
@@ -41,30 +42,30 @@
                             <md-option ng-value="opt.value" ng-repeat="opt in ctrl.intervals">{{ opt.desc }}</md-option>
                         </md-select>
                     </md-input-container>
-                    <md-input-container flex="20">
-                        <label>Max builds:</label>
-                        <md-select ng-model="ctrl.vm.count" placeholder="Select the maximum number of builds to see">
-                            <md-option ng-value="opt.value" ng-repeat="opt in ctrl.buildCounts">{{ opt.desc }}</md-option>
-                        </md-select>
-                    </md-input-container>
                 </div>
                 <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="20">
+                        <label>Lower than:</label>
+                        <input ng-model="ctrl.vm.lowerThan.value" placeholder="" type="number" />
+                    </md-input-container>
                     <md-input-container flex="30">
-                        <md-checkbox ng-model="ctrl.vm.wildcardBuild" aria-label="Wildcard Build">
-                            Wildcard Build?
-                        </md-checkbox>
+                        <label>Color:</label>
+                        <md-select ng-model="ctrl.vm.lowerThan.color" placeholder="Select the background">
+                            <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
+                        </md-select>
                     </md-input-container>
-                    <md-input-container flex="70" ng-if="ctrl.vm.wildcardBuild">
-                        <label>Build:</label>
-                        <input ng-model="ctrl.vm.buildName" placeholder="XYZ-*" type="text" />
+                    <md-input-container flex="20">
+                        <label>Greater than:</label>
+                        <input ng-model="ctrl.vm.greaterThan.value" placeholder="" type="number" />
                     </md-input-container>
-                    <md-input-container flex="70" ng-if="!ctrl.vm.wildcardBuild">
-                        <label>Build:</label>
-                        <md-select ng-model="ctrl.vm.build" placeholder="Select a build definition">
-                            <md-option ng-value="opt.id" ng-repeat="opt in ctrl.builds">{{ opt.name }}</md-option>
+                    <md-input-container flex="30">
+                        <label>Color:</label>
+                        <md-select ng-model="ctrl.vm.greaterThan.color" placeholder="Select the background">
+                            <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
                         </md-select>
                     </md-input-container>
                 </div>
+
             </div>
         </md-dialog-content>
 
