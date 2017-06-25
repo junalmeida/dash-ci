@@ -22,11 +22,11 @@ namespace TfsOnPremiseNtlm
             var handler = new HttpClientHandler();
 
             var username = ConfigurationManager.AppSettings["username"];
-            var password = ConfigurationManager.AppSettings["password"];
-            var domain = ConfigurationManager.AppSettings["domain"];
             handler.UseDefaultCredentials = string.IsNullOrWhiteSpace(username);
             if (!handler.UseDefaultCredentials)
             {
+                var password = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(ConfigurationManager.AppSettings["password"]));
+                var domain = ConfigurationManager.AppSettings["domain"];
 
                 var credential = new NetworkCredential(username, password, domain);
                 var myCache = new CredentialCache();
@@ -40,7 +40,6 @@ namespace TfsOnPremiseNtlm
 
             using (var client = new HttpClient(handler))
             {
-                
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/json"));

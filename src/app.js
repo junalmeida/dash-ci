@@ -2402,8 +2402,8 @@ var DashCI;
                 }
                 LabelController.prototype.init = function () {
                     this.data.title = this.data.title || "Label";
-                    this.data.color = this.data.color || "semi-transp";
-                    this.data.align = this.data.align || "center";
+                    this.data.color = this.data.color || "transparent";
+                    this.data.align = this.data.align || "left";
                 };
                 LabelController.prototype.config = function () {
                     var _this = this;
