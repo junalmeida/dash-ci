@@ -620,6 +620,10 @@ var DashCI;
                 desc: "10 secs"
             },
             {
+                value: 15000,
+                desc: "15 secs"
+            },
+            {
                 value: 20000,
                 desc: "20 secs"
             },
@@ -1398,8 +1402,10 @@ var DashCI;
                     this.init();
                 }
                 CustomCountController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 CustomCountController.prototype.init = function () {
@@ -1438,8 +1444,10 @@ var DashCI;
                 };
                 CustomCountController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -1597,8 +1605,10 @@ var DashCI;
                     this.init();
                 }
                 GithubIssuesController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GithubIssuesController.prototype.init = function () {
@@ -1639,8 +1649,10 @@ var DashCI;
                 };
                 GithubIssuesController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -1799,8 +1811,10 @@ var DashCI;
                     this.init();
                 }
                 GitlabIssuesController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabIssuesController.prototype.init = function () {
@@ -1841,8 +1855,10 @@ var DashCI;
                 };
                 GitlabIssuesController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -1995,8 +2011,10 @@ var DashCI;
                     this.init();
                 }
                 GitlabPipelineController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabPipelineController.prototype.init = function () {
@@ -2052,8 +2070,10 @@ var DashCI;
                 };
                 GitlabPipelineController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -2225,8 +2245,10 @@ var DashCI;
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
                 GitlabPipelineGraphController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 GitlabPipelineGraphController.prototype.init = function () {
@@ -2268,8 +2290,10 @@ var DashCI;
                 };
                 GitlabPipelineGraphController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -2560,8 +2584,10 @@ var DashCI;
                     this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 }
                 TfsBuildController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsBuildController.prototype.init = function () {
@@ -2616,8 +2642,10 @@ var DashCI;
                 };
                 TfsBuildController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -2871,8 +2899,10 @@ var DashCI;
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
                 TfsBuildGraphController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsBuildGraphController.prototype.init = function () {
@@ -2914,8 +2944,10 @@ var DashCI;
                 };
                 TfsBuildGraphController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -3116,8 +3148,10 @@ var DashCI;
                     this.init();
                 }
                 TfsQueryChartController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsQueryChartController.prototype.init = function () {
@@ -3165,8 +3199,10 @@ var DashCI;
                 };
                 TfsQueryChartController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -3437,8 +3473,10 @@ var DashCI;
                     this.init();
                 }
                 TfsQueryCountController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsQueryCountController.prototype.init = function () {
@@ -3482,8 +3520,10 @@ var DashCI;
                 };
                 TfsQueryCountController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
@@ -3655,8 +3695,10 @@ var DashCI;
                     this.init();
                 }
                 TfsReleaseController.prototype.finalize = function () {
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
                 TfsReleaseController.prototype.init = function () {
@@ -3699,8 +3741,10 @@ var DashCI;
                 };
                 TfsReleaseController.prototype.updateInterval = function () {
                     var _this = this;
-                    if (this.handle)
+                    if (this.handle) {
+                        this.$timeout.cancel(this.handle);
                         this.$interval.cancel(this.handle);
+                    }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
                     }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.

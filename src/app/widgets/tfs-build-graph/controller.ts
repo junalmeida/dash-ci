@@ -44,8 +44,10 @@
 
         private handle: ng.IPromise<any>;
         private finalize() {
-            if (this.handle)
+            if (this.handle) {
+                this.$timeout.cancel(this.handle);
                 this.$interval.cancel(this.handle);
+            }
             DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
 
@@ -95,8 +97,10 @@
         }
 
         private updateInterval() {
-            if (this.handle)
+            if (this.handle) {
+                this.$timeout.cancel(this.handle);
                 this.$interval.cancel(this.handle);
+            }
             this.handle = this.$timeout(() => {
                 this.handle = this.$interval(() => this.update(), this.data.poolInterval);
             }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.

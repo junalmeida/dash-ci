@@ -64,6 +64,10 @@ namespace DashCI.Models {
             desc: "10 secs"
         },
         {
+            value: 15000,
+            desc: "15 secs"
+        },
+        {
             value: 20000,
             desc: "20 secs"
         },
