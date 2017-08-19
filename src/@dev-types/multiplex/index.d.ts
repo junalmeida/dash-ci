@@ -1,15 +1,4 @@
-﻿/*--------------------------------------------------------------------------
-* Multiplex.js - Comprehensive data-structure and LINQ library for JavaScript.
-* Ver 1.0.0 (Jun 25, 2015)
-*
-* Created and maintained by Kamyar Nazeri <Kamyar.Nazeri@yahoo.com>
-* Licensed under Apache License Version 2.0
-* https://github.com/multiplex/multiplex.js
-*
-*--------------------------------------------------------------------------*/
-
-
-declare var multiplex: multiplex.MultiplexStatic;
+﻿declare var multiplex: multiplex.MultiplexStatic;
 
 
 // Support AMD require
@@ -28,7 +17,7 @@ interface String extends multiplex.Iterable<string> { }
 
 
 
-declare module multiplex {
+declare namespace multiplex {
 
     /**
     * ES6 Iterable
@@ -65,6 +54,7 @@ declare module multiplex {
     }
     interface EnumeratorConstructor {
         new <T>(generator: (yielder: (value: T) => T) => any): Enumerator<T>;
+        prototype: Enumerator<any>
     }
 
 
@@ -106,15 +96,16 @@ declare module multiplex {
         * Defines an enumerator, which supports an iteration over the arguments local variable available within all functions.
         * @param obj arguments local variable available within all functions.
         */
-        new (obj: IArguments): Enumerable<any>;
+        new(obj: IArguments): Enumerable<any>;
 
         /**
         * Defines an enumerator, which supports an iteration over the properties of the specified object.
         * @param obj A regular Object.
         */
-        new (obj: Object): Enumerable<KeyValuePair<string, any>>;
+        new(obj: Object): Enumerable<KeyValuePair<string, any>>;
 
 
+        prototype: Enumerable<any>
 
 
         /**
@@ -172,6 +163,9 @@ declare module multiplex {
         * @param comparison The comparison to use.
         */
         create<T>(comparison: (x: T, y: T) => number): Comparer<T>;
+
+
+        prototype: Comparer<any>
     }
 
 
@@ -209,6 +203,9 @@ declare module multiplex {
         * @param equality The equality function.
         */
         create<T>(hashCodeProvider: (obj: T) => number, equality: (x: T, y: T) => boolean): EqualityComparer<T>;
+
+
+        prototype: EqualityComparer<any>
     }
 
 
@@ -244,6 +241,9 @@ declare module multiplex {
         * @param value The Iterable to wrap.
         */
         new <T>(value: Iterable<T>): Collection<T>
+
+
+        prototype: Collection<any>
     }
 
 
@@ -287,6 +287,9 @@ declare module multiplex {
         * @param list The list to wrap.
         */
         new <T>(list: List<T>): ReadOnlyCollection<T>
+
+
+        prototype: ReadOnlyCollection<any>
     }
 
 
@@ -451,13 +454,6 @@ declare module multiplex {
 
 
         /**
-        * Performs the specified action on each element of the List.
-        * @param action The action function to perform on each element of the List.
-        */
-        forEach(action: (item: T) => void): void
-
-
-        /**
         * Gets the element at the specified index.
         * @param index The zero-based index of the element to get.
         */
@@ -566,7 +562,7 @@ declare module multiplex {
         * @param index The zero-based starting index of the range to reverse.
         * @param count The number of elements in the range to reverse.
         */
-        reverse(index: number, count: number): void
+        reverse(index: number, count: number): List<T>
 
 
         /**
@@ -646,6 +642,9 @@ declare module multiplex {
         * @param collection The collection whose elements are copied to the new list.
         */
         new <T>(collection: Iterable<T>): List<T>
+
+
+        prototype: List<any>
     }
 
 
@@ -815,6 +814,9 @@ declare module multiplex {
         * @param comparer The Comparer implementation to use when comparing keys.-or-null to use the default Comparer for the type of the key.
         */
         new <TKey, TValue>(capacity: number, comparer: Comparer<TKey>): SortedList<TKey, TValue>
+
+
+        prototype: SortedList<any, any>
     }
 
 
@@ -843,6 +845,9 @@ declare module multiplex {
         * @param value The definition associated with key.
         */
         new <TKey, TValue>(key: TKey, value: TValue): KeyValuePair<TKey, TValue>
+
+
+        prototype: KeyValuePair<any, any>
     }
 
 
@@ -976,6 +981,9 @@ declare module multiplex {
         * @param comparer The EqualityComparer implementation to use when comparing keys.
         */
         new <TKey, TValue>(dictionary: Dictionary<TKey, TValue>, comparer: EqualityComparer<TKey>): Dictionary<TKey, TValue>
+
+
+        prototype: Dictionary<any, any>
     }
 
 
@@ -1144,9 +1152,12 @@ declare module multiplex {
         * @param comparer The EqualityComparer implementation to use when comparing values in the set.
         */
         new <T>(collection: Iterable<T>, comparer: EqualityComparer<T>): HashSet<T>
+
+
+        prototype: HashSet<any>
     }
 
-    
+
 
     /**
     * Represents a node in a LinkedList.
@@ -1183,6 +1194,9 @@ declare module multiplex {
         * @param value The value to contain in the LinkedListNode
         */
         new <T>(value: T): LinkedListNode<T>
+
+
+        prototype: LinkedListNode<any>
     }
 
 
@@ -1346,6 +1360,9 @@ declare module multiplex {
         * @param collection The collection to copy elements from.
         */
         new <T>(collection: Iterable<T>): LinkedList<T>
+
+
+        prototype: LinkedList<any>
     }
 
 
@@ -1404,6 +1421,9 @@ declare module multiplex {
         * @param collection The collection to copy elements from.
         */
         new <T>(collection: Iterable<T>): Queue<T>
+
+
+        prototype: Queue<any>
     }
 
 
@@ -1463,6 +1483,9 @@ declare module multiplex {
         * @param collection The collection to copy elements from.
         */
         new <T>(collection: Iterable<T>): Stack<T>
+
+
+        prototype: Stack<any>
     }
 
 
@@ -1934,7 +1957,7 @@ declare module multiplex {
         * Filters the elements of an Enumerable based on a specified type.
         * @param type The type to filter the elements of the sequence on.
         */
-        ofType<TResult>(type: { new (...args: any[]): TResult }): Enumerable<TResult>
+        ofType<TResult>(type: { new(...args: any[]): TResult }): Enumerable<TResult>
 
 
         /**
@@ -1950,7 +1973,7 @@ declare module multiplex {
         * @param keySelector A function to extract a key from each element.
         * @param comparer A Comparer to compare keys.
         */
-        orderBy<TKey>(keySelector: (item: T) => TKey, comparer: EqualityComparer<TKey>): OrderedEnumerable<T>
+        orderBy<TKey>(keySelector: (item: T) => TKey, comparer: Comparer<TKey>): OrderedEnumerable<T>
 
 
         /**
@@ -1968,7 +1991,7 @@ declare module multiplex {
         * @param keySelector A function to extract a key from each element.
         * @param comparer A Comparer to compare keys.
         */
-        orderByDescending<TKey>(keySelector: (item: T) => TKey, comparer: EqualityComparer<TKey>): OrderedEnumerable<T>
+        orderByDescending<TKey>(keySelector: (item: T) => TKey, comparer: Comparer<TKey>): OrderedEnumerable<T>
 
 
         /**
@@ -2390,7 +2413,10 @@ declare module multiplex {
         (obj: Object): Enumerable<KeyValuePair<string, any>>
 
 
-
+        /**
+        * Returns an empty Enumerable.
+        */
+        (): Enumerable<any>
 
 
 
