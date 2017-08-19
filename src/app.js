@@ -486,6 +486,14 @@ var DashCI;
                     this.currentPage.widgets.splice(idx, 1);
                 }
             };
+            MainController.prototype.duplicateWidget = function (widget) {
+                var idx = this.currentPage.widgets.indexOf(widget);
+                if (idx > -1) {
+                    var newWidget = angular.copy(widget);
+                    newWidget.position = { left: -1, top: -1, width: 6, height: 4 };
+                    this.currentPage.widgets.push(newWidget);
+                }
+            };
             MainController.prototype.toggleEditable = function () {
                 this.editable = !this.editable;
                 this.gridOptions.showGrid = this.editable;
