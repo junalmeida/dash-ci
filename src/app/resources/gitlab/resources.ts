@@ -13,7 +13,7 @@
         ['$resource', 'globalOptions',
             ($resource: ng.resource.IResourceService, globalOptions: Models.IOptions) => (): IGitlabResource => {
 
-            if (!globalOptions || !globalOptions.gitlab || !globalOptions.gitlab.host)
+            if (!globalOptions || !globalOptions.gitlab || !globalOptions.gitlab.host || !globalOptions.gitlab.privateToken)
                 return null;
 
             var headers = {

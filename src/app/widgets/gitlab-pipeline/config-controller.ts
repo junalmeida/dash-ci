@@ -13,16 +13,25 @@ namespace DashCI.Widgets.GitlabPipeline {
             this.init();
         }
 
+        public initialized = false;
+
         private init() {
             var res = this.gitlabResources();
-            if (!res) return;
+            if (!res) {
+                this.projects = null;
+                this.initialized = true;
+                return;
+            }
+
             res.project_list().$promise
                 .then((result: Resources.Gitlab.IProject[]) => {
                     this.projects = mx(result).orderBy(x=> x.name_with_namespace).toArray();
+                    this.initialized = true;
                 })
                 .catch((reason) => {
                     console.error(reason);
                     this.projects = [];
+                    this.initialized = true;
                 });
         }
 
