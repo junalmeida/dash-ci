@@ -31,7 +31,7 @@ var DashCI;
             $mdThemingProvider.theme('default')
                 .dark()
                 .accentPalette('orange');
-            //$resourceProvider.defaults.stripTrailingSlashes = true;
+            $resourceProvider.defaults.stripTrailingSlashes = false;
         }]);
     DashCI.app.run(["$rootScope", function ($rootScope) {
             angular.element(window).on("resize", function () {
@@ -872,7 +872,7 @@ var DashCI;
                         execute_count: {
                             method: 'GET',
                             isArray: false,
-                            url: host + ":route",
+                            url: host + ":route?:params",
                             headers: headers,
                             cache: false,
                             transformResponse: countParser
@@ -1441,7 +1441,8 @@ var DashCI;
                         return;
                     DashCI.DEBUG && console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
                     res.execute_count({
-                        route: this.data.route
+                        route: this.data.route,
+                        params: this.data.params
                     }).$promise.then(function (newCount) {
                         //var newCount = Math.round(Math.random() * 100);
                         if (newCount.count != _this.count) {

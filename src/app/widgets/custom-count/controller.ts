@@ -2,6 +2,7 @@
     export interface ICustomCountData extends Models.IWidgetData {
         label?: string;
         route?: string;
+        params?: string;
         poolInterval?: number;
         lowerThan?: {
             value: number;
@@ -116,7 +117,8 @@
 
             DashCI.DEBUG && console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
             res.execute_count({
-                route: this.data.route
+                route: this.data.route,
+                params: this.data.params
             }).$promise.then((newCount: Resources.Custom.ICount) => {
                 //var newCount = Math.round(Math.random() * 100);
 

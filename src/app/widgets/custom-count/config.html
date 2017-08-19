@@ -32,9 +32,13 @@
                             <md-option ng-value="opt" ng-repeat="opt in ctrl.labels">{{ opt }}</md-option>
                         </md-select>
                     </md-input-container>
-                    <md-input-container flex="60">
+                    <md-input-container flex="20">
                         <label>Api Relative Route:</label>
                         <input ng-model="ctrl.vm.route" placeholder="/example/to/api" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="40">
+                        <label>Api Query Params:</label>
+                        <input ng-model="ctrl.vm.params" placeholder="q=value&p=param" type="text" />
                     </md-input-container>
                     <md-input-container flex="20">
                         <label>Interval:</label>

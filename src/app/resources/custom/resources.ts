@@ -1,7 +1,7 @@
 ﻿namespace DashCI.Resources.Custom {
 
     export interface ICustomResource extends ng.resource.IResourceClass<any> {
-        execute_count(param: { route: string }): ICount;
+        execute_count(param: { route: string, params?: string }): ICount;
     }
 
     DashCI.app.factory('customResources',
@@ -73,7 +73,7 @@
                 execute_count: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: false,
-                    url: host + ":route",
+                    url: host + ":route?:params",
                     headers: headers,
                     cache: false,
                     transformResponse: countParser
