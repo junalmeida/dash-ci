@@ -13,7 +13,8 @@ namespace DashCI.Models {
         githubIssues = 9,
         tfsRelease = 10,
         tfsQueryChart = 11,
-        customCount = 12
+        customCount = 12,
+        customPostIt = 13
     }
     export enum WidgetCategory {
         generic = 1,
@@ -130,6 +131,13 @@ namespace DashCI.Models {
             directive: "custom-count",
             title: "Custom API Count",
             desc: "Shows the count of the result of a custom REST API.",
+            category: WidgetCategory.custom
+        },
+        {
+            type: WidgetType.customPostIt,
+            directive: "custom-postit",
+            title: "Custom API Post It View",
+            desc: "Shows 'PostIt' of the result of a custom REST API.",
             category: WidgetCategory.custom
         },
     ]);

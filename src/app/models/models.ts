@@ -58,6 +58,7 @@ namespace DashCI.Models {
             baseUrl: string;
             basicAuth: string;
             jsonCountToken: string;
+            jsonListToken: string;
         }[],
 
         circleci: {

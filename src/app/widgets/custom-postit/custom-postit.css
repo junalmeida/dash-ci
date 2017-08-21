@@ -1,0 +1,11 @@
+﻿custom-postit p {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+custom-postit .content {
+    height: auto;
+    margin-bottom: 15px;
+}

@@ -21,6 +21,7 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -35,6 +36,9 @@
     <Content Include="app\widgets\custom-count\config.html" />
     <Content Include="app\widgets\custom-count\custom-count.css" />
     <Content Include="app\widgets\custom-count\custom-count.html" />
+    <Content Include="app\widgets\custom-postit\config.html" />
+    <Content Include="app\widgets\custom-postit\custom-postit.css" />
+    <Content Include="app\widgets\custom-postit\custom-postit.html" />
     <Content Include="app\widgets\github-issues\config.html" />
     <Content Include="app\widgets\github-issues\issues.css" />
     <Content Include="app\widgets\github-issues\issues.html" />
@@ -104,6 +108,9 @@
     <TypeScriptCompile Include="app\widgets\custom-count\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\custom-count\controller.ts" />
     <TypeScriptCompile Include="app\widgets\custom-count\custom-count.ts" />
+    <TypeScriptCompile Include="app\widgets\custom-postit\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\custom-postit\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\custom-postit\custom-postit.ts" />
     <TypeScriptCompile Include="app\widgets\github-issues\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\github-issues\controller.ts" />
     <TypeScriptCompile Include="app\widgets\github-issues\issues.ts" />
