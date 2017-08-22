@@ -56,6 +56,10 @@
                             <md-option ng-value="opt.value" ng-repeat="opt in ctrl.intervals">{{ opt.desc }}</md-option>
                         </md-select>
                     </md-input-container>
+                    <md-input-container flex="80">
+                        <label>Milestone:</label>
+                        <input ng-model="ctrl.vm.milestone" placeholder="Type milestone name" type="text" />
+                    </md-input-container>
                 </div>
                 <div layout="row" layout-align="start" flex>
                     <md-input-container flex="80">
