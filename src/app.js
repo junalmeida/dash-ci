@@ -1042,7 +1042,7 @@ var DashCI;
                         issue_count: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
+                            url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&milestone=:milestone&state=:state&per_page=1",
                             headers: headers,
                             cache: false,
                             transformResponse: countParser
@@ -1577,6 +1577,7 @@ var DashCI;
                     this.data.color = this.data.color || "grey";
                     //default values
                     this.data.labels = this.data.labels || "bug";
+                    this.data.milestone = this.data.milestone || "";
                     this.data.status = this.data.status || "open";
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
@@ -1837,6 +1838,7 @@ var DashCI;
                         scope: this.data.query_type,
                         scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
                         labels: this.data.labels,
+                        milestone: this.data.milestone,
                         state: this.data.status
                     }).$promise.then(function (newCount) {
                         //var newCount = Math.round(Math.random() * 100);
