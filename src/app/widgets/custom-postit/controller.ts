@@ -4,8 +4,15 @@
         route?: string;
         params?: string;
         poolInterval?: number;
-        headerToken?: string;
-        line1Token?: string;
+
+        postItColor?: string;
+
+        columns?: number;
+
+        headerTokens?: string;
+        line1Tokens?: string;
+        line2Tokens?: string;
+        avatarToken?: string;
     }
 
 
@@ -53,7 +60,9 @@
 
         private init() {
             this.data.title = this.data.title || "PostIt";
-            this.data.color = this.data.color || "grey";
+            this.data.color = "transparent";
+            this.data.postItColor = this.data.postItColor || "amber";
+            this.data.columns = this.data.columns || 1;
 
             //default values
             this.data.poolInterval = this.data.poolInterval || 10000;
@@ -91,7 +100,9 @@
         }
 
         public count: number = null;
+        public list: PostItListItem[] = null;
         public colorClass: string;
+
         private updateInterval() {
             if (this.handle) {
                 this.$timeout.cancel(this.handle);
@@ -124,6 +135,48 @@
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
 
+                this.list = mx(newPostIt.list)
+                    .select((item) => {
+                        var title = "";
+                        var resume = "";
+                        var desc = "";
+                        var tokens = (this.data.headerTokens || "").split(",");
+                        angular.forEach(tokens, (token) => {
+                            var value = item[token];
+                            if (title && value)
+                                title += " - ";
+                            if (value)
+                                title += value;
+                        });
+                        tokens = (this.data.line1Tokens || "").split(",");
+                        angular.forEach(tokens, (token) => {
+                            var value = item[token];
+                            if (resume && value)
+                                resume += " - ";
+                            if (value)
+                                resume += value;
+                        });
+                        tokens = (this.data.line2Tokens || "").split(",");
+                        angular.forEach(tokens, (token) => {
+                            var value = item[token];
+                            if (desc && value)
+                                desc += " - ";
+                            if (value)
+                                desc += value;
+                        });
+
+
+                        var ret = <PostItListItem>{
+                            avatarUrl: item[this.data.avatarToken],
+                            resume: resume,
+                            description: desc,
+                            title: title,
+                            colorClass: this.data.postItColor
+                        };
+                        return ret;
+
+                    }).toArray();
+
                 DashCI.DEBUG && console.log("end custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
             })
             .catch((reason) => {
@@ -133,6 +186,14 @@
             this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
+    }
+
+    export class PostItListItem {
+        public avatarUrl: string;
+        public title: string;
+        public resume: string;
+        public description: string;
+        public colorClass: string;
     }
 
 }

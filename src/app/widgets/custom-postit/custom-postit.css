@@ -1,11 +1,135 @@
-﻿custom-postit p {
-    padding: 0;
-    margin: 0;
-    text-align: center;
-    font-weight: bold;
+﻿custom-post-it .content {
+    position: relative;
+    height: auto;
+    margin-bottom: 12px;
+    display: inline-block;
+    overflow: hidden;
 }
 
-custom-postit .content {
-    height: auto;
-    margin-bottom: 15px;
+custom-post-it .one-column .content
+{
+    width: 100%;
+    margin-right: 0;
+}
+
+custom-post-it .two-column .content {
+    width: 45%;
+    margin-right: 12px;
+}
+
+
+custom-post-it .content:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-width: 0 16px 16px 0;
+    border-style: solid;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+    /* Firefox 3.0 damage limitation */
+    display: block;
+    width: 0;
+}
+
+/*#region colors*/
+    custom-post-it .content.transparent:before {
+        border-color: #000 #000 #222 #222;
+        background: #222;
+    }
+
+    custom-post-it .content.semi-transp:before {
+        border-color: #000 #000 #222 #222;
+        background: #222;
+    }
+
+    custom-post-it .content.red:before {
+        border-color: #000 #000 #a82d24 #a82d24;
+        background: #a82d24;
+    }
+
+    custom-post-it .content.turkoise:before {
+        border-color: #000 #000 #31817b #31817b;
+        background: #31817b;
+    }
+
+    custom-post-it .content.green:before {
+        border-color: #000 #000 #76973b #76973b;
+        background: #76973b;
+    }
+
+    custom-post-it .content.deep-green:before {
+        border-color: #000 #000 #164d1b #164d1b;
+        background: #164d1b;
+    }
+
+    custom-post-it .content.purple:before {
+        border-color: #000 #000 #6f2f53 #6f2f53;
+        background: #6f2f53;
+    }
+
+    custom-post-it .content.pink:before {
+        border-color: #000 #000 #b5174d #b5174d;
+        background: #b5174d;
+    }
+
+    custom-post-it .content.blue:before {
+        border-color: #000 #000 #1a76bf #1a76bf;
+        background: #1a76bf;
+    }
+
+    custom-post-it .content.amber:before {
+        border-color: #000 #000 #b08504 #b08504;
+        background: #b08504;
+    }
+
+    custom-post-it .content.orange:before {
+        border-color: #000 #000 #c7451c #c7451c;
+        background: #c7451c;
+    }
+
+    custom-post-it .content.brown:before {
+        border-color: #000 #000 #5b4138 #5b4138;
+        background: #5b4138;
+    }
+
+    custom-post-it .content.grey:before {
+        border-color: #000 #000 #797979 #797979;
+        background: #797979;
+    }
+/*#endregion*/
+
+/*#region rounded corner */
+/*custom-post-it .content {
+    -moz-border-radius: 5px 0 5px 5px;
+    border-radius: 5px 0 5px 5px;
+}
+
+custom-post-it .content:before {
+    border-width: 8px;
+    border-color: #fff #fff transparent transparent;
+    -moz-border-radius: 0 0 0 5px;
+    border-radius: 0 0 0 5px;
+}*/
+
+/*#endregion */
+
+
+custom-post-it .content .header {
+    white-space: nowrap;
+}
+
+custom-post-it .content p
+{
+    margin: 0;
+    padding: 5px;
+}
+
+custom-post-it .content p.resume {
+    font-size: 1.1em;
+}
+
+custom-post-it .content p.desc {
+    font-size: 1em;
 }

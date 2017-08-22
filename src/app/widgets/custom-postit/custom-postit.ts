@@ -13,13 +13,13 @@
         constructor() { }
 
         public restrict = "E";
-        public templateUrl = "app/widgets/custom-count/custom-count.html";
+        public templateUrl = "app/widgets/custom-postit/custom-postit.html";
         public replace = false;
         public controller = CustomPostItController;
         public controllerAs = "ctrl";
         /* Binding css to directives */
         public css = {
-            href: "app/widgets/custom-count/custom-count.css",
+            href: "app/widgets/custom-postit/custom-postit.css",
             persist: true
         }
 

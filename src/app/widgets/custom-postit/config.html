@@ -20,7 +20,7 @@
                     </md-input-container>
                     <md-input-container flex="20">
                         <label>Color:</label>
-                        <md-select ng-model="ctrl.vm.color" placeholder="Select the background">
+                        <md-select ng-model="ctrl.vm.postItColor" placeholder="Select the background">
                             <md-option ng-value="color.code" ng-repeat="color in ctrl.colors">{{color.desc}}</md-option>
                         </md-select>
                     </md-input-container>
@@ -50,13 +50,28 @@
 
 
                 <div layout="row" layout-align="start" flex>
-                    <md-input-container flex="20">
+                    <md-input-container flex="25">
                         <label>Header Json Token:</label>
-                        <input ng-model="ctrl.vm.headerToken" placeholder="jsonTokenPropertyName" type="text" />
+                        <input ng-model="ctrl.vm.headerTokens" placeholder="comma separated jsonTokenPropertyName" type="text" />
                     </md-input-container>
-                    <md-input-container flex="20">
+                    <md-input-container flex="25">
                         <label>First Line Json Token:</label>
-                        <input ng-model="ctrl.vm.line1Token" placeholder="jsonTokenPropertyName" type="text" />
+                        <input ng-model="ctrl.vm.line1Tokens" placeholder="comma separated jsonTokenPropertyName" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="25">
+                        <label>Second Line Json Token:</label>
+                        <input ng-model="ctrl.vm.line2Tokens" placeholder="comma separated jsonTokenPropertyName" type="text" />
+                    </md-input-container>
+                    <md-input-container flex="25">
+                        <label>Avatar Url Json Token:</label>
+                        <input ng-model="ctrl.vm.avatarToken" placeholder="jsonTokenPropertyName" type="text" />
+                    </md-input-container>
+                </div>
+
+                <div layout="row" layout-align="start" flex>
+                    <md-input-container flex="25">
+                        <label>Columns:</label>
+                        <input ng-model="ctrl.vm.columns" type="number" min="1" max="2" />
                     </md-input-container>
                 </div>
             </div>

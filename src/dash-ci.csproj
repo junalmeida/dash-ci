@@ -156,7 +156,9 @@
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\github-pages.pubxml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="app\widgets\tfs-postit\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

@@ -77,7 +77,7 @@
                     data = angular.fromJson(data);
                     var parameter = accounts[0].jsonListToken;
 
-                    var parsedList = <any[]>(parameter ? data : data[parameter]);
+                    var parsedList = <any[]>(parameter ? data[parameter] : data);
 
 
                     var ret = <IList>{

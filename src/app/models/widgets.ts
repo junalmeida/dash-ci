@@ -135,7 +135,7 @@ namespace DashCI.Models {
         },
         {
             type: WidgetType.customPostIt,
-            directive: "custom-postit",
+            directive: "custom-post-it",
             title: "Custom API Post It View",
             desc: "Shows 'PostIt' of the result of a custom REST API.",
             category: WidgetCategory.custom
