@@ -60,6 +60,9 @@
     <Content Include="app\widgets\tfs-build\config.html" />
     <Content Include="app\widgets\tfs-build\build.css" />
     <Content Include="app\widgets\tfs-build\build.html" />
+    <Content Include="app\widgets\tfs-postit\config.html" />
+    <Content Include="app\widgets\tfs-postit\tfs-postit.css" />
+    <Content Include="app\widgets\tfs-postit\tfs-postit.html" />
     <Content Include="app\widgets\tfs-query-chart\config.html" />
     <Content Include="app\widgets\tfs-query-chart\tfs-query-chart.css" />
     <Content Include="app\widgets\tfs-query-chart\tfs-query-chart.html" />
@@ -129,6 +132,9 @@
     <TypeScriptCompile Include="app\widgets\tfs-build\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-build\directive.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-postit\config-controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-postit\controller.ts" />
+    <TypeScriptCompile Include="app\widgets\tfs-postit\tfs-postit.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-chart\config-controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-chart\controller.ts" />
     <TypeScriptCompile Include="app\widgets\tfs-query-chart\tfs-query-chart.ts" />
@@ -156,9 +162,7 @@
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\github-pages.pubxml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="app\widgets\tfs-postit\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

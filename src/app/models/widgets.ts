@@ -14,7 +14,8 @@ namespace DashCI.Models {
         tfsRelease = 10,
         tfsQueryChart = 11,
         customCount = 12,
-        customPostIt = 13
+        customPostIt = 13,
+        tfsPostIt = 14
     }
     export enum WidgetCategory {
         generic = 1,
@@ -124,6 +125,13 @@ namespace DashCI.Models {
             directive: "tfs-query-chart",
             title: "TFS - Query Chart",
             desc: "Shows the count of saved querys count at a chart.",
+            category: WidgetCategory.tfs
+        },
+        {
+            type: WidgetType.tfsPostIt,
+            directive: "tfs-post-it",
+            title: "TFS - Post It View",
+            desc: "Shows 'PostIt' of the result of a query.",
             category: WidgetCategory.tfs
         },
         {

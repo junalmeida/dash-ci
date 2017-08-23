@@ -2,6 +2,6 @@
     <md-icon>settings</md-icon>
 </md-button>
 <div ng-class="ctrl.colorClass" class="content">
-    <div class="header" ng-if="data.header">{{data.title}}</div>
+    <div class="header" ng-if="data.header && data.title">{{data.title}}</div>
     <p class="center">{{ctrl.queryCount == null ? '?' : ctrl.queryCount}}</p>
 </div>

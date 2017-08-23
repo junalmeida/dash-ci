@@ -5,6 +5,7 @@
         team_list(param: { project: string }): ITeamResult
         query_list(param: { project: string, folder: string }): IQueryResult
         run_query(param: { project: string; team?: string, queryId: string }): IRunQueryResult;
+        get_workitems(param: { ids: string }): IWorkItemsResult;
         latest_build(param: { project: string; build: number|string }): IBuildResult;
         recent_builds(param: { project: string; build: number|string, count: number }): IBuildResult;
         build_definition_list(param: { project: string; name: string }): IBuildDefinitionResult;
@@ -67,6 +68,15 @@
                         method: 'GET',
                         isArray: false,
                         url: globalOptions.tfs.host + "/:project/:team/_apis/wit/wiql/:queryId?api-version=2.2",
+                        headers: headers,
+                        cache: false,
+                        withCredentials: withCredentials
+                    },
+
+                    get_workitems: <ng.resource.IActionDescriptor>{
+                        method: 'GET',
+                        isArray: false,
+                        url: globalOptions.tfs.host + "/_apis/wit/WorkItems?ids=:ids&fields=System.Id,System.Links.LinkType,System.WorkItemType,System.Title,System.AssignedTo,System.State,System.IterationPath&api-version=1.0",
                         headers: headers,
                         cache: false,
                         withCredentials: withCredentials
