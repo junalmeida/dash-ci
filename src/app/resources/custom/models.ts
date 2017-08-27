@@ -3,4 +3,9 @@
         count: number;
     }
 
+    export interface IList extends ng.resource.IResource<IList> {
+        count: number;
+        list: any[];
+    }
+
 }

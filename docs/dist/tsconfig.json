@@ -12,6 +12,7 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
+    "strictNullChecks": false,
 
     "module": "none",
     "moduleResolution": "node",

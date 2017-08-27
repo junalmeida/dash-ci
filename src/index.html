@@ -58,6 +58,9 @@
             <md-button title="Remove" class="remove-widget md-icon-button md-mini" ng-show="main.editable" ng-click="main.removeWidget(widget)">
                 <md-icon>close</md-icon>
             </md-button>
+            <md-button title="Duplicate" class="duplicate-widget md-icon-button md-mini" ng-show="main.editable" ng-click="main.duplicateWidget(widget)">
+                <md-icon>content_copy</md-icon>
+            </md-button>
             <div class="padder">
                 <widget-loader scope="widget" editable="main.editable" global-options="main.options"></widget-loader>
             </div>

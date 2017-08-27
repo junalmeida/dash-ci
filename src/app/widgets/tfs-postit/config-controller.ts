@@ -1,6 +1,7 @@
-﻿namespace DashCI.Widgets.TfsQueryChart {
+﻿
+namespace DashCI.Widgets.TfsPostIt {
 
-    export class TfsQueryChartConfigController implements ng.IController {
+    export class TfsPostItConfigController implements ng.IController {
         public static $inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config"];
         constructor(
             private $scope: ng.IScope,
@@ -9,10 +10,11 @@
             public tfsResources: () => Resources.Tfs.ITfsResource,
             public colors: Models.ICodeDescription[],
             public intervals: Models.IValueDescription[],
-            public vm: ITfsQueryChartData
-        ) { 
+            public vm: ITfsPostItData
+        ) {
             this.init();
         }
+
 
         private init() {
             var res = this.tfsResources();
@@ -31,7 +33,6 @@
                 this.getTeams();
                 this.getQueries();
             });
-            this.$scope.$watch(() => this.vm.queryCount, () => this.setQueryList());
         }
 
         public projects: Resources.Tfs.IProject[];
@@ -78,23 +79,6 @@
                     console.error(reason);
                     this.teams = [];
                 });;
-        }
-
-
-        private setQueryList() {
-            if (this.vm.queryIds.length < this.vm.queryCount) {
-                for (var i = 0; i < this.vm.queryCount; i++) {
-                    this.vm.queryIds.push("");
-                    this.vm.queryColors.push("");
-                }
-            }
-            else if (this.vm.queryIds.length > this.vm.queryCount)
-            {
-                while (this.vm.queryIds.length > this.vm.queryCount) {
-                    this.vm.queryIds.pop();
-                    this.vm.queryColors.pop();
-                }
-            }
         }
 
 

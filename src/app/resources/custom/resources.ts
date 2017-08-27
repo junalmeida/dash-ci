@@ -1,7 +1,8 @@
 ﻿namespace DashCI.Resources.Custom {
 
     export interface ICustomResource extends ng.resource.IResourceClass<any> {
-        execute_count(param: { route: string }): ICount;
+        execute_count(param: { route: string, params?: string }): ICount;
+        execute_list(param: { route: string, params?: string }): IList;
     }
 
     DashCI.app.factory('customResources',
@@ -67,16 +68,48 @@
 
             };
 
+
+            var listParser = (data: any, getHeaders: Function, status: number) => {
+                if (status == 200) {
+                    var count = <ICount>countParser(data, getHeaders, status);
+                   
+
+                    data = angular.fromJson(data);
+                    var parameter = accounts[0].jsonListToken;
+
+                    var parsedList = <any[]>(parameter ? data[parameter] : data);
+
+
+                    var ret = <IList>{
+                        count: count.count,
+                        list: parsedList
+                    };
+                    return ret;
+                }
+                else
+                    return data;
+
+            };
+
+
             var host = accounts[0].baseUrl;
             // Return the resource, include your custom actions
             return <ICustomResource>$resource(host, {}, {
                 execute_count: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: false,
-                    url: host + ":route",
+                    url: host + ":route?:params",
                     headers: headers,
                     cache: false,
                     transformResponse: countParser
+                },
+                execute_list: <ng.resource.IActionDescriptor>{
+                    method: 'GET',
+                    isArray: false,
+                    url: host + ":route?:params",
+                    headers: headers,
+                    cache: false,
+                    transformResponse: listParser
                 },
             });
     }])

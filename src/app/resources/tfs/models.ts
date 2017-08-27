@@ -42,6 +42,12 @@
     export interface IRunQueryResult extends ng.resource.IResource<IRunQueryResult> {
         workItems: IWorkItem[]
     }
+
+    export interface IWorkItemsResult extends ng.resource.IResource<IWorkItemsResult> {
+        count: number;
+        value: IWorkItem[];
+    }
+
     export interface IProject {
         id: string;
         name: string;
@@ -62,6 +68,14 @@
     export interface IWorkItem {
         id: string;
         url: string;
+        fields: {
+            'System.Id': number;
+            'System.WorkItemType': string;
+            'System.State': string;
+            'System.Title': string;
+            'System.AssignedTo': string;
+            'System.IterationPath': string;
+        },
     }
     export interface IBuild {
         id: string;

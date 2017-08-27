@@ -100,7 +100,7 @@
                                 </md-input-container>
                             </div>
                             <div layout="row" layout-align="start" flex>
-                                <md-input-container flex="60">
+                                <md-input-container flex="40">
                                     <label>Basic Auth Key btoa(username:password):</label>
                                     <input ng-model="ctrl.vm.custom[0].basicAuth" placeholder="Your private key." type="password" />
                                     <!--<div class="hint"><a href="#" target="_blank">How to generate a token?</a></div>-->
@@ -108,6 +108,10 @@
                                 <md-input-container flex="40">
                                     <label>Custom Json Token to get Count:</label>
                                     <input ng-model="ctrl.vm.custom[0].jsonCountToken" placeholder="Json token to get counts." type="text" />
+                                </md-input-container>
+                                <md-input-container flex="40">
+                                    <label>Custom Json Token to get List:</label>
+                                    <input ng-model="ctrl.vm.custom[0].jsonListToken" placeholder="Json token to get lists." type="text" />
                                 </md-input-container>
                             </div>
                         </div>

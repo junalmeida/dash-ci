@@ -48,7 +48,12 @@
                     angular.forEach(result[0].children || result[0].value, (item) => q.push(item));
                     angular.forEach(result[1].children || result[1].value, (item) => q.push(item));
 
+                    mx(q).forEach(x => {
+                        if (x.children)
+                            x.children = mx(x.children).orderBy(y => y.name).toArray();
+                    });
                     this.queries = mx(q).orderBy(x => x.name).toArray();
+                    
                 }).catch((reason) => {
                     console.error(reason);
                     this.queries = [];

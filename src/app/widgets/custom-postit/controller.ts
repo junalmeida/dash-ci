@@ -1,24 +1,25 @@
-﻿namespace DashCI.Widgets.CustomCount {
-    export interface ICustomCountData extends Models.IWidgetData {
+﻿namespace DashCI.Widgets.CustomPostIt {
+    export interface ICustomPostItData extends Models.IWidgetData {
         label?: string;
         route?: string;
         params?: string;
         poolInterval?: number;
-        lowerThan?: {
-            value: number;
-            color: string;
-        };
-        greaterThan?: {
-            value: number;
-            color: string;
-        };
+
+        postItColor?: string;
+
+        columns?: number;
+
+        headerTokens?: string;
+        line1Tokens?: string;
+        line2Tokens?: string;
+        avatarToken?: string;
     }
 
 
-    export class CustomCountController implements ng.IController {
+    export class CustomPostItController implements ng.IController {
         public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "customResources"];
 
-        private data: ICustomCountData;
+        private data: ICustomPostItData;
 
         constructor(
             private $scope: Models.IWidgetScope,
@@ -30,7 +31,7 @@
         ) {
             this.data = this.$scope.data;
             this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-            this.data.type = Models.WidgetType.customCount;
+            this.data.type = Models.WidgetType.customPostIt;
             this.data.footer = false;
             this.data.header = true;
 
@@ -58,8 +59,10 @@
 
 
         private init() {
-            this.data.title = this.data.title || "Count";
-            this.data.color = this.data.color || "grey";
+            this.data.title = this.data.title || "PostIt";
+            this.data.color = "transparent";
+            this.data.postItColor = this.data.postItColor || "amber";
+            this.data.columns = this.data.columns || 1;
 
             //default values
             this.data.poolInterval = this.data.poolInterval || 10000;
@@ -68,18 +71,18 @@
         }
 
         private sizeFont(height: number) {
-            var p = this.$scope.$element.find("p");
-            var fontSize = Math.round(height / 1.3) + "px";
-            var lineSize = Math.round((height) - 60) + "px";
-            p.css('font-size', fontSize);
-            p.css('line-height', lineSize);
+            //var p = this.$scope.$element.find("p");
+            //var fontSize = Math.round(height / 1.3) + "px";
+            //var lineSize = Math.round((height) - 60) + "px";
+            //p.css('font-size', fontSize);
+            //p.css('line-height', lineSize);
         }
 
         public config() {
             this.$mdDialog.show({
-                controller: CustomCountConfigController,
+                controller: CustomPostItConfigController,
                 controllerAs: "ctrl",
-                templateUrl: 'app/widgets/custom-count/config.html',
+                templateUrl: 'app/widgets/custom-postit/config.html',
                 parent: angular.element(document.body),
                 //targetEvent: ev,
                 clickOutsideToClose: true,
@@ -97,7 +100,9 @@
         }
 
         public count: number = null;
+        public list: PostItListItem[] = null;
         public colorClass: string;
+
         private updateInterval() {
             if (this.handle) {
                 this.$timeout.cancel(this.handle);
@@ -116,28 +121,61 @@
                 return;
 
             DashCI.DEBUG && console.log("start custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
-            res.execute_count({
+            res.execute_list({
                 route: this.data.route,
                 params: this.data.params
-            }).$promise.then((newCount: Resources.Custom.ICount) => {
-                //var newCount = Math.round(Math.random() * 100);
+            }).$promise.then((newPostIt: Resources.Custom.IList) => {
+                //var newPostIt = Math.round(Math.random() * 100);
 
-                if (newCount.count != this.count) {
-                    this.count = newCount.count;
+                if (newPostIt.count != this.count) {
+                    this.count = newPostIt.count;
                     var p = this.$scope.$element.find("p");
 
                     p.addClass('changed');
                     this.$timeout(() => p.removeClass('changed'), 1000);
                 }
 
-                if (this.data.lowerThan && !isNaN(this.data.lowerThan.value) && this.data.lowerThan.color) {
-                    if (this.count < this.data.lowerThan.value)
-                        this.colorClass = this.data.lowerThan.color;
-                }
-                if (this.data.greaterThan && !isNaN(this.data.greaterThan.value) && this.data.greaterThan.color) {
-                    if (this.count > this.data.greaterThan.value)
-                        this.colorClass = this.data.greaterThan.color;
-                }
+                this.list = mx(newPostIt.list)
+                    .select((item) => {
+                        var title = "";
+                        var resume = "";
+                        var desc = "";
+                        var tokens = (this.data.headerTokens || "").split(",");
+                        angular.forEach(tokens, (token) => {
+                            var value = item[token];
+                            if (title && value)
+                                title += " - ";
+                            if (value)
+                                title += value;
+                        });
+                        tokens = (this.data.line1Tokens || "").split(",");
+                        angular.forEach(tokens, (token) => {
+                            var value = item[token];
+                            if (resume && value)
+                                resume += " - ";
+                            if (value)
+                                resume += value;
+                        });
+                        tokens = (this.data.line2Tokens || "").split(",");
+                        angular.forEach(tokens, (token) => {
+                            var value = item[token];
+                            if (desc && value)
+                                desc += " - ";
+                            if (value)
+                                desc += value;
+                        });
+
+
+                        var ret = <PostItListItem>{
+                            avatarUrl: item[this.data.avatarToken],
+                            resume: resume,
+                            description: desc,
+                            title: title,
+                            colorClass: this.data.postItColor
+                        };
+                        return ret;
+
+                    }).toArray();
 
                 DashCI.DEBUG && console.log("end custom request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us") + "; " + this.data.label);
             })
@@ -148,6 +186,14 @@
             this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
 
+    }
+
+    export class PostItListItem {
+        public avatarUrl: string;
+        public title: string;
+        public resume: string;
+        public description: string;
+        public colorClass: string;
     }
 
 }

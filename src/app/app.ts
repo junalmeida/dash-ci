@@ -34,14 +34,13 @@
             .dark()
             .accentPalette('orange');
 
-        //$resourceProvider.defaults.stripTrailingSlashes = true;
+        $resourceProvider.defaults.stripTrailingSlashes = false;
     }]);
     app.run(["$rootScope", ($rootScope: ng.IRootScopeService) => {
         angular.element(window).on("resize", () => {
             $rootScope.$apply();
         });
     }]);
-
 
     export function wildcardMatch(pattern: string, source: string) {
         pattern = pattern.replace(/[\-\[\]\/\{\}\(\)\+\.\\\^\$\|]/g, "\\$&");
