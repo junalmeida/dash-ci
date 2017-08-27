@@ -67,6 +67,14 @@ md-nav-bar:hover{
     z-index: 30;
 }
 
+.grid .duplicate-widget {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 30;
+}
+
+
 .grid .configure-widget {
     position: absolute;
     right: 22px;

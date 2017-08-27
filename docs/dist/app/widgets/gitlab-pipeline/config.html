@@ -11,8 +11,11 @@
         </md-toolbar>
 
         <md-dialog-content layout-gt-sm="row" layout-padding style="width: 700px">
-            <div layout="row" layout-align="center" flex ng-if="!ctrl.projects">
+            <div layout="row" layout-align="center" flex ng-if="!ctrl.initialized">
                 <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+            <div layout="row" layout-align="center" flex ng-if="ctrl.initialized && !ctrl.projects">
+                <label>Incorrect GitLab global settings</label>
             </div>
             <div ng-if="ctrl.projects" layout="column" layout-fill>
 
