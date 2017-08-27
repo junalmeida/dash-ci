@@ -2,7 +2,7 @@
 
 Dash-CI is a simple dashing.io like dashboard to show (almost) real time continuous integration tasks status and other project information.  
 
-This application fits best using Google Chrome, full screen (F11) at a TV or large monitor. 
+This application fits best using Google Chrome, full screen (F11) at a TV or large monitor. Current version does not have the intent to be used at PC's or touch devices.
 
 
 
@@ -24,7 +24,7 @@ First version ships with Microsoft TFS (or Visual Studio Online) widgets and Git
 
 ### Usage
 
-![Demo](docs/print-1.png "Demo")
+![Demo](docs/print-2.png "Demo")
 
 Run online and click at the edit button to add or configure global options.
 
@@ -43,14 +43,17 @@ If using TFS 2015 (that uses only NTLM), use the tfs-onpremises-ntlm executable.
 5. **TFS - Query Count:** Runs a saved query from tfs and show the items count. Useful to show open bugs, issues, etc.
 6. **TFS - Query Chart:** Runs a saved query from tfs and show the items count. Useful to show open bugs, issues, etc.
 7. **TFS - Releases:** Shows status of latest release definition run from a tfs project.
+8. **TFS - Post Its:** Shows a post-it view of any query.
+ 
+9. **Gitlab - Pipeline:** Shows status of latest pipeline run from a gitlab project.
+10. **Gitlab - Pipeline Graph:** Shows status with a graph of N pipeline runs in a row from a gitlab project.
+11. **Gitlab - Issue Query:** Counts issues at gitlab by group or project, filtering by label and state.
 
-8. **Gitlab - Pipeline:** Shows status of latest pipeline run from a gitlab project.
-9. **Gitlab - Pipeline Graph:** Shows status with a graph of N pipeline runs in a row from a gitlab project.
-10. **Gitlab - Issue Query:** Counts issues at gitlab by group or project, filtering by label and state.
-
-11. **Github - Issue Query:** Counts issues at github by group or project, filtering by label and state.
+12. **Custom API - Count:** Shows a count of any custom REST API.
+13. **Custom API - Post It:** Shows a view of post its of any custom API.
 
 ### Feedback
 
 If you like this project, feel free to suggest or report a bug at github issues page. 
 
+Please contribute with photos of Dash-CI running at your TV's
