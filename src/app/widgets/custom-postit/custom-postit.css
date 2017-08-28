@@ -17,6 +17,10 @@ custom-post-it .two-column .content {
     margin-right: 12px;
 }
 
+custom-post-it .three-column .content {
+    width: 30%;
+    margin-right: 10px;
+}
 
 custom-post-it .content:before {
     content: "";
