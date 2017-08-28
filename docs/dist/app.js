@@ -1359,7 +1359,8 @@ var DashCI;
                         queryId: this.data.queryId
                     }).$promise.then(function (newPostIt) {
                         //var newPostIt = Math.round(Math.random() * 100);
-                        var ids = mx(newPostIt.workItems).select(function (x) { return x.id; }).toArray().join(",");
+                        var order = mx(newPostIt.workItems).select(function (x) { return x.id; }).toArray();
+                        var ids = order.join(",");
                         res.get_workitems({
                             ids: ids
                         }).$promise.then(function (data) {
@@ -1370,6 +1371,7 @@ var DashCI;
                                 _this.$timeout(function () { return p.removeClass('changed'); }, 1000);
                             }
                             _this.list = mx(data.value)
+                                .orderBy(function (x) { return order.indexOf(x.id); })
                                 .select(function (item) {
                                 var title = item.fields["System.Title"];
                                 var resume = item.fields["System.IterationPath"];
