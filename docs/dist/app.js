@@ -3936,6 +3936,28 @@ var DashCI;
                 desc: "2 min"
             },
         ]);
+        DashCI.app.constant("longIntervals", [
+            {
+                value: 30000,
+                desc: "30 secs"
+            },
+            {
+                value: 60000,
+                desc: "1 min"
+            },
+            {
+                value: 120000,
+                desc: "2 min"
+            },
+            {
+                value: 300000,
+                desc: "5 min"
+            },
+            {
+                value: 3600000,
+                desc: "1 hr"
+            },
+        ]);
         DashCI.app.constant("buildCounts", [
             {
                 value: 20,
@@ -4003,12 +4025,13 @@ var DashCI;
     var Core;
     (function (Core) {
         var GlobalConfigController = (function () {
-            function GlobalConfigController($timeout, $mdDialog, $scope, $rootscope, vm) {
+            function GlobalConfigController($timeout, $mdDialog, $scope, $rootscope, vm, intervals) {
                 var _this = this;
                 this.$timeout = $timeout;
                 this.$mdDialog = $mdDialog;
                 this.$rootscope = $rootscope;
                 this.vm = vm;
+                this.intervals = intervals;
                 this.pageCount = this.vm.pages.length;
                 $scope.$watch(function () { return _this.pageCount; }, function () { return _this.updatePages(); });
             }
@@ -4084,7 +4107,7 @@ var DashCI;
                 this.$timeout(function () { return window.URL.revokeObjectURL(url); }, 1000);
                 alert("Your configuration was exported. Take note of your private keys, they are not saved to the exported file.");
             };
-            GlobalConfigController.$inject = ["$timeout", "$mdDialog", "$scope", "$rootScope", "config"];
+            GlobalConfigController.$inject = ["$timeout", "$mdDialog", "$scope", "$rootScope", "config", "longIntervals"];
             return GlobalConfigController;
         }());
         Core.GlobalConfigController = GlobalConfigController;
@@ -4286,6 +4309,7 @@ var DashCI;
                 this.$q = $q;
                 this.$mdDialog = $mdDialog;
                 this.options = options;
+                this.cycleInterval = null;
                 this.gridWidth = 800;
                 this.gridHeight = 600;
                 this.editable = false;
@@ -4303,6 +4327,7 @@ var DashCI;
                 };
                 this.defOptions = {
                     columns: 30,
+                    cycle: undefined,
                     rows: 20,
                     tfs: null,
                     gitlab: null,
@@ -4337,6 +4362,8 @@ var DashCI;
                     _this.changePage();
                 });
                 this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
+                this.$scope.$watch(function () { return _this.options.cycle; }, function () { return _this.updateCycle(); });
+                this.$scope.$watch(function () { return _this.editable; }, function () { return _this.updateCycle(); });
                 this.updateGridSize();
                 this.initCastApi();
             }
@@ -4348,6 +4375,22 @@ var DashCI;
                         _this.currentPage = _this.options.pages.filter(function (item) { return item.id == _this.selectedPageId; })[0];
                     }, 500);
                 }
+            };
+            MainController.prototype.updateCycle = function () {
+                var _this = this;
+                if (this.cycleInterval)
+                    clearInterval(this.cycleInterval);
+                if (this.options.cycle && !this.editable) {
+                    this.cycleInterval = setInterval(function () { return _this.cyclePage(); }, this.options.cycle);
+                }
+            };
+            MainController.prototype.cyclePage = function () {
+                var index = this.options.pages.indexOf(this.currentPage);
+                index += 1;
+                if (index >= this.options.pages.length)
+                    index = 0;
+                this.selectedPageId = this.options.pages[index].id;
+                this.changePage();
             };
             MainController.prototype.addWidgetDialog = function (ev) {
                 var _this = this;
