@@ -31,6 +31,16 @@
                                 </md-input-container>
                             </div>
                         </div>
+                        <div layout="row" layout-align="start" flex>
+                            <md-list flex>
+                                <md-subheader class="md-no-sticky">Page Titles</md-subheader>
+                                <md-list-item class="md-2-line" ng-repeat="i in ctrl.vm.pages">
+                                    <md-input-container flex class="md-list-item-text">
+                                        <h3><input ng-model="i.name"  type="text" required /></h3>
+                                    </md-input-container>
+                                </md-list-item>
+                            </md-list>
+                        </div>
                     </md-content>
                 </md-tab>
                 <md-tab label="Gitlab">
