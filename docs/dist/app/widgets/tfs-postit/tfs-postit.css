@@ -16,7 +16,10 @@ tfs-post-it .two-column .content {
     width: 45%;
     margin-right: 12px;
 }
-
+tfs-post-it .three-column .content {
+    width: 30%;
+    margin-right: 10px;
+}
 
 tfs-post-it .content:before {
     content: "";

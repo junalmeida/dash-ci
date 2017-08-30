@@ -123,7 +123,8 @@
             }).$promise.then((newPostIt: Resources.Tfs.IRunQueryResult) => {
                 //var newPostIt = Math.round(Math.random() * 100);
 
-                var ids = mx(newPostIt.workItems).select(x => x.id).toArray().join(",");
+                var order = mx(newPostIt.workItems).select(x => x.id).toArray();
+                var ids = order.join(",");
 
                 res.get_workitems({
                     ids: ids
@@ -139,6 +140,7 @@
                     }
 
                     this.list = mx(data.value)
+                        .orderBy(x=> order.indexOf(x.id))
                         .select((item) => {
                             var title = item.fields["System.Title"];
                             var resume = item.fields["System.IterationPath"];

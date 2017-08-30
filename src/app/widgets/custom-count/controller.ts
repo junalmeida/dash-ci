@@ -58,7 +58,8 @@
 
 
         private init() {
-            this.data.title = this.data.title || "Count";
+            if (typeof (this.data.title) == "undefined")
+                this.data.title = this.data.title || "Count";
             this.data.color = this.data.color || "grey";
 
             //default values
