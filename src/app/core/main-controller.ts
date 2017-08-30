@@ -32,6 +32,8 @@ namespace DashCI.Core {
                 this.changePage();
             });
             this.$scope.$watch(() => this.selectedPageId, () => this.changePage());
+            this.$scope.$watch(() => this.options.cycle, () => this.updateCycle());
+            this.$scope.$watch(() => this.editable, () => this.updateCycle());
             this.updateGridSize();
 
 
@@ -51,6 +53,26 @@ namespace DashCI.Core {
                     this.currentPage = this.options.pages.filter((item) => item.id == this.selectedPageId)[0];
                 }, 500);
             }
+        }
+
+
+        private cycleInterval: number = null;
+        private updateCycle() {
+            if (this.cycleInterval)
+                clearInterval(this.cycleInterval)
+
+            if (this.options.cycle && !this.editable) {
+                this.cycleInterval = setInterval(() => this.cyclePage(), this.options.cycle);
+            }
+        }
+
+        private cyclePage() {
+            var index = this.options.pages.indexOf(this.currentPage);
+            index += 1;
+            if (index >= this.options.pages.length)
+                index = 0;
+            this.selectedPageId = this.options.pages[index].id;
+            this.changePage();
         }
 
         public gridWidth = 800;
@@ -148,6 +170,7 @@ namespace DashCI.Core {
 
         private defOptions: Models.IOptions = {
             columns: 30,
+            cycle: undefined,
             rows: 20,
             tfs: null,
             gitlab: null,

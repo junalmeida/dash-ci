@@ -37,6 +37,7 @@ namespace DashCI.Models {
 
     export interface IOptions {
         columns: number;
+        cycle: number;
         rows: number;
 
         tfs: {

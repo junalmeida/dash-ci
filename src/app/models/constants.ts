@@ -84,6 +84,31 @@ namespace DashCI.Models {
             desc: "2 min"
         },
     ]);
+
+    DashCI.app.constant("longIntervals", <IValueDescription[]>[
+        {
+            value: 30000,
+            desc: "30 secs"
+        },
+        {
+            value: 60000,
+            desc: "1 min"
+        },
+        {
+            value: 120000,
+            desc: "2 min"
+        },
+        {
+            value: 300000,
+            desc: "5 min"
+        },
+        {
+            value: 3600000,
+            desc: "1 hr"
+        },
+    ]);
+
+
     DashCI.app.constant("buildCounts", <IValueDescription[]>[
         {
             value: 20,
