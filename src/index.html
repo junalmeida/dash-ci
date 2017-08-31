@@ -50,6 +50,10 @@
                        ng-click="main.toggleCast()">
                 <md-icon>{{main.castStatus}}</md-icon>
             </md-button>
+            <md-button title="Go FullScreen" class="md-icon-button" ng-if="!main.isFullScreen()"
+                       ng-click="main.goFullScreen()">
+                <md-icon>fullscreen</md-icon>
+            </md-button>
 
         </section>
     </md-nav-bar>

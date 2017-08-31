@@ -237,6 +237,17 @@ namespace DashCI.Core {
                 navigator.userAgent.match(/TV/i)
             );
         }
+
+        public goFullScreen() {
+            var el = document.documentElement;
+            var rfs = <() => void>(el.webkitRequestFullScreen || (<any>el).requestFullScreen || (<any>el).mozRequestFullScreen);
+            rfs.call(el);
+        }
+
+        public isFullScreen() {
+            return (<boolean>(<any>window).fullScreen) ||
+                (window.innerWidth == screen.width && window.innerHeight == screen.height);
+        }
     }
     DashCI.app.controller("MainController", MainController);
 }
