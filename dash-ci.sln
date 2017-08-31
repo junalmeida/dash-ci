@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dash-ci", "src\dash-ci.csproj", "{3B2A4FB1-B27A-4FC4-AF5D-26C6DFB1CD43}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tfs-onpremise-ntlm", "tfs-onpremise-ntlm\tfs-onpremise-ntlm.csproj", "{D838CE03-A7A9-4ABF-B807-3AF07747D411}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{299F3D07-96D5-4450-A0B4-9D179289C096}"
+	ProjectSection(SolutionItems) = preProject
+		pack.ps1 = pack.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +29,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {130BC034-610C-44D3-8454-0E5AC6670802}
 	EndGlobalSection
 EndGlobal
