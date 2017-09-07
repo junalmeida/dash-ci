@@ -15,7 +15,7 @@
 
             var el = document.createElement('script');
             el.onload = () => {
-                setTimeout(() => this.initializeCastApi(), 100);
+                setTimeout(() => this.initializeCastApi(), 1000);
             };
             el.type = "text/javascript";
             el.src = this.script;

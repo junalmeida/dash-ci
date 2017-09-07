@@ -277,7 +277,7 @@ var DashCI;
             this.invalidOs = true;
             var el = document.createElement('script');
             el.onload = function () {
-                setTimeout(function () { return _this.initializeCastApi(); }, 100);
+                setTimeout(function () { return _this.initializeCastApi(); }, 1000);
             };
             el.type = "text/javascript";
             el.src = this.script;
