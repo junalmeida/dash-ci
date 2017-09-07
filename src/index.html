@@ -70,7 +70,8 @@
             </div>
         </wg-widget>
     </wg-grid>
-    <div ng-if="!main.isGoogleCast" ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}}</div>
-    <div ng-if="main.isGoogleCast" class="grid-dimensions">Google Cast Mode</div>
+    <div ng-if="!main.isGoogleCast" ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}} - {{main.userAgent}}</div>
+    <div ng-if="main.isGoogleCast" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}} - Google Cast Mode </div>
+    <div style="position: absolute; top:0px;left:0px; display: none; color: #FFFFFF" id="debug"></div>
 </body>
 </html>

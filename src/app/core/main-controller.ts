@@ -195,13 +195,13 @@ namespace DashCI.Core {
             this.currentPage = this.options.pages[0]; //preparing to support multiple pages
         }
 
-        public isGoogleCast = this.CheckGoogleCast();
+        public isGoogleCast = false;
         public castStatus = 'cast';
         public canCast = false;
         private castSender: GoogleCastSender = null;
         private castReceiver: GoogleCastReceiver = null;
         private initCastApi() {
-            if (!this.isGoogleCast) {
+            if (!this.CheckGoogleCast()) {
                 this.castSender = new GoogleCastSender();
                 this.$scope.$watch(() => this.castSender.connected, (connected) => {
                     this.castStatus = connected ? 'cast_connected' : 'cast';
@@ -211,6 +211,7 @@ namespace DashCI.Core {
                 });
             }
             else {
+                DashCI.DEBUG = true;
                 this.castReceiver = new GoogleCastReceiver();
                 this.castReceiver.receiveOptions = (options: DashCI.Models.IOptions) => {
                     var defOptions = angular.copy(this.defOptions);
@@ -231,11 +232,15 @@ namespace DashCI.Core {
             }
         }
 
+        public userAgent : string = null;
         private CheckGoogleCast() {
-            return (
-                navigator.userAgent.match(/CrKey/i) &&
-                navigator.userAgent.match(/TV/i)
-            );
+            this.userAgent = navigator.userAgent;
+            var crKey = this.userAgent.match(/CrKey/i);
+            var tv = this.userAgent.match(/TV/i);
+
+            this.isGoogleCast =
+                (crKey && crKey.length > 0) || (tv && tv.length > 0);
+            return this.isGoogleCast;
         }
 
         public goFullScreen() {
