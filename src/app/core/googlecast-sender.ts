@@ -14,12 +14,12 @@
             */
 
             var el = document.createElement('script');
-            document.body.appendChild(el);
             el.onload = () => {
-                setTimeout(() => this.initializeCastApi(), 1000);
+                setTimeout(() => this.initializeCastApi(), 100);
             };
             el.type = "text/javascript";
             el.src = this.script;
+            document.body.appendChild(el);
         }
         /**
          * initialization
