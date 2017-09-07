@@ -50,6 +50,10 @@
                        ng-click="main.toggleCast()">
                 <md-icon>{{main.castStatus}}</md-icon>
             </md-button>
+            <md-button title="Go FullScreen" class="md-icon-button" ng-if="!main.isFullScreen()"
+                       ng-click="main.goFullScreen()">
+                <md-icon>fullscreen</md-icon>
+            </md-button>
 
         </section>
     </md-nav-bar>
@@ -66,7 +70,8 @@
             </div>
         </wg-widget>
     </wg-grid>
-    <div ng-if="!main.isGoogleCast" ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}}</div>
-    <div ng-if="main.isGoogleCast" class="grid-dimensions">Google Cast Mode</div>
+    <div ng-if="!main.isGoogleCast" ng-hide="main.editable" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}} - {{main.userAgent}}</div>
+    <div ng-if="main.isGoogleCast" class="grid-dimensions">{{main.gridWidth}} x {{main.gridHeight}} - Google Cast Mode </div>
+    <div style="position: absolute; top:0px;left:0px; display: none; color: #FFFFFF" id="debug"></div>
 </body>
 </html>
