@@ -17,6 +17,7 @@ namespace DashCI {
             document.body.appendChild(el);
         }
 
+
         private initializeCastApi() {
 
             GoogleCastReceiver.Cast = (<any>window).cast;

@@ -33,7 +33,7 @@
             });
             this.$scope.$watch(() => this.vm.queryCount, () => this.setQueryList());
         }
-
+        $onInit() { }
         public projects: Resources.Tfs.IProject[];
         public teams: Resources.Tfs.ITeam[];
         public queries: Resources.Tfs.IQuery[];

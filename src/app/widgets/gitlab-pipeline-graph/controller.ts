@@ -32,7 +32,7 @@
             this.init();
             this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
         }
-
+        $onInit() { }
         private handle: ng.IPromise<any>;
         private finalize() {
             if (this.handle) {

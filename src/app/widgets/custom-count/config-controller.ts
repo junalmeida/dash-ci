@@ -13,7 +13,7 @@ namespace DashCI.Widgets.CustomCount {
         ) {
             this.init();
         }
-
+        $onInit() { }
         private init() {
             this.labels = [];
             angular.forEach(this.globalOptions.custom, (item) => this.labels.push(item.label));

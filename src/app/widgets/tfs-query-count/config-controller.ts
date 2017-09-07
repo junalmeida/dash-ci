@@ -33,7 +33,7 @@
         public projects: Resources.Tfs.IProject[];
         public queries: Resources.Tfs.IQuery[];
 
-
+        $onInit() { }
 
         public getQueries() {
             var res = this.tfsResources();

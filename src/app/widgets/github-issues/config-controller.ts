@@ -16,7 +16,7 @@ namespace DashCI.Widgets.GithubIssues {
             this.$scope.$watch(() => this.vm.username, () => this.listRepositories());
             this.init();
         }
-
+        $onInit() { }
         private init() {
 
 

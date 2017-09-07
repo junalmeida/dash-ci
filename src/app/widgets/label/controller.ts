@@ -28,7 +28,7 @@
             this.init();
         }
 
-
+        $onInit() { }
         private init() {
 
             this.data.title = this.data.title || "Label";

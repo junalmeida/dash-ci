@@ -82,6 +82,7 @@ var DashCI;
                 this.widgets = widgets;
                 this.categories = categories;
             }
+            AddWidgetController.prototype.$onInit = function () { };
             AddWidgetController.prototype.cancel = function () {
                 this.$mdDialog.cancel();
             };
@@ -111,6 +112,7 @@ var DashCI;
                 this.pageCount = this.vm.pages.length;
                 $scope.$watch(function () { return _this.pageCount; }, function () { return _this.updatePages(); });
             }
+            GlobalConfigController.prototype.$onInit = function () { };
             GlobalConfigController.prototype.ok = function () {
                 this.$mdDialog.hide();
             };
@@ -398,13 +400,14 @@ var DashCI;
     var Core;
     (function (Core) {
         var MainController = (function () {
-            function MainController($scope, $timeout, $q, $mdDialog, options) {
+            function MainController($scope, $timeout, $q, $mdDialog, options, $rootscope) {
                 var _this = this;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
                 this.$q = $q;
                 this.$mdDialog = $mdDialog;
                 this.options = options;
+                this.$rootscope = $rootscope;
                 this.cycleInterval = null;
                 this.gridWidth = 800;
                 this.gridHeight = 600;
@@ -464,6 +467,7 @@ var DashCI;
                 this.updateGridSize();
                 this.initCastApi();
             }
+            MainController.prototype.$onInit = function () { };
             MainController.prototype.changePage = function () {
                 var _this = this;
                 if (!this.currentPage || this.selectedPageId != this.currentPage.id) {
@@ -578,6 +582,8 @@ var DashCI;
                     this.castReceiver.receiveOptions = function (options) {
                         var defOptions = angular.copy(_this.defOptions);
                         angular.extend(_this.options, defOptions, options);
+                        _this.$rootscope.$apply();
+                        _this.$rootscope.$broadcast("dashci-refresh");
                     };
                 }
             };
@@ -610,7 +616,7 @@ var DashCI;
             };
             return MainController;
         }());
-        MainController.$inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions"];
+        MainController.$inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions", "$rootScope"];
         DashCI.app.controller("MainController", MainController);
     })(Core = DashCI.Core || (DashCI.Core = {}));
 })(DashCI || (DashCI = {}));
@@ -1374,6 +1380,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.fontSize(height); });
                     this.init();
                 }
+                ClockController.prototype.$onInit = function () { };
                 ClockController.prototype.init = function () {
                     var _this = this;
                     this.data.title = this.$scope.data.title || "Clock";
@@ -1438,6 +1445,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                CustomCountConfigController.prototype.$onInit = function () { };
                 CustomCountConfigController.prototype.init = function () {
                     var _this = this;
                     this.labels = [];
@@ -1491,6 +1499,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                CustomCountController.prototype.$onInit = function () { };
                 CustomCountController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -1634,6 +1643,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                CustomPostItConfigController.prototype.$onInit = function () { };
                 CustomPostItConfigController.prototype.init = function () {
                     var _this = this;
                     this.labels = [];
@@ -1688,6 +1698,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                CustomPostItController.prototype.$onInit = function () { };
                 CustomPostItController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -1871,6 +1882,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.vm.username; }, function () { return _this.listRepositories(); });
                     this.init();
                 }
+                GithubIssuesConfigController.prototype.$onInit = function () { };
                 GithubIssuesConfigController.prototype.init = function () {
                     var _this = this;
                     this.users = [];
@@ -1930,6 +1942,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                GithubIssuesController.prototype.$onInit = function () { };
                 GithubIssuesController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2076,6 +2089,7 @@ var DashCI;
                     this.initialized = false;
                     this.init();
                 }
+                GitlabIssuesConfigController.prototype.$onInit = function () { };
                 GitlabIssuesConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.gitlabResources();
@@ -2142,6 +2156,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                GitlabIssuesController.prototype.$onInit = function () { };
                 GitlabIssuesController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2288,6 +2303,7 @@ var DashCI;
                     this.initialized = false;
                     this.init();
                 }
+                GitlabPipelineConfigController.prototype.$onInit = function () { };
                 GitlabPipelineConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.gitlabResources();
@@ -2348,6 +2364,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                GitlabPipelineController.prototype.$onInit = function () { };
                 GitlabPipelineController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2529,6 +2546,7 @@ var DashCI;
                     this.initialized = false;
                     this.init();
                 }
+                GitlabPipelineGraphConfigController.prototype.$onInit = function () { };
                 GitlabPipelineGraphConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.gitlabResources();
@@ -2588,6 +2606,7 @@ var DashCI;
                     this.init();
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
+                GitlabPipelineGraphController.prototype.$onInit = function () { };
                 GitlabPipelineGraphController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2736,6 +2755,7 @@ var DashCI;
                 }
                 LabelConfigController.prototype.init = function () {
                 };
+                LabelConfigController.prototype.$onInit = function () { };
                 LabelConfigController.prototype.ok = function () {
                     this.$mdDialog.hide(true);
                 };
@@ -2768,6 +2788,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
                     this.init();
                 }
+                LabelController.prototype.$onInit = function () { };
                 LabelController.prototype.init = function () {
                     this.data.title = this.data.title || "Label";
                     this.data.color = this.data.color || "transparent";
@@ -2894,6 +2915,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                TfsBuildConfigController.prototype.$onInit = function () { };
                 TfsBuildConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -2966,6 +2988,7 @@ var DashCI;
                     this.init();
                     this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 }
+                TfsBuildController.prototype.$onInit = function () { };
                 TfsBuildController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -3212,6 +3235,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                TfsBuildGraphConfigController.prototype.$onInit = function () { };
                 TfsBuildGraphConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -3281,6 +3305,7 @@ var DashCI;
                     this.init();
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
+                TfsBuildGraphController.prototype.$onInit = function () { };
                 TfsBuildGraphController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -3420,6 +3445,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                TfsPostItConfigController.prototype.$onInit = function () { };
                 TfsPostItConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -3514,6 +3540,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                TfsPostItController.prototype.$onInit = function () { };
                 TfsPostItController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -3700,6 +3727,7 @@ var DashCI;
                     });
                     this.$scope.$watch(function () { return _this.vm.queryCount; }, function () { return _this.setQueryList(); });
                 };
+                TfsQueryChartConfigController.prototype.$onInit = function () { };
                 TfsQueryChartConfigController.prototype.getQueries = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -3795,6 +3823,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                TfsQueryChartController.prototype.$onInit = function () { };
                 TfsQueryChartController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -4066,6 +4095,7 @@ var DashCI;
                     });
                     this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getQueries(); });
                 };
+                TfsQueryCountConfigController.prototype.$onInit = function () { };
                 TfsQueryCountConfigController.prototype.getQueries = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -4124,6 +4154,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                TfsQueryCountController.prototype.$onInit = function () { };
                 TfsQueryCountController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -4287,6 +4318,7 @@ var DashCI;
                     });
                     this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getReleaseDefs(); });
                 };
+                TfsReleaseConfigController.prototype.$onInit = function () { };
                 TfsReleaseConfigController.prototype.getReleaseDefs = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -4347,6 +4379,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                TfsReleaseController.prototype.$onInit = function () { };
                 TfsReleaseController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);

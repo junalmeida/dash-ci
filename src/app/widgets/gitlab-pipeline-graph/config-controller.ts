@@ -14,7 +14,7 @@ namespace DashCI.Widgets.GitlabPipelineGraph {
         }
 
         public initialized = false;
-
+        $onInit() { }
         private init() {
             var res = this.gitlabResources();
             if (!res) {
