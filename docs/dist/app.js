@@ -234,6 +234,8 @@ var DashCI;
         };
         GoogleCastReceiver.prototype.receiveMessage = function (event) {
             this.log('Message [' + event.senderId + ']: ' + event.data);
+            if (typeof (event.data) == "object")
+                this.log(JSON.stringify(event.data));
             try {
                 if (event.data && this.receiveOptions)
                     this.receiveOptions(event.data);
