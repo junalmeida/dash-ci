@@ -419,9 +419,21 @@ var DashCI;
                 };
                 this.updateGridSize = function () {
                     _this.$timeout(function () {
-                        var grid = document.getElementById('grid');
-                        _this.gridWidth = grid.clientWidth;
-                        _this.gridHeight = grid.clientHeight;
+                        if (_this.isGoogleCast) {
+                            if (window.outerHeight) {
+                                _this.gridWidth = window.outerWidth;
+                                _this.gridHeight = window.outerHeight;
+                            }
+                            else {
+                                _this.gridWidth = document.body.clientWidth;
+                                _this.gridHeight = document.body.clientHeight;
+                            }
+                        }
+                        else {
+                            var grid = document.getElementById('grid');
+                            _this.gridWidth = grid.clientWidth;
+                            _this.gridHeight = grid.clientHeight;
+                        }
                     }, 500);
                 };
                 this.defOptions = {
@@ -460,6 +472,7 @@ var DashCI;
                     _this.currentPage = null;
                     _this.selectedPageId = _this.options.pages[0].id;
                     _this.changePage();
+                    _this.updateGridSize();
                 });
                 this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
                 this.$scope.$watch(function () { return _this.options.cycle; }, function () { return _this.updateCycle(); });

@@ -21,7 +21,7 @@
     <script type="text/javascript" src="node_modules/angular-widget-grid/angular-widget-grid.min.js"></script>
     <script type="text/javascript" src="app.js"></script>
 </head>
-<body ng-controller="MainController as main" ng-cloak>
+<body ng-controller="MainController as main" ng-class="{ cast: main.isGoogleCast }" ng-cloak>
     <md-nav-bar ng-if="!main.isGoogleCast" md-selected-nav-item="main.selectedPageId" nav-bar-aria-label="navigation links" ng-init="main.selectedPageId = main.options.pages[0].id">
         <md-nav-item ng-repeat="page in main.options.pages" md-nav-click="main.Go(page)" name="{{page.id}}" value="{{page.id}}">{{page.name}}</md-nav-item>
         <section class="config">
