@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,9 +16,17 @@ namespace TfsOnPremiseNtlm
         public async Task<HttpResponseMessage> ToAnyHost()
         {
             var url = Request.RequestUri.ToString();
-            url = url.Replace(Program.BaseUrl + "/api/", "");
+
+            var ixApi = url.IndexOf("/api/", StringComparison.InvariantCultureIgnoreCase);
+            url = url.Substring(ixApi + 5);
             url = url.Replace("http/", "http://");
             url = url.Replace("https/", "https://");
+
+            var origin = (string)null;
+            if (Request.Headers.Contains("Origin"))
+            {
+                origin = Request.Headers.GetValues("Origin").FirstOrDefault();
+            }
 
             var handler = new HttpClientHandler();
 
@@ -44,15 +53,26 @@ namespace TfsOnPremiseNtlm
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/json"));
 
+                HttpResponseMessage result;
+
                 if (Request.Method == HttpMethod.Get)
-                    return await ToAnyHostGet(client, url);
+                    result = await ToAnyHostGet(client, url);
                 else if (Request.Method == HttpMethod.Options)
-                    return await ToAnyHostOptions(client, url);
+                    result = await ToAnyHostOptions(client, url);
                 //else if (Request.Method == HttpMethod.Post)
                 //    return await ToTfsPost(client, url);
                 else
                     throw new NotSupportedException();
                 // List data response.
+                if (!string.IsNullOrWhiteSpace(origin))
+                {
+                    if (result.Headers.Contains("Access-Control-Allow-Origin"))
+                        result.Headers.Remove("Access-Control-Allow-Origin");
+                    result.Headers.Add("Access-Control-Allow-Origin", origin);
+                }
+
+                result.Headers.Add("Access-Control-Allow-Credentials", "true");
+                return result;
             }
         }
 
