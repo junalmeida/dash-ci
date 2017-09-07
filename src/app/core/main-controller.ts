@@ -32,6 +32,7 @@ namespace DashCI.Core {
                 this.currentPage = null;
                 this.selectedPageId = this.options.pages[0].id;
                 this.changePage();
+                this.updateGridSize();
             });
             this.$scope.$watch(() => this.selectedPageId, () => this.changePage());
             this.$scope.$watch(() => this.options.cycle, () => this.updateCycle());
@@ -151,9 +152,22 @@ namespace DashCI.Core {
 
         private updateGridSize = () => {
             this.$timeout(() => {
-                var grid = document.getElementById('grid');
-                this.gridWidth = grid.clientWidth;
-                this.gridHeight = grid.clientHeight;
+
+                if (this.isGoogleCast) {
+                    if (window.outerHeight) {
+                        this.gridWidth = window.outerWidth;
+                        this.gridHeight = window.outerHeight;
+                    }
+                    else {
+                        this.gridWidth = document.body.clientWidth;
+                        this.gridHeight = document.body.clientHeight;
+                    }
+                }
+                else {
+                    var grid = document.getElementById('grid');
+                    this.gridWidth = grid.clientWidth;
+                    this.gridHeight = grid.clientHeight;
+                }
             }, 500);
         };
 

@@ -51,6 +51,9 @@ md-nav-bar:hover{
   bottom: 0;
   left: 0;
 }
+.cast .grid  {
+    top: 0px
+}
 .wg-preview-row {
     border-top: 1px dotted rgba(103, 103, 103, 0.40);
     border-bottom: 1px dotted rgba(103, 103, 103, 0.4);
