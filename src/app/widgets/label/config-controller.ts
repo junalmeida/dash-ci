@@ -14,7 +14,7 @@ namespace DashCI.Widgets.Label {
 
         private init() {
         }
-
+        $onInit() { }
         public ok() {
             this.$mdDialog.hide(true);
         }

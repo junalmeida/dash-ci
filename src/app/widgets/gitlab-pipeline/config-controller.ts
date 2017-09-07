@@ -12,7 +12,7 @@ namespace DashCI.Widgets.GitlabPipeline {
         ) { 
             this.init();
         }
-
+        $onInit() { }
         public initialized = false;
 
         private init() {

@@ -21,7 +21,7 @@
 
             this.init();
         }
-
+        $onInit() { }
         private data: Models.IWidgetData;
         public date: string;
         public time: string;

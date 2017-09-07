@@ -37,7 +37,7 @@
 
             this.init();
         }
-
+        $onInit() { }
         private handle: ng.IPromise<any>;
         private finalize() {
             if (this.handle) {

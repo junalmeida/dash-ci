@@ -16,6 +16,8 @@ namespace DashCI.Core {
             $scope.$watch(() => this.pageCount, () => this.updatePages());
         }
 
+        $onInit() { }
+
         public ok() {
             this.$mdDialog.hide();
         }

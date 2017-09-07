@@ -15,7 +15,7 @@ namespace DashCI.Widgets.TfsPostIt {
             this.init();
         }
 
-
+        $onInit() { }
         private init() {
             var res = this.tfsResources();
             if (!res)

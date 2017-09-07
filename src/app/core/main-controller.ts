@@ -3,13 +3,15 @@
 namespace DashCI.Core {
 
     class MainController implements ng.IController {
-        public static $inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions"];
+        public static $inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions", "$rootScope"];
         constructor(
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
             private $q: ng.IQService,
             private $mdDialog: ng.material.IDialogService,
-            public options: Models.IOptions
+            public options: Models.IOptions,
+            private $rootscope: ng.IRootScopeService
+
         ) {
             this.loadData();
             window.onresize = this.updateGridSize;
@@ -41,7 +43,7 @@ namespace DashCI.Core {
         }
 
 
-
+        $onInit() { }
 
         public selectedPageId: string;
         public currentPage: Models.IDashBoardPage;
@@ -215,6 +217,8 @@ namespace DashCI.Core {
                 this.castReceiver.receiveOptions = (options: DashCI.Models.IOptions) => {
                     var defOptions = angular.copy(this.defOptions);
                     angular.extend(this.options, defOptions, options);
+                    this.$rootscope.$apply();
+                    this.$rootscope.$broadcast("dashci-refresh");
                 };
             }
         }
