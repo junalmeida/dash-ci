@@ -211,7 +211,6 @@ namespace DashCI.Core {
                 });
             }
             else {
-                DashCI.DEBUG = true;
                 this.castReceiver = new GoogleCastReceiver();
                 this.castReceiver.receiveOptions = (options: DashCI.Models.IOptions) => {
                     var defOptions = angular.copy(this.defOptions);
