@@ -237,8 +237,12 @@ var DashCI;
             if (typeof (event.data) == "object")
                 this.log(JSON.stringify(event.data));
             try {
-                if (event.data && this.receiveOptions)
-                    this.receiveOptions(event.data);
+                if (event.data && this.receiveOptions) {
+                    var opt = event.data;
+                    this.receiveOptions(opt);
+                }
+                else
+                    $("#debug").show().append("<p>Error receiving cast</p>");
             }
             catch (err) {
                 var ex = err;
@@ -570,7 +574,6 @@ var DashCI;
                     });
                 }
                 else {
-                    DashCI.DEBUG = true;
                     this.castReceiver = new DashCI.GoogleCastReceiver();
                     this.castReceiver.receiveOptions = function (options) {
                         var defOptions = angular.copy(_this.defOptions);
