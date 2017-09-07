@@ -58,9 +58,12 @@ namespace DashCI {
             if (typeof (event.data) == "object")
                 this.log(JSON.stringify(event.data));
             try {
-                if (event.data && this.receiveOptions)
-                    this.receiveOptions(event.data);
-
+                if (event.data && this.receiveOptions) {
+                    var opt = <DashCI.Models.IOptions>event.data;
+                    this.receiveOptions(opt);
+                }
+                else
+                    $("#debug").show().append("<p>Error receiving cast</p>");
             } catch (err) {
                 const ex: Error = err;
                 this.log(ex.message);
