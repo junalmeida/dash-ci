@@ -13,7 +13,7 @@ namespace DashCI.Widgets.TfsBuild {
         ) { 
             this.init();
         }
-
+        $onInit() { }
         private init() {
             var res = this.tfsResources();
             if (!res)

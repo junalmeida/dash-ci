@@ -3,13 +3,15 @@
 namespace DashCI.Core {
 
     class MainController implements ng.IController {
-        public static $inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions"];
+        public static $inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions", "$rootScope"];
         constructor(
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
             private $q: ng.IQService,
             private $mdDialog: ng.material.IDialogService,
-            public options: Models.IOptions
+            public options: Models.IOptions,
+            private $rootscope: ng.IRootScopeService
+
         ) {
             this.loadData();
             window.onresize = this.updateGridSize;
@@ -30,6 +32,7 @@ namespace DashCI.Core {
                 this.currentPage = null;
                 this.selectedPageId = this.options.pages[0].id;
                 this.changePage();
+                this.updateGridSize();
             });
             this.$scope.$watch(() => this.selectedPageId, () => this.changePage());
             this.$scope.$watch(() => this.options.cycle, () => this.updateCycle());
@@ -41,7 +44,7 @@ namespace DashCI.Core {
         }
 
 
-
+        $onInit() { }
 
         public selectedPageId: string;
         public currentPage: Models.IDashBoardPage;
@@ -149,9 +152,22 @@ namespace DashCI.Core {
 
         private updateGridSize = () => {
             this.$timeout(() => {
-                var grid = document.getElementById('grid');
-                this.gridWidth = grid.clientWidth;
-                this.gridHeight = grid.clientHeight;
+
+                if (this.isGoogleCast) {
+                    if (window.outerHeight) {
+                        this.gridWidth = window.outerWidth;
+                        this.gridHeight = window.outerHeight;
+                    }
+                    else {
+                        this.gridWidth = document.body.clientWidth;
+                        this.gridHeight = document.body.clientHeight;
+                    }
+                }
+                else {
+                    var grid = document.getElementById('grid');
+                    this.gridWidth = grid.clientWidth;
+                    this.gridHeight = grid.clientHeight;
+                }
             }, 500);
         };
 
@@ -195,13 +211,13 @@ namespace DashCI.Core {
             this.currentPage = this.options.pages[0]; //preparing to support multiple pages
         }
 
-        public isGoogleCast = this.CheckGoogleCast();
+        public isGoogleCast = false;
         public castStatus = 'cast';
         public canCast = false;
         private castSender: GoogleCastSender = null;
         private castReceiver: GoogleCastReceiver = null;
         private initCastApi() {
-            if (!this.isGoogleCast) {
+            if (!this.CheckGoogleCast()) {
                 this.castSender = new GoogleCastSender();
                 this.$scope.$watch(() => this.castSender.connected, (connected) => {
                     this.castStatus = connected ? 'cast_connected' : 'cast';
@@ -215,6 +231,8 @@ namespace DashCI.Core {
                 this.castReceiver.receiveOptions = (options: DashCI.Models.IOptions) => {
                     var defOptions = angular.copy(this.defOptions);
                     angular.extend(this.options, defOptions, options);
+                    this.$rootscope.$apply();
+                    this.$rootscope.$broadcast("dashci-refresh");
                 };
             }
         }
@@ -231,11 +249,15 @@ namespace DashCI.Core {
             }
         }
 
+        public userAgent : string = null;
         private CheckGoogleCast() {
-            return (
-                navigator.userAgent.match(/CrKey/i) &&
-                navigator.userAgent.match(/TV/i)
-            );
+            this.userAgent = navigator.userAgent;
+            var crKey = this.userAgent.match(/CrKey/i);
+            var tv = this.userAgent.match(/TV/i);
+
+            this.isGoogleCast =
+                (crKey && crKey.length > 0) || (tv && tv.length > 0);
+            return this.isGoogleCast;
         }
 
         public goFullScreen() {

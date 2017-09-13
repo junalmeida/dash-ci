@@ -11,6 +11,8 @@ namespace DashCI.Core {
         ) { 
         }
 
+        $onInit() { }
+
         public cancel() {
             this.$mdDialog.cancel();
         }

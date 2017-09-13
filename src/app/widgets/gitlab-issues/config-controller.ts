@@ -12,7 +12,7 @@ namespace DashCI.Widgets.GitlabIssues {
         ) { 
             this.init();
         }
-
+        $onInit() { }
         public initialized = false;
 
         private init() {

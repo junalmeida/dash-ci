@@ -48,7 +48,7 @@
 
             this.colors = mx(this.colors).where(x => x.code != "transparent" && x.code != "semi-transp").toArray();
         }
-
+        $onInit() { }
         private handle: ng.IPromise<any>;
         private finalize() {
             if (this.handle) {

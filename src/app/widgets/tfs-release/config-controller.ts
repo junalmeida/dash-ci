@@ -28,7 +28,7 @@ namespace DashCI.Widgets.TfsRelease {
                 });
             this.$scope.$watch(() => this.vm.project, () => this.getReleaseDefs());
         }
-
+        $onInit() { }
         public projects: Resources.Tfs.IProject[];
         public releases: Resources.Tfs.IReleaseDefinition[];
 

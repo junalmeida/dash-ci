@@ -14,7 +14,7 @@ namespace DashCI.Widgets.TfsBuildGraph {
         ) { 
             this.init();
         }
-
+        $onInit() { }
         private init() {
             var res = this.tfsResources();
             if (!res)
