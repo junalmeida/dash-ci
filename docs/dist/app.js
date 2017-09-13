@@ -293,6 +293,7 @@ var DashCI;
                     });
                     this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getReleaseDefs(); });
                 };
+                TfsReleaseConfigController.prototype.$onInit = function () { };
                 TfsReleaseConfigController.prototype.getReleaseDefs = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -352,6 +353,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                TfsReleaseController.prototype.$onInit = function () { };
                 TfsReleaseController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -629,6 +631,7 @@ var DashCI;
                     });
                     this.$scope.$watch(function () { return _this.vm.project; }, function () { return _this.getQueries(); });
                 };
+                TfsQueryCountConfigController.prototype.$onInit = function () { };
                 TfsQueryCountConfigController.prototype.getQueries = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -686,6 +689,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                TfsQueryCountController.prototype.$onInit = function () { };
                 TfsQueryCountController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -852,6 +856,7 @@ var DashCI;
                     });
                     this.$scope.$watch(function () { return _this.vm.queryCount; }, function () { return _this.setQueryList(); });
                 };
+                TfsQueryChartConfigController.prototype.$onInit = function () { };
                 TfsQueryChartConfigController.prototype.getQueries = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -946,6 +951,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                TfsQueryChartController.prototype.$onInit = function () { };
                 TfsQueryChartController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -1201,6 +1207,7 @@ var DashCI;
                     this.tfsColorBy = tfsColorBy;
                     this.init();
                 }
+                TfsPostItConfigController.prototype.$onInit = function () { };
                 TfsPostItConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -1307,6 +1314,7 @@ var DashCI;
                     this.init();
                     this.colors = mx(this.colors).where(function (x) { return x.code != "transparent" && x.code != "semi-transp"; }).toArray();
                 }
+                TfsPostItController.prototype.$onInit = function () { };
                 TfsPostItController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -1525,6 +1533,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                TfsBuildGraphConfigController.prototype.$onInit = function () { };
                 TfsBuildGraphConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -1593,6 +1602,7 @@ var DashCI;
                     this.init();
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
+                TfsBuildGraphController.prototype.$onInit = function () { };
                 TfsBuildGraphController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -1730,6 +1740,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                TfsBuildConfigController.prototype.$onInit = function () { };
                 TfsBuildConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.tfsResources();
@@ -1801,6 +1812,7 @@ var DashCI;
                     this.init();
                     this.$timeout(function () { return _this.sizeBy(_this.$scope.$element.width(), _this.$scope.$element.height()); }, 500);
                 }
+                TfsBuildController.prototype.$onInit = function () { };
                 TfsBuildController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2013,6 +2025,7 @@ var DashCI;
                 }
                 LabelConfigController.prototype.init = function () {
                 };
+                LabelConfigController.prototype.$onInit = function () { };
                 LabelConfigController.prototype.ok = function () {
                     this.$mdDialog.hide(true);
                 };
@@ -2044,6 +2057,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.sizeFont(height); });
                     this.init();
                 }
+                LabelController.prototype.$onInit = function () { };
                 LabelController.prototype.init = function () {
                     this.data.title = this.data.title || "Label";
                     this.data.color = this.data.color || "transparent";
@@ -2129,6 +2143,7 @@ var DashCI;
                     this.initialized = false;
                     this.init();
                 }
+                GitlabPipelineGraphConfigController.prototype.$onInit = function () { };
                 GitlabPipelineGraphConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.gitlabResources();
@@ -2187,6 +2202,7 @@ var DashCI;
                     this.init();
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 }
+                GitlabPipelineGraphController.prototype.$onInit = function () { };
                 GitlabPipelineGraphController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2333,6 +2349,7 @@ var DashCI;
                     this.initialized = false;
                     this.init();
                 }
+                GitlabPipelineConfigController.prototype.$onInit = function () { };
                 GitlabPipelineConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.gitlabResources();
@@ -2392,6 +2409,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                GitlabPipelineController.prototype.$onInit = function () { };
                 GitlabPipelineController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2571,6 +2589,7 @@ var DashCI;
                     this.initialized = false;
                     this.init();
                 }
+                GitlabIssuesConfigController.prototype.$onInit = function () { };
                 GitlabIssuesConfigController.prototype.init = function () {
                     var _this = this;
                     var res = this.gitlabResources();
@@ -2636,6 +2655,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                GitlabIssuesController.prototype.$onInit = function () { };
                 GitlabIssuesController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2783,6 +2803,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.vm.username; }, function () { return _this.listRepositories(); });
                     this.init();
                 }
+                GithubIssuesConfigController.prototype.$onInit = function () { };
                 GithubIssuesConfigController.prototype.init = function () {
                     var _this = this;
                     this.users = [];
@@ -2841,6 +2862,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                GithubIssuesController.prototype.$onInit = function () { };
                 GithubIssuesController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -2985,6 +3007,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                CustomPostItConfigController.prototype.$onInit = function () { };
                 CustomPostItConfigController.prototype.init = function () {
                     var _this = this;
                     this.labels = [];
@@ -3038,6 +3061,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                CustomPostItController.prototype.$onInit = function () { };
                 CustomPostItController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -3216,6 +3240,7 @@ var DashCI;
                     this.vm = vm;
                     this.init();
                 }
+                CustomCountConfigController.prototype.$onInit = function () { };
                 CustomCountConfigController.prototype.init = function () {
                     var _this = this;
                     this.labels = [];
@@ -3268,6 +3293,7 @@ var DashCI;
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
                 }
+                CustomCountController.prototype.$onInit = function () { };
                 CustomCountController.prototype.finalize = function () {
                     if (this.handle) {
                         this.$timeout.cancel(this.handle);
@@ -3443,6 +3469,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.$scope.$element.height(); }, function (height) { return _this.fontSize(height); });
                     this.init();
                 }
+                ClockController.prototype.$onInit = function () { };
                 ClockController.prototype.init = function () {
                     var _this = this;
                     this.data.title = this.$scope.data.title || "Clock";
@@ -4069,6 +4096,7 @@ var DashCI;
                 this.widgets = widgets;
                 this.categories = categories;
             }
+            AddWidgetController.prototype.$onInit = function () { };
             AddWidgetController.prototype.cancel = function () {
                 this.$mdDialog.cancel();
             };
@@ -4097,6 +4125,7 @@ var DashCI;
                 this.pageCount = this.vm.pages.length;
                 $scope.$watch(function () { return _this.pageCount; }, function () { return _this.updatePages(); });
             }
+            GlobalConfigController.prototype.$onInit = function () { };
             GlobalConfigController.prototype.ok = function () {
                 this.$mdDialog.hide();
             };
@@ -4183,28 +4212,28 @@ var DashCI;
             this.namespace = 'urn:x-cast:almasistemas.dashci';
             this.script = '//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js';
             var el = document.createElement('script');
-            document.body.appendChild(el);
             el.onload = function () {
-                setTimeout(function () { return _this.initializeCastApi(); }, 1000);
+                setTimeout(function () { return _this.initializeCastApi(); }, 100);
             };
             el.type = "text/javascript";
             el.src = this.script;
+            document.body.appendChild(el);
         }
         GoogleCastReceiver.prototype.initializeCastApi = function () {
             var _this = this;
             GoogleCastReceiver.Cast = window.cast;
             GoogleCastReceiver.Cast.receiver.logger.setLevelValue(0);
             this.manager = GoogleCastReceiver.Cast.receiver.CastReceiverManager.getInstance();
-            DashCI.DEBUG && console.log('Starting Receiver Manager');
+            this.log('Starting Receiver Manager');
             this.manager.onReady = function (event) {
-                DashCI.DEBUG && console.log('Received Ready event: ' + JSON.stringify(event.data));
+                _this.log('Received Ready event: ' + JSON.stringify(event.data));
                 _this.manager.setApplicationState('chromecast-dashboard is ready...');
             };
             this.manager.onSenderConnected = function (event) {
-                DashCI.DEBUG && console.log('Received Sender Connected event: ' + event.senderId);
+                _this.log('Received Sender Connected event: ' + event.senderId);
             };
             this.manager.onSenderDisconnected = function (event) {
-                DashCI.DEBUG && console.log('Received Sender Disconnected event: ' + event.senderId);
+                _this.log('Received Sender Disconnected event: ' + event.senderId);
                 if (_this.manager.getSenders().length == 0 &&
                     event.reason == GoogleCastReceiver.Cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
                     window.close();
@@ -4215,12 +4244,29 @@ var DashCI;
             this.messageBus.onMessage = function (event) { return _this.receiveMessage(event); };
             // Initialize the CastReceiverManager with an application status message.
             this.manager.start({ statusText: 'Application is starting' });
-            DashCI.DEBUG && console.log('Receiver Manager started');
+            this.log('Receiver Manager started');
         };
         GoogleCastReceiver.prototype.receiveMessage = function (event) {
-            DashCI.DEBUG && console.log('Message [' + event.senderId + ']: ' + event.data);
-            if (event.data && this.receiveOptions)
-                this.receiveOptions(event.data);
+            this.log('Message [' + event.senderId + ']: ' + event.data);
+            if (typeof (event.data) == "object")
+                this.log(JSON.stringify(event.data));
+            try {
+                if (event.data && this.receiveOptions) {
+                    var opt = event.data;
+                    this.receiveOptions(opt);
+                }
+                else
+                    $("#debug").show().append("<p>Error receiving cast</p>");
+            }
+            catch (err) {
+                var ex = err;
+                this.log(ex.message);
+            }
+        };
+        GoogleCastReceiver.prototype.log = function (txt) {
+            DashCI.DEBUG && console.log(txt);
+            DashCI.DEBUG && $("#debug").append("<p>" + txt + "</p>");
+            DashCI.DEBUG && $("#debug").show();
         };
         GoogleCastReceiver.Cast = null;
         return GoogleCastReceiver;
@@ -4241,12 +4287,12 @@ var DashCI;
             this.session = null;
             this.invalidOs = true;
             var el = document.createElement('script');
-            document.body.appendChild(el);
             el.onload = function () {
                 setTimeout(function () { return _this.initializeCastApi(); }, 1000);
             };
             el.type = "text/javascript";
             el.src = this.script;
+            document.body.appendChild(el);
         }
         /**
          * initialization
@@ -4364,13 +4410,14 @@ var DashCI;
     var Core;
     (function (Core) {
         var MainController = (function () {
-            function MainController($scope, $timeout, $q, $mdDialog, options) {
+            function MainController($scope, $timeout, $q, $mdDialog, options, $rootscope) {
                 var _this = this;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
                 this.$q = $q;
                 this.$mdDialog = $mdDialog;
                 this.options = options;
+                this.$rootscope = $rootscope;
                 this.cycleInterval = null;
                 this.gridWidth = 800;
                 this.gridHeight = 600;
@@ -4382,9 +4429,21 @@ var DashCI;
                 };
                 this.updateGridSize = function () {
                     _this.$timeout(function () {
-                        var grid = document.getElementById('grid');
-                        _this.gridWidth = grid.clientWidth;
-                        _this.gridHeight = grid.clientHeight;
+                        if (_this.isGoogleCast) {
+                            if (window.outerHeight) {
+                                _this.gridWidth = window.outerWidth;
+                                _this.gridHeight = window.outerHeight;
+                            }
+                            else {
+                                _this.gridWidth = document.body.clientWidth;
+                                _this.gridHeight = document.body.clientHeight;
+                            }
+                        }
+                        else {
+                            var grid = document.getElementById('grid');
+                            _this.gridWidth = grid.clientWidth;
+                            _this.gridHeight = grid.clientHeight;
+                        }
                     }, 500);
                 };
                 this.defOptions = {
@@ -4402,11 +4461,12 @@ var DashCI;
                             widgets: []
                         }]
                 };
-                this.isGoogleCast = this.CheckGoogleCast();
+                this.isGoogleCast = false;
                 this.castStatus = 'cast';
                 this.canCast = false;
                 this.castSender = null;
                 this.castReceiver = null;
+                this.userAgent = null;
                 this.loadData();
                 window.onresize = this.updateGridSize;
                 this.$scope.$on('wg-grid-full', function () {
@@ -4422,6 +4482,7 @@ var DashCI;
                     _this.currentPage = null;
                     _this.selectedPageId = _this.options.pages[0].id;
                     _this.changePage();
+                    _this.updateGridSize();
                 });
                 this.$scope.$watch(function () { return _this.selectedPageId; }, function () { return _this.changePage(); });
                 this.$scope.$watch(function () { return _this.options.cycle; }, function () { return _this.updateCycle(); });
@@ -4429,6 +4490,7 @@ var DashCI;
                 this.updateGridSize();
                 this.initCastApi();
             }
+            MainController.prototype.$onInit = function () { };
             MainController.prototype.changePage = function () {
                 var _this = this;
                 if (!this.currentPage || this.selectedPageId != this.currentPage.id) {
@@ -4529,7 +4591,7 @@ var DashCI;
             };
             MainController.prototype.initCastApi = function () {
                 var _this = this;
-                if (!this.isGoogleCast) {
+                if (!this.CheckGoogleCast()) {
                     this.castSender = new DashCI.GoogleCastSender();
                     this.$scope.$watch(function () { return _this.castSender.connected; }, function (connected) {
                         _this.castStatus = connected ? 'cast_connected' : 'cast';
@@ -4543,6 +4605,8 @@ var DashCI;
                     this.castReceiver.receiveOptions = function (options) {
                         var defOptions = angular.copy(_this.defOptions);
                         angular.extend(_this.options, defOptions, options);
+                        _this.$rootscope.$apply();
+                        _this.$rootscope.$broadcast("dashci-refresh");
                     };
                 }
             };
@@ -4557,8 +4621,12 @@ var DashCI;
                 }
             };
             MainController.prototype.CheckGoogleCast = function () {
-                return (navigator.userAgent.match(/CrKey/i) &&
-                    navigator.userAgent.match(/TV/i));
+                this.userAgent = navigator.userAgent;
+                var crKey = this.userAgent.match(/CrKey/i);
+                var tv = this.userAgent.match(/TV/i);
+                this.isGoogleCast =
+                    (crKey && crKey.length > 0) || (tv && tv.length > 0);
+                return this.isGoogleCast;
             };
             MainController.prototype.goFullScreen = function () {
                 var el = document.documentElement;
@@ -4569,7 +4637,7 @@ var DashCI;
                 return window.fullScreen ||
                     (window.innerWidth == screen.width && window.innerHeight == screen.height);
             };
-            MainController.$inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions"];
+            MainController.$inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions", "$rootScope"];
             return MainController;
         }());
         DashCI.app.controller("MainController", MainController);
