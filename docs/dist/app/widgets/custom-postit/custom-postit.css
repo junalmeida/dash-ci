@@ -22,6 +22,16 @@ custom-post-it .three-column .content {
     margin-right: 10px;
 }
 
+custom-post-it .four-column .content {
+    width: 22%;
+    margin-right: 10px;
+}
+
+custom-post-it .five-column .content {
+    width: 17%;
+    margin-right: 10px;
+}
+
 custom-post-it .content:before {
     content: "";
     position: absolute;

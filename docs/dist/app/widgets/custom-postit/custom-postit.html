@@ -1,10 +1,10 @@
 ﻿<md-button title="Configure" class="configure-widget md-icon-button md-mini" ng-show="editable" ng-click="ctrl.config()">
     <md-icon>settings</md-icon>
 </md-button>
-<div ng-class="{'two-column': data.columns == 2, 'three-column': data.columns == 3, 'one-column' : data.columns != 2}">
+<div ng-class="{'two-column': data.columns == 2, 'three-column': data.columns == 3, 'four-column': data.columns == 4, 'five-column': data.columns >= 5, 'one-column' : data.columns <= 1}">
     <div ng-repeat="item in ctrl.list" ng-class="item.colorClass" class="content">
         <div class="header" ng-if="data.header">{{item.title}}</div>
-        <img ng-if="item.avatarUrl" src="{{item.avatarUrl}}" alt="avatar" />
+        <img ng-if="item.avatarUrl" ng-src="{{item.avatarUrl}}" alt="avatar" />
         <p class="resume" ng-if="item.resume"><span>{{item.resume}}</span></p>
         <p class="desc" ng-if="item.description"><span>{{item.description}}</span></p>
     </div>

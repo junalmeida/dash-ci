@@ -1190,7 +1190,7 @@ var DashCI;
         var TfsPostIt;
         (function (TfsPostIt) {
             var TfsPostItConfigController = (function () {
-                function TfsPostItConfigController($scope, $mdDialog, $q, tfsResources, colors, intervals, vm) {
+                function TfsPostItConfigController($scope, $mdDialog, $q, tfsResources, colors, intervals, vm, tfsColorBy) {
                     this.$scope = $scope;
                     this.$mdDialog = $mdDialog;
                     this.$q = $q;
@@ -1198,6 +1198,7 @@ var DashCI;
                     this.colors = colors;
                     this.intervals = intervals;
                     this.vm = vm;
+                    this.tfsColorBy = tfsColorBy;
                     this.init();
                 }
                 TfsPostItConfigController.prototype.init = function () {
@@ -1259,7 +1260,7 @@ var DashCI;
                 TfsPostItConfigController.prototype.ok = function () {
                     this.$mdDialog.hide(true);
                 };
-                TfsPostItConfigController.$inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config"];
+                TfsPostItConfigController.$inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config", "tfsColorBy"];
                 return TfsPostItConfigController;
             }());
             TfsPostIt.TfsPostItConfigController = TfsPostItConfigController;
@@ -1273,7 +1274,7 @@ var DashCI;
         var TfsPostIt;
         (function (TfsPostIt) {
             var TfsPostItController = (function () {
-                function TfsPostItController($scope, $q, $timeout, $interval, $mdDialog, tfsResources) {
+                function TfsPostItController($scope, $q, $timeout, $interval, $mdDialog, tfsResources, colors) {
                     var _this = this;
                     this.$scope = $scope;
                     this.$q = $q;
@@ -1281,8 +1282,20 @@ var DashCI;
                     this.$interval = $interval;
                     this.$mdDialog = $mdDialog;
                     this.tfsResources = tfsResources;
+                    this.colors = colors;
                     this.count = null;
                     this.list = null;
+                    this.areaColors = {};
+                    this.workItemColors = {
+                        "Requirement": "blue",
+                        "User Story": "blue",
+                        "Release Item": "orange",
+                        "Release": "deep-green",
+                        "Feature": "purple",
+                        "Epic": "purple",
+                        "Bug": "red",
+                        "Issue": "amber"
+                    };
                     this.data = this.$scope.data;
                     this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
                     this.data.type = DashCI.Models.WidgetType.tfsPostIt;
@@ -1292,6 +1305,7 @@ var DashCI;
                     this.$scope.$watch(function () { return _this.data.poolInterval; }, function (value) { return _this.updateInterval(); });
                     this.$scope.$on("$destroy", function () { return _this.finalize(); });
                     this.init();
+                    this.colors = mx(this.colors).where(function (x) { return x.code != "transparent" && x.code != "semi-transp"; }).toArray();
                 }
                 TfsPostItController.prototype.finalize = function () {
                     if (this.handle) {
@@ -1380,12 +1394,31 @@ var DashCI;
                                     desc = desc.substr(0, desc.indexOf("<")).trim();
                                 if (resume && resume.indexOf("\\") > -1)
                                     resume = resume.substr(resume.indexOf("\\") + 1);
+                                var color = _this.data.postItColor;
+                                if (_this.data.colorBy && _this.data.colorBy == DashCI.Resources.Tfs.TfsColorBy.randomColorByPath) {
+                                    if (!_this.areaColors[resume] && _this.colors.length > 0) {
+                                        var ix = TfsPostItController.getRandomInt(0, _this.colors.length - 1);
+                                        _this.areaColors[resume] = _this.colors[ix].code;
+                                        _this.colors.splice(ix, 1);
+                                    }
+                                    else if (!_this.areaColors[resume] && _this.colors.length == 0) {
+                                        _this.areaColors[resume] = _this.data.postItColor;
+                                    }
+                                    color = _this.areaColors[resume];
+                                }
+                                else if (_this.data.colorBy && _this.data.colorBy == DashCI.Resources.Tfs.TfsColorBy.colorByWorkItemType) {
+                                    var type = item.fields["System.WorkItemType"];
+                                    if (!_this.workItemColors[type]) {
+                                        _this.workItemColors[type] = _this.data.postItColor;
+                                    }
+                                    color = _this.workItemColors[type];
+                                }
                                 var ret = {
                                     avatarUrl: null,
                                     resume: resume,
                                     description: desc,
                                     title: title,
-                                    colorClass: _this.data.postItColor
+                                    colorClass: color
                                 };
                                 return ret;
                             }).toArray();
@@ -1398,7 +1431,11 @@ var DashCI;
                     });
                     this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
                 };
-                TfsPostItController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
+                // Returns a random integer between min (included) and max (included)
+                TfsPostItController.getRandomInt = function (min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                };
+                TfsPostItController.$inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources", "colors"];
                 return TfsPostItController;
             }());
             TfsPostIt.TfsPostItController = TfsPostItController;
@@ -3453,6 +3490,39 @@ var DashCI;
         })(Clock = Widgets.Clock || (Widgets.Clock = {}));
     })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
+/// <reference path="../app.ts" />
+var DashCI;
+(function (DashCI) {
+    var Models;
+    (function (Models) {
+        DashCI.app.value("globalOptions", {});
+    })(Models = DashCI.Models || (DashCI.Models = {}));
+})(DashCI || (DashCI = {}));
+/// <reference path="../../models/models.ts" />
+var DashCI;
+(function (DashCI) {
+    var Resources;
+    (function (Resources) {
+        var Tfs;
+        (function (Tfs) {
+            var TfsColorBy;
+            (function (TfsColorBy) {
+                TfsColorBy[TfsColorBy["randomColorByPath"] = 1] = "randomColorByPath";
+                TfsColorBy[TfsColorBy["colorByWorkItemType"] = 2] = "colorByWorkItemType";
+            })(TfsColorBy = Tfs.TfsColorBy || (Tfs.TfsColorBy = {}));
+            DashCI.app.constant("tfsColorBy", [
+                {
+                    value: TfsColorBy.colorByWorkItemType,
+                    desc: "WorkItem Type"
+                },
+                {
+                    value: TfsColorBy.randomColorByPath,
+                    desc: "Random Color By Path"
+                },
+            ]);
+        })(Tfs = Resources.Tfs || (Resources.Tfs = {}));
+    })(Resources = DashCI.Resources || (DashCI.Resources = {}));
+})(DashCI || (DashCI = {}));
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -3991,14 +4061,6 @@ var DashCI;
 /// <reference path="../app.ts" />
 var DashCI;
 (function (DashCI) {
-    var Models;
-    (function (Models) {
-        DashCI.app.value("globalOptions", {});
-    })(Models = DashCI.Models || (DashCI.Models = {}));
-})(DashCI || (DashCI = {}));
-/// <reference path="../app.ts" />
-var DashCI;
-(function (DashCI) {
     var Core;
     (function (Core) {
         var AddWidgetController = (function () {
@@ -4497,6 +4559,15 @@ var DashCI;
             MainController.prototype.CheckGoogleCast = function () {
                 return (navigator.userAgent.match(/CrKey/i) &&
                     navigator.userAgent.match(/TV/i));
+            };
+            MainController.prototype.goFullScreen = function () {
+                var el = document.documentElement;
+                var rfs = (el.webkitRequestFullScreen || el.requestFullScreen || el.mozRequestFullScreen);
+                rfs.call(el);
+            };
+            MainController.prototype.isFullScreen = function () {
+                return window.fullScreen ||
+                    (window.innerWidth == screen.width && window.innerHeight == screen.height);
             };
             MainController.$inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions"];
             return MainController;
