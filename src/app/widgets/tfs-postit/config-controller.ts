@@ -2,7 +2,7 @@
 namespace DashCI.Widgets.TfsPostIt {
 
     export class TfsPostItConfigController implements ng.IController {
-        public static $inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config"];
+        public static $inject = ["$scope", "$mdDialog", "$q", "tfsResources", "colors", "intervals", "config", "tfsColorBy"];
         constructor(
             private $scope: ng.IScope,
             private $mdDialog: ng.material.IDialogService,
@@ -10,7 +10,8 @@ namespace DashCI.Widgets.TfsPostIt {
             public tfsResources: () => Resources.Tfs.ITfsResource,
             public colors: Models.ICodeDescription[],
             public intervals: Models.IValueDescription[],
-            public vm: ITfsPostItData
+            public vm: ITfsPostItData,
+            public tfsColorBy: Models.IEnumDescription<Resources.Tfs.TfsColorBy>[]
         ) {
             this.init();
         }

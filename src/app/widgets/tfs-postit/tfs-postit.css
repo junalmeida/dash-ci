@@ -21,6 +21,16 @@ tfs-post-it .three-column .content {
     margin-right: 10px;
 }
 
+tfs-post-it .four-column .content {
+    width: 22%;
+    margin-right: 10px;
+}
+
+tfs-post-it .five-column .content {
+    width: 17%;
+    margin-right: 10px;
+}
+
 tfs-post-it .content:before {
     content: "";
     position: absolute;

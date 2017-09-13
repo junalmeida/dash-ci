@@ -10,11 +10,12 @@
 
         columns?: number;
 
+        colorBy?: DashCI.Resources.Tfs.TfsColorBy;
     }
 
 
     export class TfsPostItController implements ng.IController {
-        public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources"];
+        public static $inject = ["$scope", "$q", "$timeout", "$interval", "$mdDialog", "tfsResources", "colors"];
 
         private data: ITfsPostItData;
 
@@ -24,7 +25,8 @@
             private $timeout: ng.ITimeoutService,
             private $interval: ng.IIntervalService,
             private $mdDialog: ng.material.IDialogService,
-            private tfsResources: () => Resources.Tfs.ITfsResource
+            private tfsResources: () => Resources.Tfs.ITfsResource,
+            private colors: Models.ICodeDescription[] 
         ) {
             this.data = this.$scope.data;
             this.data.id = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -43,6 +45,8 @@
             this.$scope.$on("$destroy", () => this.finalize());
 
             this.init();
+
+            this.colors = mx(this.colors).where(x => x.code != "transparent" && x.code != "semi-transp").toArray();
         }
 
         private handle: ng.IPromise<any>;
@@ -110,6 +114,19 @@
             }, DashCI.randomNess()); //this should create some randomness to avoid a lot of calls at the same moment.
             this.update();
         }
+
+        public areaColors: { [area: string]: string; } = {};
+        public workItemColors: { [type: string]: string; } = {
+            "Requirement": "blue",
+            "User Story": "blue",
+            "Release Item": "orange",
+            "Release": "deep-green",
+            "Feature": "purple",
+            "Epic": "purple",
+            "Bug": "red",
+            "Issue": "amber"
+        };
+
         private update() {
             var res = this.tfsResources();
             if (!res)
@@ -150,13 +167,34 @@
                             if (resume && resume.indexOf("\\") > -1)
                                 resume = resume.substr(resume.indexOf("\\") + 1);
 
+                            var color = this.data.postItColor;
+                            if (this.data.colorBy && this.data.colorBy == Resources.Tfs.TfsColorBy.randomColorByPath)
+                            {
+                                if (!this.areaColors[resume] && this.colors.length > 0) {
+                                    var ix = TfsPostItController.getRandomInt(0, this.colors.length - 1);
+                                    this.areaColors[resume] = this.colors[ix].code;
+                                    this.colors.splice(ix, 1);
+                                }
+                                else if (!this.areaColors[resume] && this.colors.length == 0) {
+                                    this.areaColors[resume] = this.data.postItColor;
+                                }
+                                color = this.areaColors[resume];
+                            }
+                            else if (this.data.colorBy && this.data.colorBy == Resources.Tfs.TfsColorBy.colorByWorkItemType) {
+                                var type = item.fields["System.WorkItemType"];
+
+                                if (!this.workItemColors[type]) {
+                                    this.workItemColors[type] = this.data.postItColor;
+                                }
+                                color = this.workItemColors[type];
+                            }
 
                             var ret = <PostItListItem>{
                                 avatarUrl: null,
                                 resume: resume,
                                 description: desc,
                                 title: title,
-                                colorClass: this.data.postItColor
+                                colorClass: color
                             };
                             return ret;
 
@@ -171,6 +209,12 @@
                 console.error(reason);
             });
             this.$timeout(() => this.sizeFont(this.$scope.$element.height()), 500);
+        }
+
+
+        // Returns a random integer between min (included) and max (included)
+        static getRandomInt(min:number, max: number): number {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
     }

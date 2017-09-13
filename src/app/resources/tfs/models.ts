@@ -1,4 +1,5 @@
-﻿namespace DashCI.Resources.Tfs {
+﻿/// <reference path="../../models/models.ts" />
+namespace DashCI.Resources.Tfs {
     export interface ITfsObject extends ng.resource.IResource<ITfsObject> {
 
     }
@@ -139,4 +140,22 @@
             status: string;
         }[];
     }
+
+
+
+    export enum TfsColorBy {
+        randomColorByPath = 1,
+        colorByWorkItemType = 2,
+    }
+
+    DashCI.app.constant("tfsColorBy", <DashCI.Models.IEnumDescription<TfsColorBy>[]>[
+        {
+            value: TfsColorBy.colorByWorkItemType,
+            desc: "WorkItem Type"
+        },
+        {
+            value: TfsColorBy.randomColorByPath,
+            desc: "Random Color By Path"
+        },
+    ]);
 }
