@@ -2,7 +2,7 @@
 
     export interface IGitlabResource extends ng.resource.IResourceClass<IGitlabObject> {
         project_list(): IProject[];
-        issue_count(param: { scope: string; scopeId: number; labels: string; state: string }): ICount;
+        issue_count(param: { scope: string; scopeId: number; labels: string; milestone: string; state: string }): ICount;
         latest_pipeline(param: { project: number; ref: string; }): IPipeline[];
         recent_pipelines(param: { project: number; ref: string; count: number }): IPipeline[];
         commit_count(param: { project: number; ref: string; since: string }): ICount;
