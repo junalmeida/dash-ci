@@ -12,7 +12,9 @@ $node.Attributes["value"].Value = "../client"
 
 $xmlDoc.Save($arquivo);
 
-Remove-Item -Recurse -Force "release.zip"
+if([System.IO.File]::Exists("release.zip")){
+    Remove-Item -Recurse -Force "release.zip"
+}
 [System.IO.Compression.ZipFile]::CreateFromDirectory("$Env:Temp\\dash", "release.zip") 
 
 Remove-Item -Recurse -Force "$Env:Temp\\dash"
