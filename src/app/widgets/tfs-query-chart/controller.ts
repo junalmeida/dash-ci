@@ -192,7 +192,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             var total_value = this.total;
-            var color_index = 0;
+            //var color_index = 0;
             var start_angle = 0;
 
             for (var i in data) {
@@ -210,7 +210,7 @@
                 );
 
                 start_angle += slice_angle;
-                color_index++;
+                //color_index++;
             }
 
             //drawing a white circle over the chart

@@ -6,6 +6,7 @@
         poolInterval?: number;
         labels?: string;
         status?: string;
+        milestone?: string;
         lowerThan?: {
             value: number;
             color: string;
@@ -123,6 +124,7 @@
                 scope: this.data.query_type,
                 scopeId: this.data.query_type == 'projects' ? this.data.project : this.data.group,
                 labels: this.data.labels,
+                milestone: this.data.milestone,
                 state: this.data.status
             }).$promise.then((newCount: Resources.Gitlab.ICount) => {
                 //var newCount = Math.round(Math.random() * 100);

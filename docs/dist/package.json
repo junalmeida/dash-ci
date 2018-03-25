@@ -6,24 +6,25 @@
   "author": "Marcos Junior <junalmeida@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "angular": "~1.6.2",
-    "angular-animate": "~1.6.2",
-    "angular-material": "~1.1.3",
-    "angular-widget-grid": "~0.3.0",
-    "angular-aria": "~1.6.2",
-    "angular-css": "~1.0.8",
-    "angular-resource": "~1.6.2",
-    "jquery": "^2.0.0",
-    "moment": "~2.17.1",
-    "multiplexjs": "~1.0.0"
+    "angular": "1.6.9",
+    "angular-animate": "1.6.9",
+    "angular-material": "1.1.7",
+    "angular-widget-grid": "0.3.0",
+    "angular-aria": "1.6.9",
+    "angular-css": "1.0.8",
+    "angular-resource": "1.6.9",
+    "jquery": "3.3.1",
+    "moment": "2.21.0",
+    "multiplexjs": "1.0.0"
   },
   "scripts": { "start": "http-server -a 127.0.0.1 -p 8080" },
   "devDependencies": {
-    "@types/angular": "~1.6.6",
-    "@types/jquery": "^2.0.0",
-    "@types/angular-material": "~1.1.45",
-    "@types/angular-resource": "1.5.8",
-    "http-server": "~0.9.0"
+    "@types/angular": "1.6.43",
+    "@types/jquery": "3.3.1",
+    "@types/angular-material": "~1.1.58",
+    "@types/angular-resource": "1.5.14",
+    "http-server": "0.11.1",
+    "typescript": "2.7.2"
 
   }
 }
