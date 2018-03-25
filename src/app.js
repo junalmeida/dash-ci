@@ -1190,7 +1190,7 @@ var DashCI;
                         project_list: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v3/projects?order_by=last_activity_at&sort=desc&per_page=100",
+                            url: globalOptions.gitlab.host + "/api/v4/projects?order_by=last_activity_at&sort=desc&per_page=100",
                             headers: headers,
                             transformResponse: transform,
                             cache: true
@@ -1198,7 +1198,7 @@ var DashCI;
                         group_list: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v3/groups?all_available=true&order_by=name&sort=asc&per_page=100",
+                            url: globalOptions.gitlab.host + "/api/v4/groups?all_available=true&order_by=name&sort=asc&per_page=100",
                             headers: headers,
                             transformResponse: transform,
                             cache: true
@@ -1206,7 +1206,7 @@ var DashCI;
                         issue_count: {
                             method: 'GET',
                             isArray: false,
-                            url: globalOptions.gitlab.host + "/api/v3/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
+                            url: globalOptions.gitlab.host + "/api/v4/:scope/:scopeId/issues?labels=:labels&state=:state&per_page=1",
                             headers: headers,
                             cache: false,
                             transformResponse: countParser
@@ -1214,21 +1214,21 @@ var DashCI;
                         latest_pipeline: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
+                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
                             cache: false,
                             headers: headers
                         },
                         recent_pipelines: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?ref=:ref&per_page=:count",
+                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count",
                             cache: false,
                             headers: headers
                         },
                         commit_count: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v3/projects/:project/repository/commits?ref_name=:ref&since=:since&per_page=1",
+                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/repository/commits?ref_name=:ref&since=:since&per_page=1",
                             cache: false,
                             transformResponse: countParser
                         }
