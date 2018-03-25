@@ -94,7 +94,7 @@
                 latest_pipeline: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
+                    url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
                     cache: false,
                     headers: headers
                 },
@@ -102,7 +102,7 @@
                 recent_pipelines: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count",
+                    url: globalOptions.gitlab.host + "/api/v3/projects/:project/pipelines?ref=:ref&per_page=:count",
                     cache: false,
                     headers: headers
                 },
