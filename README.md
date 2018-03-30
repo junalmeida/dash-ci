@@ -24,7 +24,7 @@ First version ships with Microsoft TFS (or Visual Studio Online) widgets and Git
 
 ### Usage
 
-![Demo](docs/print-2.png "Demo")
+![Demo](docs/print-3.png "Demo")
 
 Run online and click at the edit button to add or configure global options.
 
