@@ -139,43 +139,54 @@
                 return;
 
             DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
-            res.latest_pipeline({
+            res.branch_pipelines({
                 project: this.data.project,
-                ref: this.data.refs
-            }).$promise.then((pipelines: Resources.Gitlab.IPipeline[]) => {
-                var new_pipeline: Resources.Gitlab.IPipeline = null;
+                ref: this.data.refs,
+                count: 100
+            }).$promise.then((pipelines: Resources.Gitlab.IPipelines[]) => {
+                var new_pipeline: Resources.Gitlab.IPipelines = null;
                 var refList = this.data.refs.split(",");
                 pipelines = pipelines.filter((i: any) => refList.filter((r) => wildcardMatch(r, i.ref)).length > 0 );
 
                 if (pipelines.length >= 1)
                     new_pipeline = pipelines[0];
+    
 
-                this.latest = new_pipeline;
-                if (this.latest && this.latest.status) {
-                    switch (this.latest.status) {
-                        case "pending":
-                            this.icon = "pause_circle_filled"; break;
-                        case "running":
-                            this.icon = "play_circle_filled"; break;
-                        case "canceled":
-                            this.icon = "remove_circle"; break;
-                        case "success":
-                            this.icon = "check"; break;
-                        case "failed":
-                            this.icon = "cancel"; break;
-                        case "default":
-                            this.icon = "help"; break;
+                res.pipeline({
+                    project: this.data.project,
+                    pipeline_id: new_pipeline.id
+                }).$promise.then((pipeline: Resources.Gitlab.IPipeline) => {
+                    this.latest = pipeline;
+                    if (this.latest && this.latest.status) {
+                        switch (this.latest.status) {
+                            case "pending":
+                                this.icon = "pause_circle_filled"; break;
+                            case "running":
+                                this.icon = "play_circle_filled"; break;
+                            case "canceled":
+                                this.icon = "remove_circle"; break;
+                            case "success":
+                                this.icon = "check"; break;
+                            case "failed":
+                                this.icon = "cancel"; break;
+                            case "default":
+                                this.icon = "help"; break;
+                        }
+
                     }
+                    else
+                        this.icon = "help";
+                    //var p = this.$scope.$element.find("p");
 
-                }
-                else
-                    this.icon = "help";
-                //var p = this.$scope.$element.find("p");
-
-                //p.addClass('changed');
-                //this.$timeout(() => p.removeClass('changed'), 1000);
-                this.resizeWidget();
-                DashCI.DEBUG && console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                    //p.addClass('changed');
+                    //this.$timeout(() => p.removeClass('changed'), 1000);
+                    this.resizeWidget();
+                    DashCI.DEBUG && console.log("end gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                }).catch((reason) => {
+                    this.latest = null;
+                    console.error(reason);
+                    this.resizeWidget();
+                });
             }).catch((reason) => {
                 this.latest = null;
                 console.error(reason);
