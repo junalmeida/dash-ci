@@ -927,6 +927,44 @@ var DashCI;
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
+/// <reference path="../models/widgets.ts" />
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var LoaderDirective = /** @class */ (function () {
+            function LoaderDirective($compile, widgets) {
+                var _this = this;
+                this.$compile = $compile;
+                this.widgets = widgets;
+                this.scope = { scope: '=', editable: '=', globalOptions: '=' };
+                this.restrict = "E";
+                this.replace = true;
+                this.link = function ($scope, $element, attrs, ctrl) {
+                    var widgetParam = $scope.scope;
+                    var wscope = $scope.$new();
+                    angular.extend(wscope, {
+                        data: widgetParam
+                    });
+                    var wdesc = _this.widgets.filter(function (item) { return item.type == wscope.data.type; })[0];
+                    var el = _this.$compile("<" + (wdesc.directive || DashCI.Models.WidgetType[wdesc.type]) + ' class="widget {{data.color}}" />')(wscope);
+                    wscope.$element = el;
+                    $element.replaceWith(el);
+                    $scope.$watch(function () { return $scope.editable; }, function () { return wscope.editable = $scope.editable; });
+                    $scope.$watch(function () { return $scope.globalOptions; }, function () { return wscope.globalOptions = $scope.globalOptions; });
+                };
+            }
+            LoaderDirective.create = function () {
+                var directive = function ($compile, widgets) { return new LoaderDirective($compile, widgets); };
+                directive.$inject = ["$compile", "widgets"];
+                return directive;
+            };
+            return LoaderDirective;
+        }());
+        Widgets.LoaderDirective = LoaderDirective;
+        DashCI.app.directive("widgetLoader", LoaderDirective.create());
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
+})(DashCI || (DashCI = {}));
 var DashCI;
 (function (DashCI) {
     var Resources;
@@ -1349,44 +1387,6 @@ var DashCI;
                 }; }]);
         })(Tfs = Resources.Tfs || (Resources.Tfs = {}));
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
-})(DashCI || (DashCI = {}));
-/// <reference path="../models/widgets.ts" />
-var DashCI;
-(function (DashCI) {
-    var Widgets;
-    (function (Widgets) {
-        var LoaderDirective = /** @class */ (function () {
-            function LoaderDirective($compile, widgets) {
-                var _this = this;
-                this.$compile = $compile;
-                this.widgets = widgets;
-                this.scope = { scope: '=', editable: '=', globalOptions: '=' };
-                this.restrict = "E";
-                this.replace = true;
-                this.link = function ($scope, $element, attrs, ctrl) {
-                    var widgetParam = $scope.scope;
-                    var wscope = $scope.$new();
-                    angular.extend(wscope, {
-                        data: widgetParam
-                    });
-                    var wdesc = _this.widgets.filter(function (item) { return item.type == wscope.data.type; })[0];
-                    var el = _this.$compile("<" + (wdesc.directive || DashCI.Models.WidgetType[wdesc.type]) + ' class="widget {{data.color}}" />')(wscope);
-                    wscope.$element = el;
-                    $element.replaceWith(el);
-                    $scope.$watch(function () { return $scope.editable; }, function () { return wscope.editable = $scope.editable; });
-                    $scope.$watch(function () { return $scope.globalOptions; }, function () { return wscope.globalOptions = $scope.globalOptions; });
-                };
-            }
-            LoaderDirective.create = function () {
-                var directive = function ($compile, widgets) { return new LoaderDirective($compile, widgets); };
-                directive.$inject = ["$compile", "widgets"];
-                return directive;
-            };
-            return LoaderDirective;
-        }());
-        Widgets.LoaderDirective = LoaderDirective;
-        DashCI.app.directive("widgetLoader", LoaderDirective.create());
-    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 var DashCI;
 (function (DashCI) {
