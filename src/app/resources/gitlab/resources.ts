@@ -38,7 +38,7 @@
                     data = angular.fromJson(data);
                     var headers = getHeaders();
 
-                    var parsedCount = parseInt(headers["X-Total"]);
+                    var parsedCount = parseInt(headers["x-total"]);
                     if (isNaN(parsedCount)) {
                         parsedCount = 0;
                         //cannot access X-Total today, let's parse

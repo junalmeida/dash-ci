@@ -64,7 +64,6 @@
             this.data.color = this.data.color || "grey";
 
             //default values
-            this.data.labels = this.data.labels || "bug";
             this.data.status = this.data.status || "opened";
             this.data.poolInterval = this.data.poolInterval || 10000;
 
