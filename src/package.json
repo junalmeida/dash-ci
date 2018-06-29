@@ -17,7 +17,10 @@
     "moment": "2.21.0",
     "multiplexjs": "1.0.0"
   },
-  "scripts": { "start": "http-server -a 127.0.0.1 -p 8080" },
+  "scripts": {
+    "start": "http-server -a 127.0.0.1 -p 8080",
+    "build": "./node_modules/.bin/tsc --sourceMap"
+  },
   "devDependencies": {
     "@types/angular": "1.6.43",
     "@types/jquery": "3.3.1",

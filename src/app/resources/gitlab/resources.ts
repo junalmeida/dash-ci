@@ -3,8 +3,9 @@
     export interface IGitlabResource extends ng.resource.IResourceClass<IGitlabObject> {
         project_list(): IProject[];
         issue_count(param: { scope: string; scopeId: number; labels: string; milestone: string; state: string }): ICount;
-        latest_pipeline(param: { project: number; ref: string; }): IPipeline[];
-        recent_pipelines(param: { project: number; ref: string; count: number }): IPipeline[];
+        pipelines(param: { project: number; ref: string; count: number; }): IPipelines[];
+        branch_pipelines(param: { project: number; ref: string; count: number; }): IPipelines[];
+        pipeline(param: { project: number; pipeline_id: number; }): IPipeline;
         commit_count(param: { project: number; ref: string; since: string }): ICount;
         group_list(): IGroup[];
     }
@@ -91,18 +92,26 @@
                     transformResponse: countParser
                 },
 
-                latest_pipeline: <ng.resource.IActionDescriptor>{
+                pipelines: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
+                    url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count",
                     cache: false,
                     headers: headers
                 },
 
-                recent_pipelines: <ng.resource.IActionDescriptor>{
+                branch_pipelines: <ng.resource.IActionDescriptor>{
                     method: 'GET',
                     isArray: true,
-                    url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count",
+                    url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count&scope=branches",
+                    cache: false,
+                    headers: headers
+                },
+
+                pipeline: <ng.resource.IActionDescriptor>{
+                    method: 'GET',
+                    isArray: false,
+                    url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines/:pipeline_id",
                     cache: false,
                     headers: headers
                 },

@@ -1173,17 +1173,24 @@ var DashCI;
                             cache: false,
                             transformResponse: countParser
                         },
-                        latest_pipeline: {
-                            method: 'GET',
-                            isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
-                            cache: false,
-                            headers: headers
-                        },
-                        recent_pipelines: {
+                        pipelines: {
                             method: 'GET',
                             isArray: true,
                             url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count",
+                            cache: false,
+                            headers: headers
+                        },
+                        branch_pipelines: {
+                            method: 'GET',
+                            isArray: true,
+                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count&scope=branches",
+                            cache: false,
+                            headers: headers
+                        },
+                        pipeline: {
+                            method: 'GET',
+                            isArray: false,
+                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines/:pipeline_id",
                             cache: false,
                             headers: headers
                         },
@@ -2486,45 +2493,55 @@ var DashCI;
                     if (!res)
                         return;
                     DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
-                    res.latest_pipeline({
+                    res.branch_pipelines({
                         project: this.data.project,
-                        ref: this.data.refs
+                        ref: this.data.refs,
+                        count: 100
                     }).$promise.then(function (pipelines) {
                         var new_pipeline = null;
                         var refList = _this.data.refs.split(",");
                         pipelines = pipelines.filter(function (i) { return refList.filter(function (r) { return DashCI.wildcardMatch(r, i.ref); }).length > 0; });
                         if (pipelines.length >= 1)
                             new_pipeline = pipelines[0];
-                        _this.latest = new_pipeline;
-                        if (_this.latest && _this.latest.status) {
-                            switch (_this.latest.status) {
-                                case "pending":
-                                    _this.icon = "pause_circle_filled";
-                                    break;
-                                case "running":
-                                    _this.icon = "play_circle_filled";
-                                    break;
-                                case "canceled":
-                                    _this.icon = "remove_circle";
-                                    break;
-                                case "success":
-                                    _this.icon = "check";
-                                    break;
-                                case "failed":
-                                    _this.icon = "cancel";
-                                    break;
-                                case "default":
-                                    _this.icon = "help";
-                                    break;
+                        res.pipeline({
+                            project: _this.data.project,
+                            pipeline_id: new_pipeline.id
+                        }).$promise.then(function (pipeline) {
+                            _this.latest = pipeline;
+                            if (_this.latest && _this.latest.status) {
+                                switch (_this.latest.status) {
+                                    case "pending":
+                                        _this.icon = "pause_circle_filled";
+                                        break;
+                                    case "running":
+                                        _this.icon = "play_circle_filled";
+                                        break;
+                                    case "canceled":
+                                        _this.icon = "remove_circle";
+                                        break;
+                                    case "success":
+                                        _this.icon = "check";
+                                        break;
+                                    case "failed":
+                                        _this.icon = "cancel";
+                                        break;
+                                    case "default":
+                                        _this.icon = "help";
+                                        break;
+                                }
                             }
-                        }
-                        else
-                            _this.icon = "help";
-                        //var p = this.$scope.$element.find("p");
-                        //p.addClass('changed');
-                        //this.$timeout(() => p.removeClass('changed'), 1000);
-                        _this.resizeWidget();
-                        DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                            else
+                                _this.icon = "help";
+                            //var p = this.$scope.$element.find("p");
+                            //p.addClass('changed');
+                            //this.$timeout(() => p.removeClass('changed'), 1000);
+                            _this.resizeWidget();
+                            DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        }).catch(function (reason) {
+                            _this.latest = null;
+                            console.error(reason);
+                            _this.resizeWidget();
+                        });
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
@@ -2711,31 +2728,43 @@ var DashCI;
                     if (!res)
                         return;
                     DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
-                    res.recent_pipelines({
+                    res.pipelines({
                         project: this.data.project,
                         ref: this.data.ref,
                         count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
                     }).$promise.then(function (pipelines) {
                         pipelines = pipelines.filter(function (item) { return DashCI.wildcardMatch(_this.data.ref, item.ref); }).slice(0, _this.data.count).reverse();
-                        var maxDuration = 1;
-                        angular.forEach(pipelines, function (item) {
-                            if (maxDuration < item.duration)
-                                maxDuration = item.duration;
+                        var promises = [];
+                        pipelines.forEach(function (pipeline) {
+                            promises.push(res.pipeline({
+                                project: _this.data.project,
+                                pipeline_id: pipeline.id,
+                            }).$promise);
                         });
-                        var width = (100 / pipelines.length);
-                        angular.forEach(pipelines, function (item, i) {
-                            var height = Math.round((100 * item.duration) / maxDuration);
-                            if (height < 1)
-                                height = 1;
-                            item.css = {
-                                height: height.toString() + "%",
-                                width: width.toFixed(2) + "%",
-                                left: (width * i).toFixed(2) + "%"
-                            };
+                        _this.$q.all(promises).then(function (pipelines) {
+                            var maxDuration = 1;
+                            angular.forEach(pipelines, function (item) {
+                                if (maxDuration < item.duration)
+                                    maxDuration = item.duration;
+                            });
+                            var width = (100 / pipelines.length);
+                            angular.forEach(pipelines, function (item, i) {
+                                var height = Math.round((100 * item.duration) / maxDuration);
+                                if (height < 1)
+                                    height = 1;
+                                item.css = {
+                                    height: height.toString() + "%",
+                                    width: width.toFixed(2) + "%",
+                                    left: (width * i).toFixed(2) + "%"
+                                };
+                            });
+                            _this.pipelines = pipelines;
+                            _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                            DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        }).catch(function (reason) {
+                            _this.pipelines = null;
+                            console.error(reason);
                         });
-                        _this.pipelines = pipelines;
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
-                        DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     }).catch(function (reason) {
                         _this.pipelines = null;
                         console.error(reason);
