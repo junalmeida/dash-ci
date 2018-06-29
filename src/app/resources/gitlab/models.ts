@@ -20,6 +20,12 @@
         count: number;
     }
 
+    export interface IPipelines extends IGitlabObject {
+        id: number;
+        status: string;
+        ref: string;
+    }
+
     export interface IPipeline extends IGitlabObject {
         id: number;
         status: string;
