@@ -263,7 +263,7 @@ namespace DashCI.Core {
 
         public goFullScreen() {
             var el = document.documentElement;
-            var rfs = <() => void>(el.webkitRequestFullScreen || (<any>el).requestFullScreen || (<any>el).mozRequestFullScreen);
+            var rfs = <() => void>(el.webkitRequestFullScreen || el.requestFullScreen || el.mozRequestFullScreen);
             rfs.call(el);
         }
 
