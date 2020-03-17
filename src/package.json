@@ -15,7 +15,8 @@
     "angular-widget-grid": "0.3.0",
     "jquery": "3.4.0",
     "moment": "2.21.0",
-    "multiplexjs": "1.0.0"
+    "multiplexjs": "1.0.0",
+    "minimist": "1.2.2"
   },
   "scripts": {
     "start": "http-server -a 127.0.0.1 -p 8080",
@@ -30,6 +31,6 @@
     "typescript": "~3.7.2"
   },
   "resolutions": {
-    "minimist": "1.2.0"
+    "minimist": "1.2.2"
   }
 }
