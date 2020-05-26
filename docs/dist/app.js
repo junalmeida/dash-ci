@@ -2702,7 +2702,7 @@ var DashCI;
                     this.data.title = this.data.title || "Pipeline";
                     this.data.color = this.data.color || "green";
                     //default values
-                    this.data.refs = this.data.refs || "master";
+                    this.data.refs = this.data.refs || "";
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
                 };
