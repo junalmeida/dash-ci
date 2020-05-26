@@ -50,8 +50,8 @@
         private handle: ng.IPromise<any>;
         private finalize() {
             if (this.handle) {
-                this.$timeout.cancel(this.handle);
-                this.$interval.cancel(this.handle);
+                try { this.$timeout.cancel(this.handle); } catch { }
+                try { this.$interval.cancel(this.handle); } catch { }
             }
             DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
         }
@@ -101,8 +101,8 @@
         public colorClass: string;
         private updateInterval() {
             if (this.handle) {
-                this.$timeout.cancel(this.handle);
-                this.$interval.cancel(this.handle);
+                try { this.$timeout.cancel(this.handle); } catch { }
+                try { this.$interval.cancel(this.handle); } catch { }
             }
             this.handle = this.$timeout(() => {
                 this.handle = this.$interval(() => this.update(), this.data.poolInterval);

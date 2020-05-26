@@ -7,10 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tfs-onpremise-ntlm", "tfs-o
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{299F3D07-96D5-4450-A0B4-9D179289C096}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		pack.ps1 = pack.ps1
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dash-ci", "src\dash-ci.csproj", "{3B2A4FB1-B27A-4FC4-AF5D-26C6DFB1CD43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dash-ci", "src\dash-ci.csproj", "{3B2A4FB1-B27A-4FC4-AF5D-26C6DFB1CD43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
