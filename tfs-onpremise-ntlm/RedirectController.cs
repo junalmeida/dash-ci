@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -30,12 +29,12 @@ namespace TfsOnPremiseNtlm
 
             var handler = new HttpClientHandler();
 
-            var username = ConfigurationManager.AppSettings["username"];
+            var username = Program.Configuration["UserName"];
             handler.UseDefaultCredentials = string.IsNullOrWhiteSpace(username);
             if (!handler.UseDefaultCredentials)
             {
-                var password = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(ConfigurationManager.AppSettings["password"]));
-                var domain = ConfigurationManager.AppSettings["domain"];
+                var password = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(Program.Configuration["Password"]));
+                var domain = Program.Configuration["Domain"];
 
                 var credential = new NetworkCredential(username, password, domain);
                 var myCache = new CredentialCache();

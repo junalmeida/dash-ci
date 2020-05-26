@@ -1,19 +1,20 @@
-﻿using System;
-using System.Configuration;
-using System.Net;
-using System.Web.Http;
-using System.Windows.Forms;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Owin.FileSystems;
 using Microsoft.Owin.Hosting;
 using Microsoft.Owin.StaticFiles;
 using Owin;
+using System;
+using System.IO;
+using System.Net;
+using System.Web.Http;
+using System.Windows.Forms;
 
 namespace TfsOnPremiseNtlm
 {
     static class Program
     {
         public const string Title = "Dash-CI";
-        public static IDisposable server;
+        public static IDisposable Server { get; private set; }
 
         //static int Port => Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
 
@@ -23,8 +24,16 @@ namespace TfsOnPremiseNtlm
         [STAThread]
         static void Main()
         {
+            var environment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true);
+            Configuration = builder.Build();
+
+
             StartSelfHost();
-            if (server != null)
+            if (Server != null)
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(true);
@@ -40,7 +49,7 @@ namespace TfsOnPremiseNtlm
             var baseUrl = BaseUrl.Replace("//localhost", "//+:80");
             try
             {
-                server = WebApp.Start(baseUrl, (app) =>
+                Server = WebApp.Start(baseUrl, (app) =>
                 {
                     var listener = (HttpListener)app.Properties["System.Net.HttpListener"];
                     listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
@@ -67,7 +76,7 @@ namespace TfsOnPremiseNtlm
                     Console.Error.WriteLine(ex.ToString());
                 }
                 MessageBox.Show(msg, Title, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
-                server = null;
+                Server = null;
             }
         }
 
@@ -92,9 +101,10 @@ namespace TfsOnPremiseNtlm
             DefaultFilesOptions = { DefaultFileNames = { "index.html" } },
             EnableDefaultFiles = true,
             EnableDirectoryBrowsing = false,
-            FileSystem = new PhysicalFileSystem(ConfigurationManager.AppSettings["static-files"])
+            FileSystem = new PhysicalFileSystem(Configuration["StaticFiles"])
         };
 
+        public static IConfiguration Configuration { get; private set; }
 
         public static bool IsRunningOnMono()
         {
