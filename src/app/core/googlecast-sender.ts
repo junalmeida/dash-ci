@@ -28,11 +28,13 @@
          */
         private initializeCastApi() {
             GoogleCastSender.Cast = (<any>window).chrome.cast;
-            var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
-            var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest,
-                (e: any) => this.sessionListener(e),
-                (e: any) => this.receiverListener(e));
-            GoogleCastSender.Cast.initialize(apiConfig, () => this.onInitSuccess(), (m: string) => this.onError(m));
+            if (GoogleCastSender.Cast) {
+                var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
+                var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest,
+                    (e: any) => this.sessionListener(e),
+                    (e: any) => this.receiverListener(e));
+                GoogleCastSender.Cast.initialize(apiConfig, () => this.onInitSuccess(), (m: string) => this.onError(m));
+            }
         }
         /**
          * initialization success callback

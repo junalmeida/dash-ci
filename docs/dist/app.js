@@ -51,6 +51,7 @@ var DashCI;
     }
     DashCI.randomNess = randomNess;
     DashCI.DEBUG = false;
+    angular.uppercase = angular.uppercase || (function (str) { return str && str.toUpperCase(); });
     var EnumEx = /** @class */ (function () {
         function EnumEx() {
         }
@@ -285,9 +286,11 @@ var DashCI;
         GoogleCastSender.prototype.initializeCastApi = function () {
             var _this = this;
             GoogleCastSender.Cast = window.chrome.cast;
-            var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
-            var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest, function (e) { return _this.sessionListener(e); }, function (e) { return _this.receiverListener(e); });
-            GoogleCastSender.Cast.initialize(apiConfig, function () { return _this.onInitSuccess(); }, function (m) { return _this.onError(m); });
+            if (GoogleCastSender.Cast) {
+                var sessionRequest = new GoogleCastSender.Cast.SessionRequest(this.applicationID);
+                var apiConfig = new GoogleCastSender.Cast.ApiConfig(sessionRequest, function (e) { return _this.sessionListener(e); }, function (e) { return _this.receiverListener(e); });
+                GoogleCastSender.Cast.initialize(apiConfig, function () { return _this.onInitSuccess(); }, function (m) { return _this.onError(m); });
+            }
         };
         /**
          * initialization success callback
@@ -395,7 +398,7 @@ var DashCI;
     var Core;
     (function (Core) {
         var MainController = /** @class */ (function () {
-            function MainController($scope, $timeout, $q, $mdDialog, options, $rootscope) {
+            function MainController($scope, $timeout, $q, $mdDialog, options, $rootscope, defOptions) {
                 var _this = this;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
@@ -403,6 +406,7 @@ var DashCI;
                 this.$mdDialog = $mdDialog;
                 this.options = options;
                 this.$rootscope = $rootscope;
+                this.defOptions = defOptions;
                 this.cycleInterval = null;
                 this.gridWidth = 800;
                 this.gridHeight = 600;
@@ -431,28 +435,13 @@ var DashCI;
                         }
                     }, 500);
                 };
-                this.defOptions = {
-                    columns: 30,
-                    cycle: undefined,
-                    rows: 20,
-                    tfs: null,
-                    gitlab: null,
-                    github: [],
-                    circleci: [],
-                    custom: [],
-                    pages: [{
-                            id: "1",
-                            name: "Dash-CI",
-                            widgets: []
-                        }]
-                };
                 this.isGoogleCast = false;
                 this.castStatus = 'cast';
                 this.canCast = false;
                 this.castSender = null;
                 this.castReceiver = null;
                 this.userAgent = null;
-                this.loadData();
+                this.loadData(defOptions);
                 window.onresize = this.updateGridSize;
                 this.$scope.$on('wg-grid-full', function () {
                     _this.additionPossible = false;
@@ -565,8 +554,7 @@ var DashCI;
             MainController.prototype.saveData = function () {
                 window.localStorage['dash-ci-options'] = angular.toJson(this.options);
             };
-            MainController.prototype.loadData = function () {
-                var defOptions = { "columns": 30, "rows": 25, "tfs": null, "gitlab": { "host": "https://gitlab.com", "privateToken": "xcijrZB97fv9xQnCNsJc" }, "github": [], "circleci": [], "custom": [], "pages": [{ "id": "1", "name": "GitLab", "widgets": [{ "type": 5, "position": { "left": 1, "top": 1, "width": 30, "height": 2 }, "id": "3a49", "footer": false, "header": false, "title": "Dashboard Example", "color": "transparent", "align": "center" }, { "type": 7, "position": { "left": 12, "top": 15, "width": 12, "height": 6 }, "id": "da4f", "footer": false, "header": true, "title": "All History", "color": "transparent", "ref": "*", "poolInterval": 30000, "count": 20, "project": 13083 }, { "type": 2, "position": { "left": 1, "top": 3, "width": 11, "height": 6 }, "id": "daa2", "footer": false, "header": false, "title": "Master", "color": "deep-green", "refs": "master", "poolInterval": 10000, "project": 13083 }, { "type": 2, "position": { "left": 1, "top": 9, "width": 11, "height": 6 }, "id": "97d0", "footer": false, "header": false, "title": "Docs", "color": "deep-green", "refs": "docs/*", "poolInterval": 10000, "project": 13083 }, { "type": 3, "position": { "left": 24, "top": 3, "width": 7, "height": 6 }, "id": "a7af", "footer": false, "header": true, "title": "Front End Bugs", "color": "grey", "labels": "frontend,bug", "status": "opened", "poolInterval": 10000, "query_type": "projects", "project": 13083, "greaterThan": { "value": 0, "color": "red" }, "lowerThan": { "value": 1, "color": "green" } }, { "type": 3, "position": { "left": 24, "top": 9, "width": 7, "height": 6 }, "id": "0bda", "footer": false, "header": true, "title": "Back End Bugs", "color": "grey", "labels": "bug,backend", "status": "opened", "poolInterval": 30000, "query_type": "projects", "project": 13083, "greaterThan": { "value": 0, "color": "turkoise" }, "lowerThan": { "value": 1, "color": "green" } }, { "type": 1, "position": { "left": 24, "top": 15, "width": 7, "height": 11 }, "id": "f815", "footer": false, "header": true, "title": "Clock", "color": "green" }, { "type": 5, "position": { "left": 1, "top": 22, "width": 22, "height": 2 }, "id": "353c", "footer": false, "header": false, "title": "This is an example of board using GitLab data", "color": "transparent", "align": "left" }, { "type": 5, "position": { "left": 1, "top": 24, "width": 23, "height": 2 }, "id": "d87e", "footer": false, "header": false, "title": "Use the top toolbar to configure service tokens", "color": "transparent", "align": "left" }, { "type": 7, "position": { "left": 12, "top": 9, "width": 12, "height": 6 }, "id": "4e5e", "footer": false, "header": true, "title": "Docs History", "color": "transparent", "ref": "docs/*", "poolInterval": 30000, "count": 20, "project": 13083 }, { "type": 7, "position": { "left": 12, "top": 3, "width": 12, "height": 6 }, "id": "b713", "footer": false, "header": true, "title": "Master History", "color": "transparent", "ref": "master", "poolInterval": 30000, "count": 20, "project": 13083 }, { "type": 2, "position": { "left": 1, "top": 15, "width": 11, "height": 6 }, "id": "5786", "footer": false, "header": false, "title": "All", "color": "purple", "refs": "*", "poolInterval": 10000, "project": 13083 }] }] };
+            MainController.prototype.loadData = function (defOptions) {
                 var savedOpts = (angular.fromJson(window.localStorage['dash-ci-options']) || defOptions);
                 angular.extend(this.options, defOptions, savedOpts);
                 angular.forEach(savedOpts.pages, function (item) {
@@ -622,7 +610,7 @@ var DashCI;
                 return window.fullScreen ||
                     (window.innerWidth == screen.width && window.innerHeight == screen.height);
             };
-            MainController.$inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions", "$rootScope"];
+            MainController.$inject = ["$scope", "$timeout", "$q", "$mdDialog", "globalOptions", "$rootScope", "defaultBoards"];
             return MainController;
         }());
         DashCI.app.controller("MainController", MainController);
@@ -763,6 +751,244 @@ var DashCI;
                 desc: "Right"
             },
         ]);
+        DashCI.app.constant("defaultBoards", {
+            "columns": 30,
+            "rows": 25,
+            "tfs": null,
+            "gitlab": {
+                "host": "https://gitlab.com",
+                "privateToken": "xcijrZB97fv9xQnCNsJc"
+            },
+            "github": [],
+            "circleci": [],
+            "custom": [],
+            "pages": [
+                {
+                    "id": "1",
+                    "name": "GitLab",
+                    "widgets": [
+                        {
+                            "type": 5,
+                            "position": {
+                                "left": 1,
+                                "top": 1,
+                                "width": 30,
+                                "height": 2
+                            },
+                            "id": "6279",
+                            "footer": false,
+                            "header": false,
+                            "title": "Dashboard Example",
+                            "color": "transparent",
+                            "align": "center"
+                        },
+                        {
+                            "type": 7,
+                            "position": {
+                                "left": 12,
+                                "top": 15,
+                                "width": 12,
+                                "height": 6
+                            },
+                            "id": "9834",
+                            "footer": false,
+                            "header": true,
+                            "title": "All History",
+                            "color": "transparent",
+                            "ref": "",
+                            "poolInterval": 30000,
+                            "count": 20,
+                            "project": 278964
+                        },
+                        {
+                            "type": 2,
+                            "position": {
+                                "left": 1,
+                                "top": 3,
+                                "width": 11,
+                                "height": 6
+                            },
+                            "id": "8e74",
+                            "footer": false,
+                            "header": false,
+                            "title": "Master",
+                            "color": "deep-green",
+                            "refs": "master",
+                            "poolInterval": 10000,
+                            "project": 278964
+                        },
+                        {
+                            "type": 2,
+                            "position": {
+                                "left": 1,
+                                "top": 9,
+                                "width": 11,
+                                "height": 6
+                            },
+                            "id": "d83a",
+                            "footer": false,
+                            "header": false,
+                            "title": "Use Templates Branch",
+                            "color": "deep-green",
+                            "refs": "use-templates",
+                            "poolInterval": 10000,
+                            "project": 278964
+                        },
+                        {
+                            "type": 3,
+                            "position": {
+                                "left": 24,
+                                "top": 3,
+                                "width": 7,
+                                "height": 6
+                            },
+                            "id": "63c8",
+                            "footer": false,
+                            "header": true,
+                            "title": "Front End Bugs",
+                            "color": "grey",
+                            "labels": "frontend,bug",
+                            "status": "opened",
+                            "poolInterval": 10000,
+                            "query_type": "projects",
+                            "project": 278964,
+                            "greaterThan": {
+                                "value": 0,
+                                "color": "red"
+                            },
+                            "lowerThan": {
+                                "value": 1,
+                                "color": "green"
+                            }
+                        },
+                        {
+                            "type": 3,
+                            "position": {
+                                "left": 24,
+                                "top": 9,
+                                "width": 7,
+                                "height": 6
+                            },
+                            "id": "39d2",
+                            "footer": false,
+                            "header": true,
+                            "title": "Back End Bugs",
+                            "color": "grey",
+                            "labels": "bug,backend",
+                            "status": "opened",
+                            "poolInterval": 30000,
+                            "query_type": "projects",
+                            "project": 278964,
+                            "greaterThan": {
+                                "value": 0,
+                                "color": "turkoise"
+                            },
+                            "lowerThan": {
+                                "value": 1,
+                                "color": "green"
+                            }
+                        },
+                        {
+                            "type": 1,
+                            "position": {
+                                "left": 24,
+                                "top": 15,
+                                "width": 7,
+                                "height": 11
+                            },
+                            "id": "7e73",
+                            "footer": false,
+                            "header": true,
+                            "title": "Clock",
+                            "color": "green"
+                        },
+                        {
+                            "type": 5,
+                            "position": {
+                                "left": 1,
+                                "top": 22,
+                                "width": 22,
+                                "height": 2
+                            },
+                            "id": "9665",
+                            "footer": false,
+                            "header": false,
+                            "title": "This is an example of board using GitLab data",
+                            "color": "transparent",
+                            "align": "left"
+                        },
+                        {
+                            "type": 5,
+                            "position": {
+                                "left": 1,
+                                "top": 24,
+                                "width": 23,
+                                "height": 2
+                            },
+                            "id": "b1ee",
+                            "footer": false,
+                            "header": false,
+                            "title": "Use the top toolbar to configure service tokens",
+                            "color": "transparent",
+                            "align": "left"
+                        },
+                        {
+                            "type": 7,
+                            "position": {
+                                "left": 12,
+                                "top": 9,
+                                "width": 12,
+                                "height": 6
+                            },
+                            "id": "6afd",
+                            "footer": false,
+                            "header": true,
+                            "title": "Use Templates History",
+                            "color": "transparent",
+                            "ref": "use-templates",
+                            "poolInterval": 30000,
+                            "count": 20,
+                            "project": 278964
+                        },
+                        {
+                            "type": 7,
+                            "position": {
+                                "left": 12,
+                                "top": 3,
+                                "width": 12,
+                                "height": 6
+                            },
+                            "id": "74ee",
+                            "footer": false,
+                            "header": true,
+                            "title": "Master History",
+                            "color": "transparent",
+                            "ref": "master",
+                            "poolInterval": 30000,
+                            "count": 20,
+                            "project": 278964
+                        },
+                        {
+                            "type": 2,
+                            "position": {
+                                "left": 1,
+                                "top": 15,
+                                "width": 11,
+                                "height": 6
+                            },
+                            "id": "49ee",
+                            "footer": false,
+                            "header": false,
+                            "title": "All",
+                            "color": "purple",
+                            "refs": "",
+                            "poolInterval": 10000,
+                            "project": 278964
+                        }
+                    ]
+                }
+            ]
+        });
     })(Models = DashCI.Models || (DashCI.Models = {}));
 })(DashCI || (DashCI = {}));
 /// <reference path="../app.ts" />
@@ -926,44 +1152,6 @@ var DashCI;
             },
         ]);
     })(Models = DashCI.Models || (DashCI.Models = {}));
-})(DashCI || (DashCI = {}));
-/// <reference path="../models/widgets.ts" />
-var DashCI;
-(function (DashCI) {
-    var Widgets;
-    (function (Widgets) {
-        var LoaderDirective = /** @class */ (function () {
-            function LoaderDirective($compile, widgets) {
-                var _this = this;
-                this.$compile = $compile;
-                this.widgets = widgets;
-                this.scope = { scope: '=', editable: '=', globalOptions: '=' };
-                this.restrict = "E";
-                this.replace = true;
-                this.link = function ($scope, $element, attrs, ctrl) {
-                    var widgetParam = $scope.scope;
-                    var wscope = $scope.$new();
-                    angular.extend(wscope, {
-                        data: widgetParam
-                    });
-                    var wdesc = _this.widgets.filter(function (item) { return item.type == wscope.data.type; })[0];
-                    var el = _this.$compile("<" + (wdesc.directive || DashCI.Models.WidgetType[wdesc.type]) + ' class="widget {{data.color}}" />')(wscope);
-                    wscope.$element = el;
-                    $element.replaceWith(el);
-                    $scope.$watch(function () { return $scope.editable; }, function () { return wscope.editable = $scope.editable; });
-                    $scope.$watch(function () { return $scope.globalOptions; }, function () { return wscope.globalOptions = $scope.globalOptions; });
-                };
-            }
-            LoaderDirective.create = function () {
-                var directive = function ($compile, widgets) { return new LoaderDirective($compile, widgets); };
-                directive.$inject = ["$compile", "widgets"];
-                return directive;
-            };
-            return LoaderDirective;
-        }());
-        Widgets.LoaderDirective = LoaderDirective;
-        DashCI.app.directive("widgetLoader", LoaderDirective.create());
-    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 var DashCI;
 (function (DashCI) {
@@ -1190,7 +1378,7 @@ var DashCI;
                         project_list: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v4/projects?order_by=last_activity_at&sort=desc&per_page=100",
+                            url: globalOptions.gitlab.host + "/api/v4/projects?order_by=last_activity_at&sort=desc&per_page=300",
                             headers: headers,
                             transformResponse: transform,
                             cache: true
@@ -1198,7 +1386,7 @@ var DashCI;
                         group_list: {
                             method: 'GET',
                             isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v4/groups?all_available=true&order_by=name&sort=asc&per_page=100",
+                            url: globalOptions.gitlab.host + "/api/v4/groups?all_available=true&order_by=name&sort=asc&per_page=300",
                             headers: headers,
                             transformResponse: transform,
                             cache: true
@@ -1211,17 +1399,24 @@ var DashCI;
                             cache: false,
                             transformResponse: countParser
                         },
-                        latest_pipeline: {
-                            method: 'GET',
-                            isArray: true,
-                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?scope=branches&ref=:ref&per_page=100",
-                            cache: false,
-                            headers: headers
-                        },
-                        recent_pipelines: {
+                        pipelines: {
                             method: 'GET',
                             isArray: true,
                             url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count",
+                            cache: false,
+                            headers: headers
+                        },
+                        branch_pipelines: {
+                            method: 'GET',
+                            isArray: true,
+                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines?ref=:ref&per_page=:count&scope=branches",
+                            cache: false,
+                            headers: headers
+                        },
+                        pipeline: {
+                            method: 'GET',
+                            isArray: false,
+                            url: globalOptions.gitlab.host + "/api/v4/projects/:project/pipelines/:pipeline_id",
                             cache: false,
                             headers: headers
                         },
@@ -1387,6 +1582,44 @@ var DashCI;
                 }; }]);
         })(Tfs = Resources.Tfs || (Resources.Tfs = {}));
     })(Resources = DashCI.Resources || (DashCI.Resources = {}));
+})(DashCI || (DashCI = {}));
+/// <reference path="../models/widgets.ts" />
+var DashCI;
+(function (DashCI) {
+    var Widgets;
+    (function (Widgets) {
+        var LoaderDirective = /** @class */ (function () {
+            function LoaderDirective($compile, widgets) {
+                var _this = this;
+                this.$compile = $compile;
+                this.widgets = widgets;
+                this.scope = { scope: '=', editable: '=', globalOptions: '=' };
+                this.restrict = "E";
+                this.replace = true;
+                this.link = function ($scope, $element, attrs, ctrl) {
+                    var widgetParam = $scope.scope;
+                    var wscope = $scope.$new();
+                    angular.extend(wscope, {
+                        data: widgetParam
+                    });
+                    var wdesc = _this.widgets.filter(function (item) { return item.type == wscope.data.type; })[0];
+                    var el = _this.$compile("<" + (wdesc.directive || DashCI.Models.WidgetType[wdesc.type]) + ' class="widget {{data.color}}" />')(wscope);
+                    wscope.$element = el;
+                    $element.replaceWith(el);
+                    $scope.$watch(function () { return $scope.editable; }, function () { return wscope.editable = $scope.editable; });
+                    $scope.$watch(function () { return $scope.globalOptions; }, function () { return wscope.globalOptions = $scope.globalOptions; });
+                };
+            }
+            LoaderDirective.create = function () {
+                var directive = function ($compile, widgets) { return new LoaderDirective($compile, widgets); };
+                directive.$inject = ["$compile", "widgets"];
+                return directive;
+            };
+            return LoaderDirective;
+        }());
+        Widgets.LoaderDirective = LoaderDirective;
+        DashCI.app.directive("widgetLoader", LoaderDirective.create());
+    })(Widgets = DashCI.Widgets || (DashCI.Widgets = {}));
 })(DashCI || (DashCI = {}));
 var DashCI;
 (function (DashCI) {
@@ -1558,8 +1791,14 @@ var DashCI;
                 CustomCountController.prototype.$onInit = function () { };
                 CustomCountController.prototype.finalize = function () {
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
@@ -1601,8 +1840,14 @@ var DashCI;
                 CustomCountController.prototype.updateInterval = function () {
                     var _this = this;
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
@@ -1754,8 +1999,14 @@ var DashCI;
                 CustomPostItController.prototype.$onInit = function () { };
                 CustomPostItController.prototype.finalize = function () {
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
@@ -1798,8 +2049,14 @@ var DashCI;
                 CustomPostItController.prototype.updateInterval = function () {
                     var _this = this;
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
@@ -1995,8 +2252,14 @@ var DashCI;
                 GithubIssuesController.prototype.$onInit = function () { };
                 GithubIssuesController.prototype.finalize = function () {
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
@@ -2206,8 +2469,14 @@ var DashCI;
                 GitlabIssuesController.prototype.$onInit = function () { };
                 GitlabIssuesController.prototype.finalize = function () {
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
@@ -2250,8 +2519,14 @@ var DashCI;
                 GitlabIssuesController.prototype.updateInterval = function () {
                     var _this = this;
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
@@ -2412,8 +2687,14 @@ var DashCI;
                 GitlabPipelineController.prototype.$onInit = function () { };
                 GitlabPipelineController.prototype.finalize = function () {
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
@@ -2421,7 +2702,7 @@ var DashCI;
                     this.data.title = this.data.title || "Pipeline";
                     this.data.color = this.data.color || "green";
                     //default values
-                    this.data.refs = this.data.refs || "master";
+                    this.data.refs = this.data.refs || "";
                     this.data.poolInterval = this.data.poolInterval || 10000;
                     this.updateInterval();
                 };
@@ -2471,8 +2752,14 @@ var DashCI;
                 GitlabPipelineController.prototype.updateInterval = function () {
                     var _this = this;
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
@@ -2487,45 +2774,57 @@ var DashCI;
                     if (!res)
                         return;
                     DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
-                    res.latest_pipeline({
+                    res.branch_pipelines({
                         project: this.data.project,
-                        ref: this.data.refs
+                        ref: this.data.refs,
+                        count: 100
                     }).$promise.then(function (pipelines) {
                         var new_pipeline = null;
                         var refList = _this.data.refs.split(",");
                         pipelines = pipelines.filter(function (i) { return refList.filter(function (r) { return DashCI.wildcardMatch(r, i.ref); }).length > 0; });
                         if (pipelines.length >= 1)
                             new_pipeline = pipelines[0];
-                        _this.latest = new_pipeline;
-                        if (_this.latest && _this.latest.status) {
-                            switch (_this.latest.status) {
-                                case "pending":
-                                    _this.icon = "pause_circle_filled";
-                                    break;
-                                case "running":
-                                    _this.icon = "play_circle_filled";
-                                    break;
-                                case "canceled":
-                                    _this.icon = "remove_circle";
-                                    break;
-                                case "success":
-                                    _this.icon = "check";
-                                    break;
-                                case "failed":
-                                    _this.icon = "cancel";
-                                    break;
-                                case "default":
+                        if (new_pipeline && new_pipeline.id) {
+                            res.pipeline({
+                                project: _this.data.project,
+                                pipeline_id: new_pipeline.id
+                            }).$promise.then(function (pipeline) {
+                                _this.latest = pipeline;
+                                if (_this.latest && _this.latest.status) {
+                                    switch (_this.latest.status) {
+                                        case "pending":
+                                            _this.icon = "pause_circle_filled";
+                                            break;
+                                        case "running":
+                                            _this.icon = "play_circle_filled";
+                                            break;
+                                        case "canceled":
+                                            _this.icon = "remove_circle";
+                                            break;
+                                        case "success":
+                                            _this.icon = "check";
+                                            break;
+                                        case "failed":
+                                            _this.icon = "cancel";
+                                            break;
+                                        case "default":
+                                            _this.icon = "help";
+                                            break;
+                                    }
+                                }
+                                else
                                     _this.icon = "help";
-                                    break;
-                            }
+                                //var p = this.$scope.$element.find("p");
+                                //p.addClass('changed');
+                                //this.$timeout(() => p.removeClass('changed'), 1000);
+                                _this.resizeWidget();
+                                DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                            }).catch(function (reason) {
+                                _this.latest = null;
+                                console.error(reason);
+                                _this.resizeWidget();
+                            });
                         }
-                        else
-                            _this.icon = "help";
-                        //var p = this.$scope.$element.find("p");
-                        //p.addClass('changed');
-                        //this.$timeout(() => p.removeClass('changed'), 1000);
-                        _this.resizeWidget();
-                        DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     }).catch(function (reason) {
                         _this.latest = null;
                         console.error(reason);
@@ -2651,8 +2950,14 @@ var DashCI;
                 GitlabPipelineGraphController.prototype.$onInit = function () { };
                 GitlabPipelineGraphController.prototype.finalize = function () {
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     DashCI.DEBUG && console.log("dispose: " + this.data.id + "-" + this.data.title);
                 };
@@ -2696,8 +3001,14 @@ var DashCI;
                 GitlabPipelineGraphController.prototype.updateInterval = function () {
                     var _this = this;
                     if (this.handle) {
-                        this.$timeout.cancel(this.handle);
-                        this.$interval.cancel(this.handle);
+                        try {
+                            this.$timeout.cancel(this.handle);
+                        }
+                        catch (_a) { }
+                        try {
+                            this.$interval.cancel(this.handle);
+                        }
+                        catch (_b) { }
                     }
                     this.handle = this.$timeout(function () {
                         _this.handle = _this.$interval(function () { return _this.update(); }, _this.data.poolInterval);
@@ -2712,31 +3023,43 @@ var DashCI;
                     if (!res)
                         return;
                     DashCI.DEBUG && console.log("start gitlab request: " + this.data.id + "; " + this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
-                    res.recent_pipelines({
+                    res.pipelines({
                         project: this.data.project,
                         ref: this.data.ref,
                         count: 60 //since we don't have a filter by ref, lets take more and then filter crossing fingers
                     }).$promise.then(function (pipelines) {
                         pipelines = pipelines.filter(function (item) { return DashCI.wildcardMatch(_this.data.ref, item.ref); }).slice(0, _this.data.count).reverse();
-                        var maxDuration = 1;
-                        angular.forEach(pipelines, function (item) {
-                            if (maxDuration < item.duration)
-                                maxDuration = item.duration;
+                        var promises = [];
+                        pipelines.forEach(function (pipeline) {
+                            promises.push(res.pipeline({
+                                project: _this.data.project,
+                                pipeline_id: pipeline.id,
+                            }).$promise);
                         });
-                        var width = (100 / pipelines.length);
-                        angular.forEach(pipelines, function (item, i) {
-                            var height = Math.round((100 * item.duration) / maxDuration);
-                            if (height < 1)
-                                height = 1;
-                            item.css = {
-                                height: height.toString() + "%",
-                                width: width.toFixed(2) + "%",
-                                left: (width * i).toFixed(2) + "%"
-                            };
+                        _this.$q.all(promises).then(function (pipelines) {
+                            var maxDuration = 1;
+                            angular.forEach(pipelines, function (item) {
+                                if (maxDuration < item.duration)
+                                    maxDuration = item.duration;
+                            });
+                            var width = (100 / pipelines.length);
+                            angular.forEach(pipelines, function (item, i) {
+                                var height = Math.round((100 * item.duration) / maxDuration);
+                                if (height < 1)
+                                    height = 1;
+                                item.css = {
+                                    height: height.toString() + "%",
+                                    width: width.toFixed(2) + "%",
+                                    left: (width * i).toFixed(2) + "%"
+                                };
+                            });
+                            _this.pipelines = pipelines;
+                            _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
+                            DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
+                        }).catch(function (reason) {
+                            _this.pipelines = null;
+                            console.error(reason);
                         });
-                        _this.pipelines = pipelines;
-                        _this.$timeout(function () { return _this.sizeFont(_this.$scope.$element.height()); }, 500);
-                        DashCI.DEBUG && console.log("end gitlab request: " + _this.data.id + "; " + _this.data.title + "; " + new Date().toLocaleTimeString("en-us"));
                     }).catch(function (reason) {
                         _this.pipelines = null;
                         console.error(reason);

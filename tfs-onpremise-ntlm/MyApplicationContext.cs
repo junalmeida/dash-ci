@@ -59,14 +59,18 @@ namespace TfsOnPremiseNtlm
 
         private void TraySwf()
         {
+            var menu = new Swf.ContextMenuStrip();
+            menu.Items.AddRange(new Swf.ToolStripMenuItem[] {
+                    new Swf.ToolStripMenuItem("Open", null, Open),
+                    new Swf.ToolStripMenuItem("Exit", null, Exit)
+                });
+
+
             trayIconSwf = new Swf.NotifyIcon()
             {
                 Icon = Resources.PerfCenterCpl,
                 Text = Program.Title,
-                ContextMenu = new Swf.ContextMenu(new Swf.MenuItem[] {
-                    new Swf.MenuItem("Open", Open) { DefaultItem = true },
-                    new Swf.MenuItem("Exit", Exit)
-                }),
+                ContextMenuStrip = menu,
                 Visible = true
             };
             trayIconSwf.DoubleClick += Open;
@@ -83,8 +87,9 @@ namespace TfsOnPremiseNtlm
             //if (trayIcon != null)
             //    trayIcon.Visible = false;
 
-            if (Program.server != null)
-                Program.server.Dispose();
+            if (Program.Server != null)
+                Program.Server.Dispose();
+            this.ExitThread();
             Swf.Application.Exit();
         }
 

@@ -50,11 +50,12 @@
         return regEx.test(source);
     }
 
-    export function randomNess():number {
+    export function randomNess(): number {
         return (Math.floor(Math.random() * 10) + 1) * 1000;
     }
 
     export var DEBUG = false;
+    angular.uppercase = angular.uppercase || ((str: string) => str && str.toUpperCase());
 
     export class EnumEx {
         static getNamesAndValues<T extends number>(e: any) {
