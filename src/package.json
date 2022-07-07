@@ -16,7 +16,7 @@
     "jquery": "3.5.0",
     "moment": "2.29.4",
     "multiplexjs": "1.0.0",
-    "minimist": "1.2.3"
+    "minimist": "1.2.6"
   },
   "scripts": {
     "start": "http-server -a 127.0.0.1 -p 8080",
@@ -31,6 +31,6 @@
     "typescript": "~3.7.2"
   },
   "resolutions": {
-    "minimist": "1.2.3"
+    "minimist": "1.2.6"
   }
 }
