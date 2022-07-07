@@ -14,7 +14,7 @@
     "angular-resource": "~1.7.9",
     "angular-widget-grid": "0.3.0",
     "jquery": "3.5.0",
-    "moment": "2.21.0",
+    "moment": "2.29.4",
     "multiplexjs": "1.0.0",
     "minimist": "1.2.3"
   },
